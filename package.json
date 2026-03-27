@@ -23,7 +23,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "jimp": "^1.6.0",
-    "link-preview-js": "^4.0.0",
+    "link-preview-js": "^3.0.0",
     "lucide-react": "0.475.0",
     "next": "16.2.1",
     "next-auth": "^4.24.13",
