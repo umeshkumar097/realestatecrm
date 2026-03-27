@@ -83,7 +83,7 @@ export default function LoginForm({ agency }: LoginFormProps) {
         <div className="space-y-1">
           <div className="flex justify-between">
             <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Password</label>
-            <a href="#" className="text-sm text-primary hover:underline">Forgot?</a>
+            <Link href="/forgot-password" className="text-sm text-primary hover:underline">Forgot?</Link>
           </div>
           <input
             type="password"
