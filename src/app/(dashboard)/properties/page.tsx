@@ -1,0 +1,138 @@
+"use client"
+import { useState, useEffect } from "react"
+import { 
+  Building2, Plus, Search, 
+  MapPin, IndianRupee, Bed, 
+  Bath, Square, ArrowUpRight,
+  Filter, Home, Loader2
+} from "lucide-react"
+
+export default function PropertiesPage() {
+  const [properties, setProperties] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [formData, setFormData] = useState({ title: "", price: "", location: "", type: "APARTMENT", beds: "", baths: "", area: "" })
+
+  const loadProperties = async () => {
+    try {
+      const res = await fetch("/api/properties")
+      if (res.ok) setProperties(await res.json())
+    } catch (e) {} finally { setLoading(false) }
+  }
+
+  useEffect(() => { loadProperties() }, [])
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    try {
+      const res = await fetch("/api/properties", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...formData, price: parseFloat(formData.price) }),
+      })
+      if (res.ok) {
+        setIsModalOpen(false)
+        loadProperties()
+      }
+    } catch (e) { alert("Failed to add property") }
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-black text-slate-800 tracking-tight text-premium">Property Inventory</h1>
+          <p className="text-slate-500 text-sm mt-0.5">Manage your agency's real estate listings.</p>
+        </div>
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-xl text-sm font-extrabold shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all"
+        >
+           <Plus className="h-4 w-4" /> List Property
+        </button>
+      </div>
+
+      <div className="flex items-center gap-3 p-1 bg-white border border-slate-200 rounded-2xl shadow-sm">
+         <div className="flex-1 flex items-center gap-4 px-4 py-2 text-slate-400">
+            <Search className="h-4 w-4" />
+            <input type="text" placeholder="Search by location, title or property type..." className="w-full bg-transparent border-none focus:ring-0 text-sm placeholder:text-slate-400 text-slate-800" />
+         </div>
+         <button className="flex items-center gap-2 px-4 py-2 border-l border-slate-100 text-sm font-bold text-slate-500 hover:text-primary transition-all">
+           <Filter className="h-4 w-4" /> Filter
+         </button>
+      </div>
+
+      {loading ? (
+        <div className="flex items-center justify-center h-64">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      ) : properties.length === 0 ? (
+        <div className="p-20 text-center bg-white border border-slate-100 rounded-3xl">
+           <Home className="h-12 w-12 mx-auto text-slate-200 mb-4" />
+           <p className="text-slate-500 font-bold">No properties listed yet.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {properties.map((p) => (
+            <div key={p.id} className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-xl transition-all group">
+              <div className="h-48 bg-slate-100 relative overflow-hidden flex items-center justify-center">
+                {p.images?.[0] ? (
+                  <img src={p.images[0]} alt={p.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                ) : (
+                  <Building2 className="h-12 w-12 text-slate-200" />
+                )}
+                <div className="absolute top-4 right-4 px-3 py-1 bg-white/90 backdrop-blur shadow-lg rounded-full text-[10px] font-black uppercase text-primary">FOR {p.status || 'SALE'}</div>
+              </div>
+              <div className="p-6 space-y-4">
+                <div>
+                  <h3 className="text-lg font-black text-slate-800 tracking-tight line-clamp-1">{p.title}</h3>
+                  <p className="text-xs text-slate-400 flex items-center gap-1 mt-1"><MapPin className="h-3 w-3" /> {p.location || p.address}</p>
+                </div>
+                <div className="flex items-center justify-between py-4 border-y border-slate-50">
+                  <div className="flex items-center gap-1.5 text-slate-500 font-bold text-xs"><Bed className="h-3.5 w-3.5" /> {p.beds || 0}</div>
+                  <div className="flex items-center gap-1.5 text-slate-500 font-bold text-xs"><Bath className="h-3.5 w-3.5" /> {p.baths || 0}</div>
+                  <div className="flex items-center gap-1.5 text-slate-500 font-bold text-xs"><Square className="h-3.5 w-3.5" /> {p.area || 0} sqft</div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <p className="text-xl font-black text-slate-900">₹{p.price.toLocaleString('en-IN')}</p>
+                  <button className="p-2 bg-slate-50 hover:bg-primary hover:text-white rounded-xl transition-all"><ArrowUpRight className="h-4 w-4" /></button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl">
+            <h2 className="text-xl font-black text-slate-900 mb-6 font-primary">Add New Listing</h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <input type="text" placeholder="Listing Title" required className="w-full px-4 py-3 rounded-xl border border-slate-200" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} />
+              <div className="grid grid-cols-2 gap-4">
+                <input type="number" placeholder="Price (INR)" required className="w-full px-4 py-3 rounded-xl border border-slate-200" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} />
+                <select className="w-full px-4 py-3 rounded-xl border border-slate-200" value={formData.type} onChange={e => setFormData({...formData, type: e.target.value})}>
+                  <option value="APARTMENT">Apartment</option>
+                  <option value="HOUSE">House</option>
+                  <option value="LAND">Land</option>
+                  <option value="COMMERCIAL">Commercial</option>
+                </select>
+              </div>
+              <input type="text" placeholder="Location" required className="w-full px-4 py-3 rounded-xl border border-slate-200" value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} />
+              <div className="grid grid-cols-3 gap-4">
+                <input type="number" placeholder="Beds" className="w-full px-4 py-3 rounded-xl border border-slate-200" value={formData.beds} onChange={e => setFormData({...formData, beds: e.target.value})} />
+                <input type="number" step="0.5" placeholder="Baths" className="w-full px-4 py-3 rounded-xl border border-slate-200" value={formData.baths} onChange={e => setFormData({...formData, baths: e.target.value})} />
+                <input type="number" placeholder="Area (sqft)" className="w-full px-4 py-3 rounded-xl border border-slate-200" value={formData.area} onChange={e => setFormData({...formData, area: e.target.value})} />
+              </div>
+              <div className="flex gap-3 pt-4">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 border border-slate-200 rounded-xl font-bold text-slate-500">Cancel</button>
+                <button type="submit" className="flex-2 px-8 py-3 bg-primary text-white rounded-xl font-extrabold shadow-lg">Save Property</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}

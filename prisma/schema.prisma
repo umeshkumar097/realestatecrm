@@ -1,0 +1,257 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Agency {
+  id            String         @id @default(cuid())
+  name          String
+  domain        String?        @unique
+  customDomain  String?        @unique
+  logo          String?
+  users         User[]
+  leads         Lead[]
+  properties    Property[]
+  messages      Message[]
+  whatsappSessions WhatsAppSession[]
+  subscription  Subscription?
+  projects      Project[]
+  emis          EMI[]
+  tasks         Task[]
+  tickets       Ticket[]
+  activities    Activity[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+enum UserRole {
+  ADMIN
+  SUPER_ADMIN
+  AGENCY_OWNER
+  AGENT
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  password      String?
+  role          UserRole  @default(AGENT)
+  agencyId      String?
+  agency        Agency?    @relation(fields: [agencyId], references: [id])
+  leads         Lead[]    @relation("AssignedLeads")
+  tasks         Task[]
+  tickets       Ticket[]
+  activities    Activity[]
+  whatsappSession WhatsAppSession?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model WhatsAppSession {
+  id            String   @id @default(cuid())
+  agentId       String   @unique
+  agent         User     @relation(fields: [agentId], references: [id])
+  agencyId      String
+  agency        Agency   @relation(fields: [agencyId], references: [id])
+  sessionData   String   // JSON string of Baileys credentials
+  status        String   @default("DISCONNECTED") // CONNECTED, DISCONNECTED, CONNECTING
+  phoneNumber   String?
+  qrCode        String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+enum LeadStatus {
+  NEW
+  CONNECTED
+  NOT_CONNECTED
+  QUALIFIED
+  NOT_QUALIFIED
+  SITE_VISIT
+  CONVERTED
+  LOST
+}
+
+model Lead {
+  id            String     @id @default(cuid())
+  name          String?
+  phone         String
+  email         String?
+  source        String?    @default("WHATSAPP")
+  status        LeadStatus @default(NEW)
+  priority      Int        @default(1)
+  
+  // AI Extracted Data
+  budget        String?
+  location      String?
+  propertyType  String?
+  notes         String?
+
+  agencyId      String
+  agency        Agency     @relation(fields: [agencyId], references: [id])
+  assignedToId  String?
+  assignedTo    User?      @relation("AssignedLeads", fields: [assignedToId], references: [id])
+  messages      Message[]
+  emis          EMI[]
+  tickets       Ticket[]
+  activities    Activity[]
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  @@unique([phone, agencyId])
+}
+
+model Activity {
+  id            String    @id @default(cuid())
+  type          String    // CALL, MESSAGE, VISIT, NOTE
+  content       String
+  leadId        String
+  lead          Lead      @relation(fields: [leadId], references: [id])
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  agencyId      String
+  agency        Agency    @relation(fields: [agencyId], references: [id])
+  createdAt     DateTime  @default(now())
+}
+
+model Project {
+  id            String     @id @default(cuid())
+  name          String
+  description   String?
+  location      String
+  agencyId      String
+  agency        Agency     @relation(fields: [agencyId], references: [id])
+  properties    Property[]
+  emis          EMI[]
+  tickets       Ticket[]
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+model EMI {
+  id            String     @id @default(cuid())
+  leadId        String
+  lead          Lead       @relation(fields: [leadId], references: [id])
+  projectId     String
+  project       Project    @relation(fields: [projectId], references: [id])
+  plotNumber    String
+  plotRate      Float
+  totalPrice    Float
+  planDetails   String?
+  startDate     DateTime
+  expiryDate    DateTime
+  status        String     @default("ACTIVE") // ACTIVE, PAID, OVERDUE
+  
+  agencyId      String
+  agency        Agency     @relation(fields: [agencyId], references: [id])
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+model Task {
+  id            String     @id @default(cuid())
+  title         String
+  description   String?
+  status        String     @default("TODAY") // TODAY, PENDING, COMPLETE
+  dueDate       DateTime?
+  
+  assignedToId  String
+  assignedTo    User       @relation(fields: [assignedToId], references: [id])
+  agencyId      String
+  agency        Agency     @relation(fields: [agencyId], references: [id])
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+model Ticket {
+  id            String     @id @default(cuid())
+  subject       String
+  description   String?
+  type          String     @default("SUPPORT") // EMI, PAYMENT, SUPPORT, OTHER
+  status        String     @default("OPEN") // OPEN, CLOSED, IN_PROGRESS
+  
+  leadId        String
+  lead          Lead       @relation(fields: [leadId], references: [id])
+  projectId     String?
+  project       Project?    @relation(fields: [projectId], references: [id])
+  assignedToId  String?
+  assignedTo    User?      @relation(fields: [assignedToId], references: [id])
+  agencyId      String
+  agency        Agency     @relation(fields: [agencyId], references: [id])
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+model Message {
+  id            String   @id @default(cuid())
+  content       String
+  fromMe        Boolean
+  timestamp     DateTime @default(now())
+  
+  leadId        String
+  lead          Lead     @relation(fields: [leadId], references: [id])
+  agencyId      String
+  agency        Agency   @relation(fields: [agencyId], references: [id])
+  
+  // Optional: tracking which agent sent the message
+  senderId      String?
+  createdAt     DateTime @default(now())
+}
+
+enum PropertyStatus {
+  AVAILABLE
+  PENDING
+  SOLD
+}
+
+enum PropertyType {
+  HOUSE
+  APARTMENT
+  LAND
+  COMMERCIAL
+}
+
+model Property {
+  id            String         @id @default(cuid())
+  title         String
+  description   String?
+  price         Float
+  address       String
+  city          String
+  state         String
+  zip           String
+  beds          Int?
+  baths         Float?
+  area          Float?
+  type          PropertyType
+  status        PropertyStatus @default(AVAILABLE)
+  images        String[]
+  agencyId      String
+  agency        Agency         @relation(fields: [agencyId], references: [id])
+  projectId     String?
+  project       Project?       @relation(fields: [projectId], references: [id])
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  PAST_DUE
+}
+
+model Subscription {
+  id                    String             @id @default(cuid())
+  agencyId              String             @unique
+  agency                Agency             @relation(fields: [agencyId], references: [id])
+  plan                  String
+  stripeSubscriptionId  String?            @unique
+  status                SubscriptionStatus @default(ACTIVE)
+  currentPeriodEnd      DateTime?
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+}
