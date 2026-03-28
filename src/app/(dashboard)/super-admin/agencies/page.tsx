@@ -1,0 +1,192 @@
+"use client"
+import { useState, useEffect } from "react"
+import { 
+  Building2, Users, Search, 
+  ShieldCheck, ShieldAlert, MoreVertical,
+  Calendar, Activity, Filter, Plus,
+  CheckCircle2, XCircle, AlertTriangle
+} from "lucide-react"
+
+export default function AgenciesPage() {
+  const [agencies, setAgencies] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState("")
+
+  const fetchAgencies = async () => {
+    try {
+      const res = await fetch("/api/super-admin/agencies")
+      if (res.ok) {
+        const data = await res.json()
+        setAgencies(data.agencies)
+      }
+    } catch (err) {
+      console.error("Failed to fetch agencies", err)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchAgencies()
+  }, [])
+
+  const handleUpdateStatus = async (id: string, status: string) => {
+    try {
+      const res = await fetch("/api/super-admin/agencies", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, status })
+      })
+      if (res.ok) fetchAgencies()
+    } catch (err) {
+      alert("Failed to update agency status")
+    }
+  }
+
+  const filteredAgencies = agencies.filter(a => 
+    a.name.toLowerCase().includes(search.toLowerCase()) ||
+    (a.domain || "").toLowerCase().includes(search.toLowerCase())
+  )
+
+  if (loading) return (
+    <div className="flex items-center justify-center h-full">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+    </div>
+  )
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-black tracking-tight">Agency Fleet</h1>
+          <p className="text-zinc-500 text-sm">Monitor and manage all tenant agencies securely.</p>
+        </div>
+        <button className="bg-primary text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95 transition-all flex items-center gap-2">
+            <Plus className="h-4 w-4" /> Register New Agency
+        </button>
+      </div>
+
+      <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-4 rounded-2xl border border-zinc-200 shadow-sm">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
+          <input 
+            type="text" 
+            placeholder="Search by name, ID or domain..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 bg-zinc-50 border border-zinc-200 rounded-xl text-sm focus:ring-2 focus:ring-primary outline-none transition-all shadow-inner"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+            <button className="flex items-center gap-2 px-3 py-2 border border-zinc-200 rounded-xl text-xs font-bold text-zinc-600 hover:bg-zinc-50 transition-all">
+                <Filter className="h-3.5 w-3.5" /> All Status
+            </button>
+            <button className="flex items-center gap-2 px-3 py-2 border border-zinc-200 rounded-xl text-xs font-bold text-zinc-600 hover:bg-zinc-50 transition-all">
+                <ShieldCheck className="h-3.5 w-3.5" /> All Plans
+            </button>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-2xl border border-zinc-200 shadow-sm overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-zinc-50/50 border-b border-zinc-100">
+                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-zinc-500">Agency & Identity</th>
+                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-zinc-500">Subscription</th>
+                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-zinc-500">Utilization</th>
+                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-zinc-500">Health Status</th>
+                <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-zinc-500">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-zinc-50">
+              {filteredAgencies.map((agency) => (
+                <tr key={agency.id} className="hover:bg-zinc-50/80 transition-colors group">
+                  <td className="px-6 py-6">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-zinc-100 to-zinc-200 flex items-center justify-center font-black text-zinc-500 shadow-inner">
+                        {agency.logo ? <img src={agency.logo} className="w-full h-full object-cover rounded-2xl" /> : agency.name.charAt(0)}
+                      </div>
+                      <div>
+                        <p className="text-sm font-black text-zinc-800">{agency.name}</p>
+                        <p className="text-[10px] text-zinc-400 font-bold flex items-center gap-1 uppercase tracking-tighter">
+                            {agency.subdomain || agency.id.slice(-8)}.aiclex.in
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-6">
+                    <div className="space-y-1.5">
+                        <div className="flex items-center gap-2">
+                            <span className="text-xs font-black text-zinc-700">{agency.plan?.name || "Free Trial"}</span>
+                            <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-500 border border-zinc-200">
+                                {agency.subscription?.status || "OPEN"}
+                            </span>
+                        </div>
+                        <p className="text-[10px] text-zinc-400 font-bold italic">Renewal: {new Date(agency.createdAt).toLocaleDateString()}</p>
+                    </div>
+                  </td>
+                  <td className="px-6 py-6">
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+                        <div className="flex items-center gap-1.5">
+                            <Users className="h-3 w-3 text-zinc-400" />
+                            <span className="text-[11px] font-bold text-zinc-600">{agency._count.users}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                            <Activity className="h-3 w-3 text-zinc-400" />
+                            <span className="text-[11px] font-bold text-zinc-600">{agency._count.leads}</span>
+                        </div>
+                         <div className="flex items-center gap-1.5">
+                            <ShieldCheck className="h-3 w-3 text-emerald-400" />
+                            <span className="text-[11px] font-bold text-zinc-600">{agency._count.whatsappSessions}</span>
+                        </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-6">
+                     <div className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full ${
+                            agency.status === "ACTIVE" ? "bg-emerald-500 animate-pulse" : 
+                            agency.status === "SUSPENDED" ? "bg-amber-500" : "bg-zinc-400"
+                        }`} />
+                        <span className="text-xs font-black text-zinc-700 uppercase tracking-tight">{agency.status}</span>
+                     </div>
+                  </td>
+                  <td className="px-6 py-6 text-right">
+                    <div className="flex items-center gap-2 justify-end">
+                        {agency.status === "ACTIVE" ? (
+                            <button 
+                                onClick={() => handleUpdateStatus(agency.id, "SUSPENDED")}
+                                className="p-2 bg-amber-50 text-amber-600 rounded-xl hover:bg-amber-100 transition-colors"
+                                title="Suspend Agency"
+                            >
+                                <ShieldAlert className="h-4 w-4" />
+                            </button>
+                        ) : (
+                            <button 
+                                onClick={() => handleUpdateStatus(agency.id, "ACTIVE")}
+                                className="p-2 bg-emerald-50 text-emerald-600 rounded-xl hover:bg-emerald-100 transition-colors"
+                                title="Activate Agency"
+                            >
+                                <CheckCircle2 className="h-4 w-4" />
+                            </button>
+                        )}
+                        <button className="p-2 bg-zinc-50 text-zinc-400 rounded-xl hover:bg-zinc-100 transition-colors">
+                            <MoreVertical className="h-4 w-4" />
+                        </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {filteredAgencies.length === 0 && (
+            <div className="p-12 text-center">
+                <Building2 className="h-12 w-12 text-zinc-200 mx-auto mb-3" />
+                <p className="text-zinc-500 font-bold">No agencies found matching your search.</p>
+            </div>
+        )}
+      </div>
+    </div>
+  )
+}

@@ -29,7 +29,11 @@ const navigation = [
   { name: 'Properties', href: '/properties', icon: Building2 },
   { name: 'Billing', href: '/dashboard/billing', icon: CreditCard, adminOnly: true },
   { name: 'Reports', href: '/dashboard/reports', icon: BarChart3, adminOnly: true },
-  { name: 'Master Control', href: '/super-admin', icon: ShieldCheck, superAdminOnly: true },
+  { name: 'Master Overview', href: '/super-admin', icon: ShieldCheck, superAdminOnly: true },
+  { name: 'Agencies', href: '/super-admin/agencies', icon: Building2, superAdminOnly: true },
+  { name: 'WhatsApp Hub', href: '/super-admin/whatsapp', icon: MessageSquare, superAdminOnly: true },
+  { name: 'Billing/MRR', href: '/super-admin/billing', icon: CreditCard, superAdminOnly: true },
+  { name: 'Master Settings', href: '/super-admin/settings', icon: ShieldAlert, superAdminOnly: true },
 ]
 
 interface DashboardClientLayoutProps {
