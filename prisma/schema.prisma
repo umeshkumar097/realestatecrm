@@ -6,12 +6,22 @@ datasource db {
   provider = "postgresql"
 }
 
+enum AgencyStatus {
+  ACTIVE
+  SUSPENDED
+  PENDING
+  DELETED
+}
+
 model Agency {
   id            String         @id @default(cuid())
   name          String
   domain        String?        @unique
   customDomain  String?        @unique
   logo          String?
+  status        AgencyStatus   @default(ACTIVE)
+  planId        String?
+  plan          SubscriptionPlan? @relation(fields: [planId], references: [id])
   users         User[]
   leads         Lead[]
   properties    Property[]
@@ -275,4 +285,30 @@ model PasswordResetToken {
   token     String   @unique
   expires   DateTime
   createdAt DateTime @default(now())
+}
+
+model SubscriptionPlan {
+  id            String   @id @default(cuid())
+  name          String   @unique // e.g., Starter, Pro, Enterprise
+  description   String?
+  monthlyPrice  Float
+  yearlyPrice   Float
+  maxAgents     Int      @default(5)
+  maxLeads      Int      @default(1000)
+  features      Json?    // Array of feature strings or structured JSON
+  agencies      Agency[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model SystemLog {
+  id            String   @id @default(cuid())
+  type          String   // API_CALL, AUTH, ERROR, SYSTEM, BROADCAST
+  level         String   @default("INFO") // INFO, WARN, ERROR, CRITICAL
+  action        String   // Concise description of what happened
+  details       Json?    // Structured payload for debugging
+  userId        String?
+  ip            String?
+  userAgent     String?
+  createdAt     DateTime @default(now())
 }
