@@ -7,13 +7,24 @@ import {
 } from "lucide-react"
 
 export default function WhatsAppControlsPage() {
-  const [sessions, setSessions] = useState<any[]>([])
+  const [stats, setStats] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // In a real app, this would fetch from /api/super-admin/whatsapp
-    // For now, I'll mock some data or use existing sessions
-    setLoading(false)
+    async function fetchStats() {
+      try {
+        const res = await fetch("/api/super-admin/stats")
+        if (res.ok) {
+          const data = await res.json()
+          setStats(data.stats)
+        }
+      } catch (err) {
+        console.error("Failed to fetch whatsapp stats", err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchStats()
   }, [])
 
   return (
@@ -40,7 +51,7 @@ export default function WhatsAppControlsPage() {
             </div>
             <div>
                 <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Active Links</p>
-                <p className="text-lg font-black text-zinc-800">12 / 15</p>
+                <p className="text-lg font-black text-zinc-800">{stats?.whatsapp?.active || 0} / {stats?.whatsapp?.total || 0}</p>
             </div>
         </div>
         <div className="bg-white p-4 rounded-2xl border border-zinc-100 shadow-sm flex items-center gap-4">
@@ -49,7 +60,7 @@ export default function WhatsAppControlsPage() {
             </div>
             <div>
                 <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Retrying</p>
-                <p className="text-lg font-black text-zinc-800">2</p>
+                <p className="text-lg font-black text-zinc-800">{stats?.whatsapp?.retrying || 0}</p>
             </div>
         </div>
         <div className="bg-white p-4 rounded-2xl border border-red-50 text-red-600 shadow-sm flex items-center gap-4">
@@ -58,7 +69,7 @@ export default function WhatsAppControlsPage() {
             </div>
             <div>
                 <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Critical Fail</p>
-                <p className="text-lg font-black text-red-600">1</p>
+                <p className="text-lg font-black text-red-600">{stats?.whatsapp?.failed || 0}</p>
             </div>
         </div>
         <div className="bg-white p-4 rounded-2xl border border-zinc-100 shadow-sm flex items-center gap-4">
@@ -67,7 +78,7 @@ export default function WhatsAppControlsPage() {
             </div>
             <div>
                 <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Msg / Min</p>
-                <p className="text-lg font-black text-zinc-800">142</p>
+                <p className="text-lg font-black text-zinc-800">Dynamic</p>
             </div>
         </div>
       </div>

@@ -9,8 +9,10 @@ import {
 
 export default function AgenciesPage() {
   const [agencies, setAgencies] = useState<any[]>([])
+  const [plans, setPlans] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
+  const [showRegisterModal, setShowRegisterModal] = useState(false)
 
   const fetchAgencies = async () => {
     try {
@@ -18,6 +20,7 @@ export default function AgenciesPage() {
       if (res.ok) {
         const data = await res.json()
         setAgencies(data.agencies)
+        setPlans(data.plans)
       }
     } catch (err) {
       console.error("Failed to fetch agencies", err)
@@ -30,16 +33,16 @@ export default function AgenciesPage() {
     fetchAgencies()
   }, [])
 
-  const handleUpdateStatus = async (id: string, status: string) => {
+  const handleUpdateStatus = async (id: string, status?: string, planId?: string) => {
     try {
       const res = await fetch("/api/super-admin/agencies", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, status })
+        body: JSON.stringify({ id, status, planId })
       })
       if (res.ok) fetchAgencies()
     } catch (err) {
-      alert("Failed to update agency status")
+      alert("Failed to update agency")
     }
   }
 
@@ -61,7 +64,10 @@ export default function AgenciesPage() {
           <h1 className="text-2xl font-black tracking-tight">Agency Fleet</h1>
           <p className="text-zinc-500 text-sm">Monitor and manage all tenant agencies securely.</p>
         </div>
-        <button className="bg-primary text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95 transition-all flex items-center gap-2">
+        <button 
+            onClick={() => setShowRegisterModal(true)}
+            className="bg-primary text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95 transition-all flex items-center gap-2"
+        >
             <Plus className="h-4 w-4" /> Register New Agency
         </button>
       </div>
@@ -118,7 +124,16 @@ export default function AgenciesPage() {
                   <td className="px-6 py-6">
                     <div className="space-y-1.5">
                         <div className="flex items-center gap-2">
-                            <span className="text-xs font-black text-zinc-700">{agency.plan?.name || "Free Trial"}</span>
+                            <select 
+                                value={agency.planId || ""} 
+                                onChange={(e) => handleUpdateStatus(agency.id, undefined, e.target.value)}
+                                className="text-xs font-black text-zinc-700 bg-transparent border-none focus:ring-0 cursor-pointer hover:underline"
+                            >
+                                <option value="">Free Trial</option>
+                                {(plans || []).map((p: any) => (
+                                    <option key={p.id} value={p.id}>{p.name}</option>
+                                ))}
+                            </select>
                             <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-500 border border-zinc-200">
                                 {agency.subscription?.status || "OPEN"}
                             </span>
@@ -187,6 +202,52 @@ export default function AgenciesPage() {
             </div>
         )}
       </div>
+
+      {showRegisterModal && (
+        <div className="fixed inset-0 bg-zinc-950/20 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl border border-zinc-200 p-8">
+                <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-xl font-black italic">Register New Agency</h2>
+                    <button onClick={() => setShowRegisterModal(false)} className="text-zinc-400 hover:text-zinc-600 transition-colors">
+                        <XCircle className="h-6 w-6" />
+                    </button>
+                </div>
+                <form className="space-y-4" onSubmit={async (e) => {
+                    e.preventDefault()
+                    const formData = new FormData(e.currentTarget)
+                    const res = await fetch("/api/register", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(Object.fromEntries(formData))
+                    })
+                    if (res.ok) {
+                        setShowRegisterModal(false)
+                        fetchAgencies()
+                    } else {
+                        alert("Failed to register agency")
+                    }
+                }}>
+                    <div className="space-y-1">
+                        <label className="text-[10px] font-black uppercase text-zinc-500">Agency Name</label>
+                        <input name="agencyName" required className="w-full px-4 py-2 bg-zinc-50 border border-zinc-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary transition-all" placeholder="Elite Agency" />
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-[10px] font-black uppercase text-zinc-500">Admin Name</label>
+                        <input name="name" required className="w-full px-4 py-2 bg-zinc-50 border border-zinc-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary transition-all" placeholder="Umesh Kumar" />
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-[10px] font-black uppercase text-zinc-500">Email Address</label>
+                        <input name="email" type="email" required className="w-full px-4 py-2 bg-zinc-50 border border-zinc-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary transition-all" placeholder="umesh@agency.com" />
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-[10px] font-black uppercase text-zinc-500">Password</label>
+                        <input name="password" type="password" required className="w-full px-4 py-2 bg-zinc-50 border border-zinc-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary transition-all" placeholder="••••••••" />
+                    </div>
+                    <button type="submit" className="w-full py-3 bg-primary text-white rounded-xl font-black shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95 transition-all mt-4">Create Agency Account</button>
+                </form>
+            </div>
+        </div>
+      )}
     </div>
   )
 }

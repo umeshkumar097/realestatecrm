@@ -12,22 +12,25 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const agencies = await prisma.agency.findMany({
-      include: {
-        _count: {
-          select: {
-            users: true,
-            leads: true,
-            whatsappSessions: true
-          }
+    const [agencies, plans] = await Promise.all([
+      prisma.agency.findMany({
+        include: {
+          _count: {
+            select: {
+              users: true,
+              leads: true,
+              whatsappSessions: true
+            }
+          },
+          plan: true,
+          subscription: true
         },
-        plan: true,
-        subscription: true
-      },
-      orderBy: { createdAt: "desc" }
-    })
+        orderBy: { createdAt: "desc" }
+      }),
+      prisma.subscriptionPlan.findMany()
+    ])
 
-    return NextResponse.json({ agencies })
+    return NextResponse.json({ agencies, plans })
   } catch (error: any) {
     console.error("[Superadmin Agency API Error]:", error)
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 })

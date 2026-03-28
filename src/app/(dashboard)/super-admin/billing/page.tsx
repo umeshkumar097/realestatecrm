@@ -58,7 +58,7 @@ export default function BillingPage() {
                 </div>
             </div>
             <p className="text-zinc-400 text-xs font-bold uppercase tracking-widest mb-1">Monthly Recurring Revenue</p>
-            <h2 className="text-4xl font-black mb-2">{stats?.revenue || "₹0L"}</h2>
+            <h2 className="text-4xl font-black mb-2">{stats?.mrr || "₹0L"}</h2>
             <p className="text-zinc-500 text-[10px] font-bold italic">* Excludes one-time setup fees.</p>
          </div>
 
@@ -72,8 +72,8 @@ export default function BillingPage() {
             <div className="mt-6">
                 <p className="text-zinc-400 text-xs font-bold uppercase tracking-widest mb-1">Paying Agencies</p>
                 <div className="flex items-baseline gap-2">
-                    <h2 className="text-3xl font-black text-zinc-800">{stats?.totalAgencies || 0}</h2>
-                    <span className="text-emerald-500 text-xs font-bold">+2 this week</span>
+                    <h2 className="text-3xl font-black text-zinc-800">{stats?.totalSubscriptions || 0}</h2>
+                    <span className="text-emerald-500 text-xs font-bold">+{stats?.newAgenciesThisWeek || 0} this week</span>
                 </div>
             </div>
          </div>
@@ -84,14 +84,14 @@ export default function BillingPage() {
                     <CreditCard className="h-6 w-6" />
                 </div>
                 <div className="flex items-center gap-1 text-red-500 font-bold text-[10px] bg-red-50 px-2 py-0.5 rounded-full">
-                    Churn: 2.1%
+                    Churn: {stats?.churn || "0%"}
                 </div>
             </div>
             <div className="mt-6">
                 <p className="text-zinc-400 text-xs font-bold uppercase tracking-widest mb-1">Average Customer LTV</p>
                 <div className="flex items-baseline gap-2">
-                    <h2 className="text-3xl font-black text-zinc-800">₹45,200</h2>
-                    <span className="text-zinc-400 text-xs font-bold italic">Stable</span>
+                    <h2 className="text-3xl font-black text-zinc-800">{stats?.ltv || "₹0"}</h2>
+                    <span className="text-zinc-400 text-xs font-bold italic">Dynamic</span>
                 </div>
             </div>
          </div>
