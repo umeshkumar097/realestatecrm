@@ -4,7 +4,8 @@ import {
   Building2, Users, CreditCard, 
   Search, ShieldCheck, Globe, 
   ExternalLink, MoreVertical,
-  Calendar, ArrowUpRight, Activity
+  Calendar, ArrowUpRight, Activity,
+  IndianRupee
 } from "lucide-react"
 
 export default function SuperAdminPage() {
@@ -13,21 +14,32 @@ export default function SuperAdminPage() {
   const [search, setSearch] = useState("")
 
   useEffect(() => {
-    async function fetchAgencies() {
+    async function fetchData() {
       try {
-        const res = await fetch("/api/super-admin/agencies")
-        if (res.ok) {
-          const data = await res.json()
+        const [agenciesRes, statsRes] = await Promise.all([
+          fetch("/api/super-admin/agencies"),
+          fetch("/api/super-admin/stats")
+        ])
+        
+        if (agenciesRes.ok) {
+          const data = await agenciesRes.json()
           setAgencies(data.agencies)
         }
+        
+        if (statsRes.ok) {
+          const data = await statsRes.json()
+          setGlobalStats(data.stats)
+        }
       } catch (err) {
-        console.error("Failed to fetch agencies", err)
+        console.error("Failed to fetch superadmin data", err)
       } finally {
         setLoading(false)
       }
     }
-    fetchAgencies()
+    fetchData()
   }, [])
+
+  const [globalStats, setGlobalStats] = useState<any>(null)
 
   const filteredAgencies = agencies.filter(a => 
     a.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -72,25 +84,25 @@ export default function SuperAdminPage() {
             </div>
             <div>
                 <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Total Agencies</p>
-                <p className="text-2xl font-black">{agencies.length}</p>
+                <p className="text-2xl font-black">{globalStats?.totalAgencies || "..."}</p>
             </div>
          </div>
          <div className="bg-white p-6 rounded-2xl border border-zinc-200 shadow-sm flex items-center gap-4">
             <div className="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center">
-                <ShieldCheck className="h-6 w-6" />
+                <Users className="h-6 w-6" />
             </div>
             <div>
-                <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Active Trials</p>
-                <p className="text-2xl font-black">{agencies.filter(a => a.subscription?.status === "ACTIVE").length}</p>
+                <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Global Agents</p>
+                <p className="text-2xl font-black">{globalStats?.totalAgents || "..."}</p>
             </div>
          </div>
          <div className="bg-white p-6 rounded-2xl border border-zinc-200 shadow-sm flex items-center gap-4">
             <div className="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center">
-                <CreditCard className="h-6 w-6" />
+                <IndianRupee className="h-6 w-6" />
             </div>
             <div>
-                <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Revenue (Total)</p>
-                <p className="text-2xl font-black">₹{agencies.length * 1.5}L</p>
+                <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Estimated MRR</p>
+                <p className="text-2xl font-black">{globalStats?.revenue || "₹0L"}</p>
             </div>
          </div>
       </div>

@@ -34,6 +34,7 @@ const navigation = [
   { name: 'WhatsApp Hub', href: '/super-admin/whatsapp', icon: MessageSquare, superAdminOnly: true },
   { name: 'Billing/MRR', href: '/super-admin/billing', icon: CreditCard, superAdminOnly: true },
   { name: 'Master Settings', href: '/super-admin/settings', icon: ShieldAlert, superAdminOnly: true },
+  { name: 'System Logs', href: '/super-admin/logs', icon: Activity, superAdminOnly: true },
 ]
 
 interface DashboardClientLayoutProps {
@@ -71,8 +72,14 @@ export default function DashboardClientLayout({
         <div className="flex-1 py-6 px-4 space-y-1">
           {navigation.map((item: any) => {
             const userRole = (session?.user as any)?.role
-            if (item.adminOnly && userRole !== 'ADMIN' && userRole !== 'SUPER_ADMIN') return null
-            if (item.superAdminOnly && userRole !== 'SUPER_ADMIN') return null
+            
+            // Separation: SuperAdmin sees only their tools, others see Agency tools
+            if (userRole === 'SUPER_ADMIN') {
+              if (!item.superAdminOnly) return null
+            } else {
+              if (item.superAdminOnly) return null
+              if (item.adminOnly && userRole !== 'ADMIN') return null
+            }
             const isActive = pathname === item.href
             return (
               <Link
