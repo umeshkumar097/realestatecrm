@@ -13,7 +13,8 @@ import {
   CreditCard,
   ListTodo,
   ShieldAlert,
-  ShieldCheck
+  ShieldCheck,
+  Activity
 } from "lucide-react"
 import { signOut, useSession } from "next-auth/react"
 import { cn } from "@/lib/utils"
