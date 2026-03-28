@@ -44,18 +44,41 @@ export async function PATCH(req: NextRequest) {
   }
 
   try {
-    const { id, status, planId } = await req.json()
+    const { id, status, planId, name, domain } = await req.json()
     
     const agency = await prisma.agency.update({
       where: { id },
       data: { 
         ...(status && { status }),
-        ...(planId && { planId })
+        ...(planId && { planId }),
+        ...(name && { name }),
+        ...(domain && { domain })
       }
     })
 
     return NextResponse.json({ success: true, agency })
   } catch (error: any) {
     return NextResponse.json({ error: "Failed to update agency" }, { status: 500 })
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  const session = await getServerSession(authOptions)
+  if ((session?.user as any)?.role !== "SUPER_ADMIN") {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 })
+  }
+
+  try {
+    const { id } = await req.json()
+    
+    // Deleting agency will cascade to related models if defined in schema
+    await prisma.agency.delete({
+      where: { id }
+    })
+
+    return NextResponse.json({ success: true })
+  } catch (error: any) {
+    console.error("[Agency Delete Error]:", error)
+    return NextResponse.json({ error: "Failed to delete agency" }, { status: 500 })
   }
 }

@@ -13,6 +13,8 @@ export default function AgenciesPage() {
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
   const [showRegisterModal, setShowRegisterModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [editingAgency, setEditingAgency] = useState<any>(null)
 
   const fetchAgencies = async () => {
     try {
@@ -33,16 +35,33 @@ export default function AgenciesPage() {
     fetchAgencies()
   }, [])
 
-  const handleUpdateStatus = async (id: string, status?: string, planId?: string) => {
+  const handleUpdateStatus = async (id: string, status?: string, planId?: string, name?: string, domain?: string) => {
     try {
       const res = await fetch("/api/super-admin/agencies", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, status, planId })
+        body: JSON.stringify({ id, status, planId, name, domain })
+      })
+      if (res.ok) {
+        fetchAgencies()
+        setShowEditModal(false)
+      }
+    } catch (err) {
+      alert("Failed to update agency")
+    }
+  }
+
+  const handleDeleteAgency = async (id: string) => {
+    if (!confirm("Are you sure you want to PERMANENTLY delete this agency? All data (users, leads, etc.) will be lost.")) return
+    try {
+      const res = await fetch("/api/super-admin/agencies", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id })
       })
       if (res.ok) fetchAgencies()
     } catch (err) {
-      alert("Failed to update agency")
+      alert("Failed to delete agency")
     }
   }
 
@@ -185,9 +204,28 @@ export default function AgenciesPage() {
                                 <CheckCircle2 className="h-4 w-4" />
                             </button>
                         )}
-                        <button className="p-2 bg-zinc-50 text-zinc-400 rounded-xl hover:bg-zinc-100 transition-colors">
-                            <MoreVertical className="h-4 w-4" />
-                        </button>
+                        <div className="relative group/menu">
+                            <button className="p-2 bg-zinc-50 text-zinc-400 rounded-xl hover:bg-zinc-100 transition-colors">
+                                <MoreVertical className="h-4 w-4" />
+                            </button>
+                            <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-2xl shadow-xl border border-zinc-100 hidden group-hover/menu:block z-20 overflow-hidden py-1">
+                                <button 
+                                    onClick={() => {
+                                        setEditingAgency(agency)
+                                        setShowEditModal(true)
+                                    }}
+                                    className="w-full px-4 py-2 text-left text-xs font-bold text-zinc-600 hover:bg-zinc-50 flex items-center gap-2"
+                                >
+                                    Edit Details
+                                </button>
+                                <button 
+                                    onClick={() => handleDeleteAgency(agency.id)}
+                                    className="w-full px-4 py-2 text-left text-xs font-bold text-red-500 hover:bg-red-50 flex items-center gap-2"
+                                >
+                                    Delete Agency
+                                </button>
+                            </div>
+                        </div>
                     </div>
                   </td>
                 </tr>
@@ -244,6 +282,39 @@ export default function AgenciesPage() {
                         <input name="password" type="password" required className="w-full px-4 py-2 bg-zinc-50 border border-zinc-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary transition-all" placeholder="••••••••" />
                     </div>
                     <button type="submit" className="w-full py-3 bg-primary text-white rounded-xl font-black shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95 transition-all mt-4">Create Agency Account</button>
+                </form>
+            </div>
+        </div>
+      )}
+      {showEditModal && editingAgency && (
+        <div className="fixed inset-0 bg-zinc-950/20 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl border border-zinc-200 p-8">
+                <div className="flex justify-between items-center mb-6">
+                    <h2 className="text-xl font-black italic">Edit Agency</h2>
+                    <button onClick={() => setShowEditModal(false)} className="text-zinc-400 hover:text-zinc-600 transition-colors">
+                        <XCircle className="h-6 w-6" />
+                    </button>
+                </div>
+                <form className="space-y-4" onSubmit={(e) => {
+                    e.preventDefault()
+                    const formData = new FormData(e.currentTarget)
+                    handleUpdateStatus(
+                        editingAgency.id, 
+                        undefined, 
+                        undefined, 
+                        formData.get("name") as string,
+                        formData.get("domain") as string
+                    )
+                }}>
+                    <div className="space-y-1">
+                        <label className="text-[10px] font-black uppercase text-zinc-500">Agency Name</label>
+                        <input name="name" defaultValue={editingAgency.name} required className="w-full px-4 py-2 bg-zinc-50 border border-zinc-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary transition-all" />
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-[10px] font-black uppercase text-zinc-500">Custom Domain</label>
+                        <input name="domain" defaultValue={editingAgency.domain || ""} className="w-full px-4 py-2 bg-zinc-50 border border-zinc-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-primary transition-all" placeholder="estate.com" />
+                    </div>
+                    <button type="submit" className="w-full py-3 bg-primary text-white rounded-xl font-black shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95 transition-all mt-4">Save Changes</button>
                 </form>
             </div>
         </div>
