@@ -6,7 +6,11 @@ export function middleware(request: NextRequest) {
   const hostname = request.headers.get('host') || ''
 
   // Allowed main domains
-  const mainDomains = ['localhost:3000', 'aiclexrealestatecrm.vercel.app']
+  const mainDomains = [
+    'localhost:3000', 
+    'aiclexrealestatecrm.vercel.app', 
+    'realestatecrm-psi.vercel.app'
+  ]
   const isMainDomain = mainDomains.includes(hostname)
 
   if (isMainDomain) {
