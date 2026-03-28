@@ -11,27 +11,19 @@ export async function PATCH(
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const { id } = await params
-  const { status, notes, name, phone, email, budget, location } = await req.json()
-
-  console.log(`[PATCH Lead] ID: ${id}, Status: ${status}, Agency: ${session.user.agencyId}`)
+  const { name, email, role } = await req.json()
 
   try {
-    const lead = await prisma.lead.update({
+    const user = await prisma.user.update({
       where: { id },
       data: { 
-        ...(status && { status }),
-        ...(notes && { notes }),
         ...(name && { name }),
-        ...(phone && { phone }),
         ...(email && { email }),
-        ...(budget && { budget }),
-        ...(location && { location })
+        ...(role && { role })
       }
     })
-    console.log(`[PATCH Lead] Success for ${id}`)
-    return NextResponse.json(lead)
+    return NextResponse.json(user)
   } catch (error: any) {
-    console.error(`[PATCH Lead] Error: ${error.message}`)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
@@ -45,7 +37,7 @@ export async function DELETE(
 
   const { id } = await params
   try {
-    await prisma.lead.delete({ where: { id } })
+    await prisma.user.delete({ where: { id } })
     return NextResponse.json({ success: true })
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 })

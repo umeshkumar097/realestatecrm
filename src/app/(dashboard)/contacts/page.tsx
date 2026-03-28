@@ -10,16 +10,45 @@ import {
 export default function ContactsPage() {
   const [contacts, setContacts] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [editingMember, setEditingMember] = useState<any>(null)
+
+  const load = async () => {
+    setLoading(true)
+    try {
+      const res = await fetch("/api/contacts")
+      if (res.ok) setContacts(await res.json())
+    } catch (e) {} finally { setLoading(false) }
+  }
 
   useEffect(() => {
-    async function load() {
-      try {
-        const res = await fetch("/api/contacts")
-        if (res.ok) setContacts(await res.json())
-      } catch (e) {} finally { setLoading(false) }
-    }
     load()
   }, [])
+
+  const handleUpdate = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!editingMember) return
+    const formData = new FormData(e.currentTarget as HTMLFormElement)
+    try {
+      const res = await fetch(`/api/contacts/${editingMember.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(Object.fromEntries(formData))
+      })
+      if (res.ok) {
+        setShowEditModal(false)
+        load()
+      }
+    } catch (e) { alert("Update failed") }
+  }
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure? This agent will lose all access.")) return
+    try {
+      const res = await fetch(`/api/contacts/${id}`, { method: "DELETE" })
+      if (res.ok) load()
+    } catch (e) { alert("Delete failed") }
+  }
 
   return (
     <div className="space-y-6">
@@ -74,8 +103,21 @@ export default function ContactsPage() {
                   <td className="px-6 py-4 text-xs font-bold text-slate-400">{new Date(c.createdAt).toLocaleDateString()}</td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2 text-slate-300">
-                       <button className="p-2 hover:bg-slate-100 rounded-lg transition-colors"><Edit3 className="h-4 w-4" /></button>
-                       <button className="p-2 hover:bg-slate-100 rounded-lg transition-colors"><Trash2 className="h-4 w-4" /></button>
+                       <button 
+                         onClick={() => {
+                           setEditingMember(c)
+                           setShowEditModal(true)
+                         }}
+                         className="p-2 hover:bg-slate-100 hover:text-primary rounded-lg transition-colors"
+                       >
+                         <Edit3 className="h-4 w-4" />
+                       </button>
+                       <button 
+                         onClick={() => handleDelete(c.id)}
+                         className="p-2 hover:bg-red-50 hover:text-red-500 rounded-lg transition-colors"
+                       >
+                         <Trash2 className="h-4 w-4" />
+                       </button>
                     </div>
                   </td>
                 </tr>
@@ -84,6 +126,35 @@ export default function ContactsPage() {
           </table>
         </div>
       </div>
+
+      {showEditModal && editingMember && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl">
+            <h2 className="text-xl font-black text-slate-900 mb-6 uppercase tracking-tighter italic">Edit Team Member</h2>
+            <form onSubmit={handleUpdate} className="space-y-4">
+              <div className="space-y-1">
+                <label className="text-[10px] font-black uppercase text-slate-400">Full Name</label>
+                <input name="name" defaultValue={editingMember.name} required className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-bold" />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[10px] font-black uppercase text-slate-400">Email Address</label>
+                <input name="email" type="email" defaultValue={editingMember.email} required className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-bold" />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[10px] font-black uppercase text-slate-400">System Role</label>
+                <select name="role" defaultValue={editingMember.role} className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-bold">
+                  <option value="AGENT">AGENT</option>
+                  <option value="AGENCY_OWNER">AGENCY OWNER</option>
+                </select>
+              </div>
+              <div className="flex gap-3 pt-4">
+                <button type="button" onClick={() => setShowEditModal(false)} className="flex-1 py-3 border border-slate-200 rounded-xl font-bold text-slate-500">Cancel</button>
+                <button type="submit" className="flex-2 px-8 py-3 bg-primary text-white rounded-xl font-extrabold shadow-lg">Save Changes</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

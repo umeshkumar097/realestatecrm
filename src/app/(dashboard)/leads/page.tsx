@@ -7,7 +7,7 @@ import {
   MessageSquare, Phone, MoreHorizontal,
   Mail, Calendar, ArrowUpRight, 
   ChevronRight, BadgeInfo, Building2, X,
-  Clock, MapPin, CreditCard, Activity, Trash2,
+  Clock, MapPin, CreditCard, Activity, Trash2, Edit3,
   FileDown, Upload, FileType
 } from "lucide-react"
 import * as XLSX from "xlsx"
@@ -18,6 +18,8 @@ export default function LeadsPage() {
   const [loading, setLoading] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [formData, setFormData] = useState({ name: "", phone: "", email: "", budget: "", location: "" })
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [editingLead, setEditingLead] = useState<any>(null)
   
   const [statusFilter, setStatusFilter] = useState("ALL")
   const [selectedLead, setSelectedLead] = useState<any>(null)
@@ -316,6 +318,26 @@ export default function LeadsPage() {
     }
   }
 
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!editingLead) return
+    try {
+      const res = await fetch(`/api/leads/${editingLead.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      })
+      if (res.ok) {
+        setIsEditModalOpen(false)
+        setEditingLead(null)
+        setFormData({ name: "", phone: "", email: "", budget: "", location: "" })
+        loadLeads()
+      }
+    } catch (err) {
+      alert("Failed to update client")
+    }
+  }
+
   const filteredLeads = leads
 
   if (loading && leads.length === 0) return (
@@ -452,6 +474,16 @@ export default function LeadsPage() {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2" onClick={e => e.stopPropagation()}>
+                       <button 
+                         onClick={() => {
+                           setEditingLead(lead)
+                           setFormData({ name: lead.name, phone: lead.phone, email: lead.email || "", budget: lead.budget || "", location: lead.location || "" })
+                           setIsEditModalOpen(true)
+                         }}
+                         className="p-2 hover:bg-slate-100 rounded-lg text-slate-400 hover:text-primary transition-colors"
+                       >
+                         <Edit3 className="h-4 w-4" />
+                       </button>
                        <button className="p-2 hover:bg-slate-100 rounded-lg text-slate-400 transition-colors"><MessageSquare className="h-4 w-4" /></button>
                        <button 
                          onClick={() => deleteLead(lead.id)}

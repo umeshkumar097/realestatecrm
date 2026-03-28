@@ -11,27 +11,25 @@ export async function PATCH(
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const { id } = await params
-  const { status, notes, name, phone, email, budget, location } = await req.json()
-
-  console.log(`[PATCH Lead] ID: ${id}, Status: ${status}, Agency: ${session.user.agencyId}`)
+  const body = await req.json()
+  const { title, price, location, type, beds, baths, area, status } = body
 
   try {
-    const lead = await prisma.lead.update({
+    const property = await prisma.property.update({
       where: { id },
       data: { 
-        ...(status && { status }),
-        ...(notes && { notes }),
-        ...(name && { name }),
-        ...(phone && { phone }),
-        ...(email && { email }),
-        ...(budget && { budget }),
-        ...(location && { location })
+        ...(title && { title }),
+        ...(price && { price: parseFloat(price) }),
+        ...(location && { address: location }),
+        ...(type && { type }),
+        ...(beds && { beds: parseInt(beds) }),
+        ...(baths && { baths: parseFloat(baths) }),
+        ...(area && { area: parseFloat(area) }),
+        ...(status && { status })
       }
     })
-    console.log(`[PATCH Lead] Success for ${id}`)
-    return NextResponse.json(lead)
+    return NextResponse.json(property)
   } catch (error: any) {
-    console.error(`[PATCH Lead] Error: ${error.message}`)
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 }
@@ -45,7 +43,7 @@ export async function DELETE(
 
   const { id } = await params
   try {
-    await prisma.lead.delete({ where: { id } })
+    await prisma.property.delete({ where: { id } })
     return NextResponse.json({ success: true })
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 })

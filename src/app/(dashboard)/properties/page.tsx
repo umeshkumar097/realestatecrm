@@ -4,13 +4,15 @@ import {
   Building2, Plus, Search, 
   MapPin, IndianRupee, Bed, 
   Bath, Square, ArrowUpRight,
-  Filter, Home, Loader2
+  Filter, Home, Loader2, Edit3, Trash2
 } from "lucide-react"
 
 export default function PropertiesPage() {
   const [properties, setProperties] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [editingProperty, setEditingProperty] = useState<any>(null)
   const [formData, setFormData] = useState({ title: "", price: "", location: "", type: "APARTMENT", beds: "", baths: "", area: "" })
 
   const loadProperties = async () => {
@@ -32,9 +34,36 @@ export default function PropertiesPage() {
       })
       if (res.ok) {
         setIsModalOpen(false)
+        setFormData({ title: "", price: "", location: "", type: "APARTMENT", beds: "", baths: "", area: "" })
         loadProperties()
       }
     } catch (e) { alert("Failed to add property") }
+  }
+
+  const handleEditSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!editingProperty) return
+    try {
+      const res = await fetch(`/api/properties/${editingProperty.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      })
+      if (res.ok) {
+        setIsEditModalOpen(false)
+        setEditingProperty(null)
+        setFormData({ title: "", price: "", location: "", type: "APARTMENT", beds: "", baths: "", area: "" })
+        loadProperties()
+      }
+    } catch (e) { alert("Failed to update property") }
+  }
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this property listing?")) return
+    try {
+      const res = await fetch(`/api/properties/${id}`, { method: "DELETE" })
+      if (res.ok) loadProperties()
+    } catch (e) { alert("Delete failed") }
   }
 
   return (
@@ -95,7 +124,25 @@ export default function PropertiesPage() {
                 </div>
                 <div className="flex items-center justify-between">
                   <p className="text-xl font-black text-slate-900">₹{p.price.toLocaleString('en-IN')}</p>
-                  <button className="p-2 bg-slate-50 hover:bg-primary hover:text-white rounded-xl transition-all"><ArrowUpRight className="h-4 w-4" /></button>
+                  <div className="flex gap-2">
+                    <button 
+                        onClick={() => {
+                            setEditingProperty(p)
+                            setFormData({ title: p.title, price: p.price.toString(), location: p.address || p.location || "", type: p.type, beds: (p.beds || "").toString(), baths: (p.baths || "").toString(), area: (p.area || "").toString() })
+                            setIsEditModalOpen(true)
+                        }}
+                        className="p-2 bg-slate-50 hover:bg-primary hover:text-white rounded-xl transition-all"
+                    >
+                        <Edit3 className="h-4 w-4" />
+                    </button>
+                    <button 
+                        onClick={() => handleDelete(p.id)}
+                        className="p-2 bg-slate-50 hover:bg-red-500 hover:text-white rounded-xl transition-all"
+                    >
+                        <Trash2 className="h-4 w-4" />
+                    </button>
+                    <button className="p-2 bg-slate-50 hover:bg-slate-200 rounded-xl transition-all"><ArrowUpRight className="h-4 w-4" /></button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -128,6 +175,37 @@ export default function PropertiesPage() {
               <div className="flex gap-3 pt-4">
                 <button type="button" onClick={() => setIsModalOpen(false)} className="flex-1 py-3 border border-slate-200 rounded-xl font-bold text-slate-500">Cancel</button>
                 <button type="submit" className="flex-2 px-8 py-3 bg-primary text-white rounded-xl font-extrabold shadow-lg">Save Property</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Modal */}
+      {isEditModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl">
+            <h2 className="text-xl font-black text-slate-900 mb-6 uppercase italic tracking-tighter">Edit Listing</h2>
+            <form onSubmit={handleEditSubmit} className="space-y-4">
+              <input type="text" placeholder="Listing Title" required className="w-full px-4 py-3 rounded-xl border border-slate-200 font-bold" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} />
+              <div className="grid grid-cols-2 gap-4">
+                <input type="number" placeholder="Price (INR)" required className="w-full px-4 py-3 rounded-xl border border-slate-200 font-bold" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} />
+                <select className="w-full px-4 py-3 rounded-xl border border-slate-200 font-bold" value={formData.type} onChange={e => setFormData({...formData, type: e.target.value})}>
+                  <option value="APARTMENT">Apartment</option>
+                  <option value="HOUSE">House</option>
+                  <option value="LAND">Land</option>
+                  <option value="COMMERCIAL">Commercial</option>
+                </select>
+              </div>
+              <input type="text" placeholder="Location" required className="w-full px-4 py-3 rounded-xl border border-slate-200 font-bold" value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} />
+              <div className="grid grid-cols-3 gap-4">
+                <input type="number" placeholder="Beds" className="w-full px-4 py-3 rounded-xl border border-slate-200 font-bold" value={formData.beds} onChange={e => setFormData({...formData, beds: e.target.value})} />
+                <input type="number" step="0.5" placeholder="Baths" className="w-full px-4 py-3 rounded-xl border border-slate-200 font-bold" value={formData.baths} onChange={e => setFormData({...formData, baths: e.target.value})} />
+                <input type="number" placeholder="Area (sqft)" className="w-full px-4 py-3 rounded-xl border border-slate-200 font-bold" value={formData.area} onChange={e => setFormData({...formData, area: e.target.value})} />
+              </div>
+              <div className="flex gap-3 pt-4">
+                <button type="button" onClick={() => setIsEditModalOpen(false)} className="flex-1 py-3 border border-slate-200 rounded-xl font-bold text-slate-500">Cancel</button>
+                <button type="submit" className="flex-2 px-8 py-3 bg-primary text-white rounded-xl font-extrabold shadow-lg">Save Changes</button>
               </div>
             </form>
           </div>
