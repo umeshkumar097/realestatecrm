@@ -31,6 +31,32 @@ class BaileysManager {
     return instance
   }
 
+  getAllInstances() {
+    return Array.from(this.instances.entries()).map(([agentId, instance]) => ({
+      agentId,
+      status: instance.status,
+    }))
+  }
+
+  async resetAll() {
+    logger.info("[Baileys] Resetting all global instances")
+    const agentIds = Array.from(this.instances.keys())
+    for (const agentId of agentIds) {
+      await this.logout(agentId).catch(err => logger.error(`[Baileys] Reset logout failed for ${agentId}: ${err}`))
+    }
+    
+    // Re-initialize all from DB
+    const sessions = await prisma.whatsAppSession.findMany({
+      where: { status: "CONNECTED" }
+    })
+    
+    for (const session of sessions) {
+      this.init(session.agentId, session.agencyId).catch(err => logger.error(`[Baileys] Reset init failed for ${session.agentId}: ${err}`))
+    }
+    
+    return { count: sessions.length }
+  }
+
   async init(agentId: string, agencyId: string) {
     if (this.instances.has(agentId)) {
       const inst = this.instances.get(agentId)

@@ -5,10 +5,12 @@ import {
   ShieldCheck, ShieldAlert, RefreshCcw,
   Unlink, Info, Search, Send, Clock
 } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 export default function WhatsAppControlsPage() {
   const [stats, setStats] = useState<any>(null)
   const [loading, setLoading] = useState(true)
+  const [actionLoading, setActionLoading] = useState(false)
 
   useEffect(() => {
     async function fetchStats() {
@@ -27,6 +29,32 @@ export default function WhatsAppControlsPage() {
     fetchStats()
   }, [])
 
+  const handleAction = async (action: string, message?: string) => {
+    setActionLoading(true)
+    try {
+      const res = await fetch("/api/super-admin/whatsapp/control", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action, message })
+      })
+      const data = await res.json()
+      if (res.ok) {
+        alert(data.message)
+      } else {
+        alert(data.error || "Action failed")
+      }
+    } catch (err) {
+      alert("Network error occurred")
+    } finally {
+      setActionLoading(false)
+    }
+  }
+
+  const promptBroadcast = () => {
+    const msg = prompt("Enter announcement message to send across all connected sessions:")
+    if (msg) handleAction("broadcast", msg)
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -35,10 +63,18 @@ export default function WhatsAppControlsPage() {
           <p className="text-zinc-500 text-sm">Monitor and force-manage connected WhatsApp sessions globally.</p>
         </div>
         <div className="flex items-center gap-3">
-            <button className="bg-white border border-zinc-200 px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-zinc-50 flex items-center gap-2">
-                <RefreshCcw className="h-4 w-4" /> Reset Global Broker
+            <button 
+                onClick={() => handleAction("reset")}
+                disabled={actionLoading}
+                className="bg-white border border-zinc-200 px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-zinc-50 flex items-center gap-2 disabled:opacity-50"
+            >
+                <RefreshCcw className={cn("h-4 w-4", actionLoading && "animate-spin")} /> Reset Global Broker
             </button>
-            <button className="bg-primary text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg shadow-primary/20 flex items-center gap-2">
+            <button 
+                onClick={promptBroadcast}
+                disabled={actionLoading}
+                className="bg-primary text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg shadow-primary/20 flex items-center gap-2 disabled:opacity-50"
+            >
                 <Send className="h-4 w-4" /> Broadcast Announcement
             </button>
         </div>
