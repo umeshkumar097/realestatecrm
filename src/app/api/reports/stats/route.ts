@@ -20,9 +20,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "No agency assigned" }, { status: 400 })
   }
 
-  const whereLead: any = { agencyId }
-  const whereTask: any = { agencyId }
-  const whereTicket: any = { agencyId }
+  const isSuperAdmin = role === "SUPER_ADMIN"
+  const whereLead: any = isSuperAdmin ? {} : { agencyId }
+  const whereTask: any = isSuperAdmin ? {} : { agencyId }
+  const whereTicket: any = isSuperAdmin ? {} : { agencyId }
 
   if (role === "AGENT") {
     whereLead.assignedToId = userId

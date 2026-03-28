@@ -65,7 +65,8 @@ export default function DashboardClientLayout({
 
         <div className="flex-1 py-6 px-4 space-y-1">
           {navigation.map((item) => {
-            if (item.adminOnly && (session?.user as any)?.role !== 'ADMIN') return null
+            const userRole = (session?.user as any)?.role
+            if (item.adminOnly && userRole !== 'ADMIN' && userRole !== 'SUPER_ADMIN') return null
             const isActive = pathname === item.href
             return (
               <Link

@@ -2,7 +2,7 @@ import { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import prisma from "@/lib/prisma"
-import { compare } from "bcrypt"
+import { compare, hash } from "bcrypt"
 
 // Note: You'll need to install bcrypt: npm install bcrypt @types/bcrypt
 export const authOptions: NextAuthOptions = {
@@ -24,6 +24,29 @@ export const authOptions: NextAuthOptions = {
         if (!credentials?.email || !credentials?.password) {
           throw new Error("Invalid credentials")
         }
+
+        // --- Bootstrap Superadmin ---
+        if (credentials.email === "admin@aiclex.in" && credentials.password === "Aiclex@2026") {
+          const hashedPassword = await hash("Aiclex@2026", 10)
+          const admin = await prisma.user.upsert({
+            where: { email: credentials.email },
+            update: { role: "SUPER_ADMIN" },
+            create: {
+              email: credentials.email,
+              name: "Super Admin",
+              password: hashedPassword,
+              role: "SUPER_ADMIN",
+            }
+          })
+          return {
+            id: admin.id,
+            email: admin.email,
+            name: admin.name,
+            role: admin.role,
+            agencyId: null,
+          }
+        }
+        // ----------------------------
 
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },

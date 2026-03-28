@@ -13,8 +13,20 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "No agency assigned" }, { status: 400 })
   }
 
-  // Filter based on role: Agents only see their data, Admins see all agency data
-  const filter = role === "AGENT" ? { agencyId, assignedToId: userId } : { agencyId }
+  // Filter based on role: Agents only see their data, Admins see all agency data, Super Admin sees system-wide data
+  const filter: any = {}
+  
+  if (role === "SUPER_ADMIN") {
+    // No agency filter for Super Admin
+  } else if (role === "AGENT") {
+    filter.agencyId = agencyId
+    filter.assignedToId = userId
+  } else {
+    filter.agencyId = agencyId
+  }
+
+  // Define global where clause for models that share the same filter
+  const globalWhere = role === "SUPER_ADMIN" ? {} : { agencyId }
 
   const [
     totalLeads,
@@ -28,7 +40,7 @@ export async function GET(req: NextRequest) {
   ] = await Promise.all([
     prisma.lead.count({ where: filter }),
     prisma.lead.count({ where: { ...filter, status: "NEW" } }),
-    prisma.property.count({ where: { agencyId } }),
+    prisma.property.count({ where: globalWhere }),
     prisma.lead.count({ where: { ...filter, status: "CONVERTED" } }),
     prisma.lead.findMany({
       where: filter,
@@ -36,14 +48,14 @@ export async function GET(req: NextRequest) {
       take: 5,
       include: { assignedTo: { select: { name: true } } }
     }),
-    prisma.message.count({ where: { agencyId } }),
+    prisma.message.count({ where: globalWhere }),
     prisma.lead.groupBy({
       by: ['source'],
       where: filter,
       _count: { source: true }
     }),
     prisma.eMI.aggregate({
-      where: { agencyId },
+      where: globalWhere,
       _sum: { totalPrice: true }
     })
   ])
