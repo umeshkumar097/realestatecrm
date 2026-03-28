@@ -23,6 +23,21 @@ class BaileysManager {
 
   constructor() {}
 
+  private async logToSystem(action: string, level: string = "INFO", details: any = {}) {
+    try {
+      await prisma.systemLog.create({
+        data: {
+          type: "WHATSAPP",
+          level,
+          action,
+          details: details ? JSON.parse(JSON.stringify(details)) : null
+        }
+      })
+    } catch (e) {
+      logger.error(`[Baileys] SystemLog failed: ${e}`)
+    }
+  }
+
   async getInstance(agentId: string) {
     const instance = this.instances.get(agentId)
     if (instance) {
@@ -42,6 +57,7 @@ class BaileysManager {
     logger.info("[Baileys] Resetting all global instances")
     const agentIds = Array.from(this.instances.keys())
     for (const agentId of agentIds) {
+      await this.logToSystem(`Reset: Logged out agent ${agentId}`, "WARN")
       await this.logout(agentId).catch(err => logger.error(`[Baileys] Reset logout failed for ${agentId}: ${err}`))
     }
     
@@ -50,6 +66,7 @@ class BaileysManager {
       where: { status: "CONNECTED" }
     })
     
+    await this.logToSystem(`Reset: Re-initializing ${sessions.length} sessions`, "INFO")
     for (const session of sessions) {
       this.init(session.agentId, session.agencyId).catch(err => logger.error(`[Baileys] Reset init failed for ${session.agentId}: ${err}`))
     }
@@ -100,24 +117,25 @@ class BaileysManager {
         const shouldReconnect = (lastDisconnect?.error as Boom)?.output?.statusCode !== DisconnectReason.loggedOut
         logger.info(`connection closed due to ${lastDisconnect?.error}, reconnecting ${shouldReconnect}`)
         
-        // Don't clear the QR immediately if we're reconnecting
         if (!shouldReconnect) {
           instance.status = "DISCONNECTED"
           instance.qr = undefined
+          await this.logToSystem(`Connection Closed: ${agentId}`, "ERROR", { error: lastDisconnect?.error?.message })
           await prisma.whatsAppSession.update({
             where: { agentId },
             data: { status: "DISCONNECTED", qrCode: null }
           })
           this.instances.delete(agentId)
         } else {
-          // Keep the status as CONNECTING so the FE keeps polling/showing QR
           instance.status = "CONNECTING"
+          await this.logToSystem(`Connection Retrying: ${agentId}`, "WARN")
           this.init(agentId, agencyId)
         }
       } else if (connection === "open") {
         logger.info("opened connection")
         instance.status = "CONNECTED"
         instance.qr = undefined
+        await this.logToSystem(`Connection Opened: ${agentId}`, "INFO")
         await prisma.whatsAppSession.update({
           where: { agentId },
           data: { status: "CONNECTED", qrCode: null, phoneNumber: socket.user?.id.split(":")[0] }
@@ -221,6 +239,7 @@ class BaileysManager {
         await this.sendMessage(agentId, remoteJid, replyText).catch(e => logger.error("Auto-reply failed"))
       }
 
+      await this.logToSystem(`Message Received: ${phoneNumber}`, "INFO", { agentId, content: content.substring(0, 100) })
       logger.info(`Lead ${lead.id} received message: ${content}`)
 
     } catch (err) {

@@ -11,6 +11,8 @@ export default function WhatsAppControlsPage() {
   const [stats, setStats] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState(false)
+  const [logs, setLogs] = useState<any[]>([])
+  const [logsLoading, setLogsLoading] = useState(true)
 
   useEffect(() => {
     async function fetchStats() {
@@ -27,6 +29,16 @@ export default function WhatsAppControlsPage() {
       }
     }
     fetchStats()
+
+    async function fetchLogs() {
+      try {
+        const res = await fetch("/api/super-admin/whatsapp/logs")
+        if (res.ok) setLogs(await res.json())
+      } catch (err) {} finally { setLogsLoading(false) }
+    }
+    fetchLogs()
+    const interval = setInterval(fetchLogs, 5000)
+    return () => clearInterval(interval)
   }, [])
 
   const handleAction = async (action: string, message?: string) => {
@@ -119,15 +131,60 @@ export default function WhatsAppControlsPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-3xl border border-zinc-200 shadow-sm overflow-hidden p-8 flex flex-col items-center justify-center min-h-[400px]">
-         <div className="w-20 h-20 bg-zinc-50 rounded-full flex items-center justify-center mb-6">
-            <MessageSquare className="h-10 w-10 text-zinc-300" />
+      <div className="bg-white rounded-3xl border border-zinc-200 shadow-sm overflow-hidden flex flex-col h-[500px]">
+         <div className="px-8 py-4 border-b border-zinc-100 flex items-center justify-between bg-zinc-50/50">
+            <div className="flex items-center gap-2">
+                <Activity className="h-4 w-4 text-primary animate-pulse" />
+                <h2 className="text-sm font-black uppercase tracking-widest text-zinc-800 italic">Advanced Message Flows</h2>
+            </div>
+            <div className="flex items-center gap-4">
+                <span className="flex items-center gap-1.5">
+                    <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
+                    <span className="text-[10px] font-black text-emerald-600 uppercase">Live Flow</span>
+                </span>
+                <button onClick={() => setLogsLoading(true)} className="p-1.5 hover:bg-white rounded-lg transition-colors border border-transparent hover:border-zinc-100">
+                    <RefreshCcw className={cn("h-3.5 w-3.5 text-zinc-400", logsLoading && "animate-spin")} />
+                </button>
+            </div>
          </div>
-         <h2 className="text-xl font-black text-zinc-800 mb-2">Advanced Monitoring Pending</h2>
-         <p className="text-zinc-500 text-sm max-w-sm text-center font-bold">This global panel is currently aggregating real-time session logs. Connect your Redis broker to see live message flows.</p>
-         <div className="mt-8 flex gap-3">
-            <button className="px-6 py-2.5 bg-zinc-950 text-white rounded-xl text-sm font-bold shadow-xl active:scale-95 transition-all">Configure Redis</button>
-            <button className="px-6 py-2.5 bg-zinc-100 text-zinc-600 rounded-xl text-sm font-bold hover:bg-zinc-200 transition-all">View Docs</button>
+
+         <div className="flex-1 overflow-y-auto p-6 space-y-3 bg-zinc-950 font-mono text-[11px] custom-scrollbar">
+            {logs.length === 0 && !logsLoading ? (
+                <div className="h-full flex flex-col items-center justify-center text-zinc-600 space-y-4 font-sans">
+                    <Info className="h-8 w-8 opacity-20" />
+                    <p className="font-bold">No message flows detected in the last 24h.</p>
+                </div>
+            ) : logs.map((log) => (
+                <div key={log.id} className="flex gap-4 group border-b border-white/5 pb-2 last:border-0 hover:bg-white/5 transition-colors rounded">
+                    <span className="text-zinc-500 shrink-0 select-none">[{new Date(log.createdAt).toLocaleTimeString()}]</span>
+                    <span className={cn(
+                        "font-black uppercase tracking-tighter w-20 shrink-0",
+                        log.level === "ERROR" ? "text-red-400" : log.level === "WARN" ? "text-amber-400" : "text-emerald-400"
+                    )}>{log.level}</span>
+                    <div className="flex flex-col gap-0.5 min-w-0">
+                        <span className="text-zinc-100 font-bold whitespace-pre-wrap">{log.action}</span>
+                        {log.details && Object.keys(log.details).length > 0 && (
+                            <span className="text-zinc-500 text-[10px] truncate group-hover:whitespace-pre-wrap group-hover:break-words">
+                                {JSON.stringify(log.details)}
+                            </span>
+                        )}
+                    </div>
+                </div>
+            ))}
+            {logsLoading && logs.length === 0 && (
+                <div className="h-full flex items-center justify-center">
+                    <RefreshCcw className="h-6 w-6 text-zinc-700 animate-spin" />
+                </div>
+            )}
+         </div>
+
+         <div className="px-8 py-3 bg-zinc-100 border-t border-zinc-200 flex items-center justify-between">
+            <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest">Global Broker: connected via local-bridge</p>
+            <div className="flex items-center gap-3">
+                <button className="text-[10px] font-black text-zinc-500 hover:text-zinc-800 uppercase">Export Sessions</button>
+                <div className="h-3 w-[1px] bg-zinc-300" />
+                <button className="text-[10px] font-black text-primary hover:opacity-80 uppercase">Redis Configuration</button>
+            </div>
          </div>
       </div>
     </div>
