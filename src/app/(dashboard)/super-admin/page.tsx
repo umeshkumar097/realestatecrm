@@ -77,14 +77,14 @@ export default function SuperAdminPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
          <div className="bg-white p-6 rounded-2xl border border-zinc-200 shadow-sm flex items-center gap-4">
             <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center">
                 <Building2 className="h-6 w-6" />
             </div>
             <div>
                 <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Total Agencies</p>
-                <p className="text-2xl font-black">{globalStats?.totalAgencies || "..."}</p>
+                <p className="text-2xl font-black">{globalStats?.totalAgencies || 0}</p>
             </div>
          </div>
          <div className="bg-white p-6 rounded-2xl border border-zinc-200 shadow-sm flex items-center gap-4">
@@ -93,7 +93,7 @@ export default function SuperAdminPage() {
             </div>
             <div>
                 <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Global Agents</p>
-                <p className="text-2xl font-black">{globalStats?.totalAgents || "..."}</p>
+                <p className="text-2xl font-black">{globalStats?.totalAgents || 0}</p>
             </div>
          </div>
          <div className="bg-white p-6 rounded-2xl border border-zinc-200 shadow-sm flex items-center gap-4">
@@ -101,8 +101,17 @@ export default function SuperAdminPage() {
                 <IndianRupee className="h-6 w-6" />
             </div>
             <div>
-                <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Estimated MRR</p>
-                <p className="text-2xl font-black">{globalStats?.revenue || "₹0L"}</p>
+                <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">MRR (Est.)</p>
+                <p className="text-2xl font-black">{globalStats?.mrr || "₹0L"}</p>
+            </div>
+         </div>
+         <div className="bg-white p-6 rounded-2xl border border-zinc-200 shadow-sm flex items-center gap-4">
+            <div className="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center">
+                <ShieldCheck className="h-6 w-6" />
+            </div>
+            <div>
+                <p className="text-xs font-bold text-zinc-400 uppercase tracking-widest">Active Subs</p>
+                <p className="text-2xl font-black">{globalStats?.totalSubscriptions || 0}</p>
             </div>
          </div>
       </div>
@@ -159,11 +168,11 @@ export default function SuperAdminPage() {
                                 ? "bg-emerald-100 text-emerald-700" 
                                 : "bg-zinc-100 text-zinc-600"
                         }`}>
-                            {agency.subscription?.plan || "No Plan"}
+                            {agency.plan?.name || "Free Trial"}
                         </span>
                         <p className="text-[10px] text-zinc-400 font-bold flex items-center gap-1">
                             <ShieldCheck className="h-2.5 w-2.5" />
-                            {agency.subscription?.status || "PENDING"}
+                            {agency.subscription?.status || "OPEN"}
                         </p>
                     </div>
                   </td>
