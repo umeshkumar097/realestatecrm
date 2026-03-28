@@ -1,6 +1,7 @@
 "use client"
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { 
   Users, Building2, TrendingUp, CheckCircle2,
   Clock, ArrowUpRight, MessageSquare,
@@ -13,11 +14,18 @@ function cn(...inputs: any[]) { return inputs.filter(Boolean).join(" ") }
 
 export default function DashboardPage() {
   const { data: session } = useSession()
+  const router = useRouter()
   const [stats, setStats] = useState<any>(null)
   const [recentLeads, setRecentLeads] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
 
   const [waStatus, setWaStatus] = useState<string>("DISCONNECTED")
+  
+  useEffect(() => {
+    if (session?.user && (session.user as any).role === "SUPER_ADMIN") {
+      router.push("/super-admin")
+    }
+  }, [session, router])
 
   useEffect(() => {
     async function loadData() {

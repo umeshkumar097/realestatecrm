@@ -35,7 +35,15 @@ export default function LoginForm({ agency }: LoginFormProps) {
       if (res?.error) {
         setError("Invalid email or password")
       } else {
-        router.push("/dashboard")
+        // Fetch session to get user role for proper redirection
+        const sessionRes = await fetch("/api/auth/session")
+        const session = await sessionRes.json()
+        
+        if (session?.user?.role === "SUPER_ADMIN") {
+          router.push("/super-admin")
+        } else {
+          router.push("/dashboard")
+        }
         router.refresh()
       }
     } catch (err) {
