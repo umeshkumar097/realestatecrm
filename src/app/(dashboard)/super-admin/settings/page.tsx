@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { 
   ShieldCheck, ShieldAlert, Zap, 
   MessageSquare, Users, Globe,
@@ -7,21 +7,75 @@ import {
   Eye, EyeOff
 } from "lucide-react"
 
+function cn(...classes: string[]) {
+  return classes.filter(Boolean).join(" ")
+}
+
 export default function MasterSettingsPage() {
-  const [settings, setSettings] = useState({
-    globalRegistration: true,
-    maintenanceMode: false,
-    freeTrialDays: 14,
-    maxAgentsStarter: 3,
-    maxAgentsPro: 15,
-    aiFeaturesEnabled: true,
-    bulkWhatsAppEnabled: true
-  })
+  const [settings, setSettings] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [broadcastMsg, setBroadcastMsg] = useState("")
 
-  const [loading, setLoading] = useState(false)
+  useEffect(() => {
+    async function fetchSettings() {
+      try {
+        const res = await fetch("/api/super-admin/settings")
+        if (res.ok) {
+          const data = await res.json()
+          setSettings(data)
+        }
+      } catch (err) {
+        console.error("Failed to fetch settings", err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchSettings()
+  }, [])
 
-  const handleToggle = (key: keyof typeof settings) => {
-    setSettings(prev => ({ ...prev, [key]: !prev[key] }))
+  const handleUpdate = async (updates: any) => {
+    setSettings((prev: any) => ({ ...prev, ...updates }))
+    try {
+      await fetch("/api/super-admin/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updates)
+      })
+    } catch (err) {
+      alert("Failed to save setting")
+    }
+  }
+
+  const saveAll = async () => {
+    setSaving(true)
+    try {
+      const res = await fetch("/api/super-admin/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(settings)
+      })
+      if (res.ok) alert("All settings saved successfully")
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const shootBroadcast = async () => {
+    if (!broadcastMsg) return
+    try {
+        const res = await fetch("/api/super-admin/whatsapp/control", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "broadcast", message: broadcastMsg })
+        })
+        if (res.ok) {
+            alert("Broadcast notification sent successfully!")
+            setBroadcastMsg("")
+        }
+    } catch (err) {
+        alert("Failed to send broadcast")
+    }
   }
 
   return (
@@ -31,8 +85,12 @@ export default function MasterSettingsPage() {
           <h1 className="text-2xl font-black tracking-tight">Master Settings</h1>
           <p className="text-zinc-500 text-sm font-bold">Configure global feature toggles and system-wide limits.</p>
         </div>
-        <button className="bg-primary text-white px-6 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95 transition-all flex items-center gap-2">
-            <Save className="h-4 w-4" /> Save All Changes
+        <button 
+            onClick={saveAll}
+            disabled={saving}
+            className="bg-primary text-white px-6 py-2.5 rounded-xl font-bold shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95 transition-all flex items-center gap-2"
+        >
+            {saving ? "Saving..." : <><ShieldCheck className="h-4 w-4" /> Save All Changes</>}
         </button>
       </div>
 
@@ -43,33 +101,60 @@ export default function MasterSettingsPage() {
                 <Zap className="h-5 w-5 text-amber-500" />
                 <h2 className="font-black text-zinc-800">Feature Toggles</h2>
             </div>
-            <div className="p-8 space-y-6">
-               <div className="flex items-center justify-between">
-                  <div className="space-y-1">
+            <div className="p-8">
+               <div className="flex items-center justify-between py-4 border-b border-zinc-100">
+                  <div>
                       <p className="text-sm font-black text-zinc-800">Public Registration</p>
-                      <p className="text-xs text-zinc-500 font-bold">Allow new agencies to sign up without an invite.</p>
+                      <p className="text-xs text-zinc-400 font-bold uppercase tracking-tight">Allow new agencies to sign up without an invite.</p>
                   </div>
-                  <button onClick={() => handleToggle('globalRegistration')} className={`w-12 h-6 rounded-full transition-all relative ${settings.globalRegistration ? 'bg-primary' : 'bg-zinc-200'}`}>
-                      <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${settings.globalRegistration ? 'left-7' : 'left-1'}`} />
-                  </button>
+                  <button 
+                    onClick={() => handleUpdate({ publicSignup: !settings?.publicSignup })}
+                    className={cn(
+                        "w-12 h-6 rounded-full transition-colors relative",
+                        settings?.publicSignup ? "bg-primary" : "bg-zinc-200"
+                    )}
+                >
+                    <div className={cn(
+                        "absolute top-1 w-4 h-4 bg-white rounded-full transition-all",
+                        settings?.publicSignup ? "left-7" : "left-1"
+                    )}></div>
+                </button>
                </div>
-               <div className="flex items-center justify-between">
-                  <div className="space-y-1">
+               <div className="flex items-center justify-between py-4 border-b border-zinc-100">
+                  <div>
                       <p className="text-sm font-black text-zinc-800">System Maintenance Mode</p>
-                      <p className="text-xs text-zinc-500 font-bold">Restrict all access except for Super Admins.</p>
+                      <p className="text-xs text-zinc-400 font-bold uppercase tracking-tight">Restrict all access except for Super Admins.</p>
                   </div>
-                  <button onClick={() => handleToggle('maintenanceMode')} className={`w-12 h-6 rounded-full transition-all relative ${settings.maintenanceMode ? 'bg-red-500' : 'bg-zinc-200'}`}>
-                      <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${settings.maintenanceMode ? 'left-7' : 'left-1'}`} />
-                  </button>
+                  <button 
+                    onClick={() => handleUpdate({ maintenanceMode: !settings?.maintenanceMode })}
+                    className={cn(
+                        "w-12 h-6 rounded-full transition-colors relative",
+                        settings?.maintenanceMode ? "bg-primary" : "bg-zinc-200"
+                    )}
+                >
+                    <div className={cn(
+                        "absolute top-1 w-4 h-4 bg-white rounded-full transition-all",
+                        settings?.maintenanceMode ? "left-7" : "left-1"
+                    )}></div>
+                </button>
                </div>
-               <div className="flex items-center justify-between border-t border-zinc-50 pt-6">
-                  <div className="space-y-1">
+               <div className="flex items-center justify-between py-4">
+                  <div>
                       <p className="text-sm font-black text-zinc-800">AI Intent Extraction</p>
-                      <p className="text-xs text-zinc-500 font-bold">Enable GPT-powered lead extraction globally.</p>
+                      <p className="text-xs text-zinc-400 font-bold uppercase tracking-tight">Enable GPT-powered lead extraction globally.</p>
                   </div>
-                  <button onClick={() => handleToggle('aiFeaturesEnabled')} className={`w-12 h-6 rounded-full transition-all relative ${settings.aiFeaturesEnabled ? 'bg-primary' : 'bg-zinc-200'}`}>
-                      <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all ${settings.aiFeaturesEnabled ? 'left-7' : 'left-1'}`} />
-                  </button>
+                  <button 
+                    onClick={() => handleUpdate({ aiExtraction: !settings?.aiExtraction })}
+                    className={cn(
+                        "w-12 h-6 rounded-full transition-colors relative",
+                        settings?.aiExtraction ? "bg-primary" : "bg-zinc-200"
+                    )}
+                >
+                    <div className={cn(
+                        "absolute top-1 w-4 h-4 bg-white rounded-full transition-all",
+                        settings?.aiExtraction ? "left-7" : "left-1"
+                    )}></div>
+                </button>
                </div>
             </div>
           </div>
@@ -79,14 +164,26 @@ export default function MasterSettingsPage() {
                 <Globe className="h-5 w-5 text-blue-500" />
                 <h2 className="font-black text-zinc-800">System Defaults</h2>
             </div>
-            <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                    <label className="text-xs font-black text-zinc-400 uppercase tracking-widest">Free Trial Period (Days)</label>
-                    <input type="number" value={settings.freeTrialDays} className="w-full px-4 py-2 bg-zinc-50 border border-zinc-200 rounded-xl font-bold" />
-                </div>
-                <div className="space-y-2">
-                    <label className="text-xs font-black text-zinc-400 uppercase tracking-widest">Global Support Email</label>
-                    <input type="email" placeholder="support@aiclex.in" className="w-full px-4 py-2 bg-zinc-50 border border-zinc-200 rounded-xl font-bold" />
+            <div className="p-8">
+                <div className="flex gap-6">
+                    <div className="flex-1 space-y-1">
+                        <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Free Trial Period (Days)</label>
+                        <input 
+                            type="number" 
+                            value={settings?.freeTrialDays || 14}
+                            onChange={(e) => setSettings((prev: any) => ({ ...prev, freeTrialDays: parseInt(e.target.value) }))}
+                            className="w-full px-4 py-2 bg-zinc-50 border border-zinc-100 rounded-xl font-bold text-zinc-700 outline-none focus:ring-2 focus:ring-primary/20" 
+                        />
+                    </div>
+                    <div className="flex-1 space-y-1">
+                        <label className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Global Support Email</label>
+                        <input 
+                            type="email" 
+                            value={settings?.supportEmail || "support@aiclex.in"}
+                            onChange={(e) => setSettings((prev: any) => ({ ...prev, supportEmail: e.target.value }))}
+                            className="w-full px-4 py-2 bg-zinc-50 border border-zinc-100 rounded-xl font-bold text-zinc-700 outline-none focus:ring-2 focus:ring-primary/20" 
+                        />
+                    </div>
                 </div>
             </div>
           </div>
@@ -99,10 +196,20 @@ export default function MasterSettingsPage() {
               </div>
               <h3 className="text-lg font-black mb-2">Global Broadcast</h3>
               <p className="text-zinc-500 text-xs font-bold leading-relaxed mb-6">Send an emergency notification to all logged-in agencies and agents.</p>
-              <textarea placeholder="Write message..." className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl p-4 text-sm mb-4 outline-none focus:border-zinc-700 h-32" />
-              <button className="w-full py-3 bg-white text-zinc-950 rounded-xl font-black text-xs hover:bg-zinc-100 active:scale-95 transition-all">
-                  Shoot Notification
-              </button>
+              <div className="bg-zinc-900 rounded-2xl p-6 space-y-4">
+                <textarea 
+                    value={broadcastMsg}
+                    onChange={(e) => setBroadcastMsg(e.target.value)}
+                    placeholder="Write message..."
+                    className="w-full h-32 bg-zinc-800 border-none rounded-xl p-4 text-white text-sm placeholder:text-zinc-600 outline-none ring-1 ring-white/5 focus:ring-primary/50 transition-all resize-none"
+                ></textarea>
+                <button 
+                    onClick={shootBroadcast}
+                    className="w-full py-3 bg-white text-zinc-900 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-zinc-100 active:scale-95 transition-all"
+                >
+                    Shoot Notification
+                </button>
+            </div>
            </div>
 
            <div className="bg-red-50 p-8 rounded-3xl border border-red-100">

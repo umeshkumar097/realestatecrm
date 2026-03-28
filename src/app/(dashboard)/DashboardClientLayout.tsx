@@ -1,5 +1,6 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { 
@@ -52,6 +53,21 @@ export default function DashboardClientLayout({
 }: DashboardClientLayoutProps) {
   const pathname = usePathname()
   const { data: session } = useSession()
+  const [time, setTime] = useState(new Date())
+
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000)
+    return () => clearInterval(timer)
+  }, [])
+
+  const handleQuickAdd = () => {
+    const userRole = (session?.user as any)?.role
+    if (userRole === 'SUPER_ADMIN') {
+        window.location.href = '/super-admin/agencies?add=true'
+    } else {
+        window.location.href = '/leads?add=true'
+    }
+  }
 
   return (
     <div className="flex h-screen bg-zinc-50 dark:bg-zinc-950">
@@ -115,12 +131,20 @@ export default function DashboardClientLayout({
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
         <header className="h-16 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-8 flex items-center justify-between">
-          <h2 className="text-sm font-medium text-zinc-500 uppercase tracking-wider">
-            {pathname.split('/')[1] || 'Overview'}
-          </h2>
-          
           <div className="flex items-center gap-4">
-            <button className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm font-bold shadow-md shadow-primary/10 hover:opacity-90 active:scale-95 transition-all">
+            <div className="text-right hidden lg:block mr-4">
+                <p className="text-xs font-black text-zinc-400 uppercase tracking-widest leading-none">
+                    {time.toLocaleDateString('en-IN', { weekday: 'short', day: '2-digit', month: 'short' })}
+                </p>
+                <p className="text-sm font-black text-zinc-800 tabular-nums">
+                    {time.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}
+                </p>
+            </div>
+
+            <button 
+                onClick={handleQuickAdd}
+                className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm font-bold shadow-md shadow-primary/10 hover:opacity-90 active:scale-95 transition-all"
+            >
                 <Plus className="h-4 w-4" />
                 Quick Add
             </button>

@@ -17,7 +17,6 @@ export async function GET(req: NextRequest) {
       totalAgents,
       totalLeads,
       activeSessions,
-      revenueData,
       activeSubscriptions,
       newAgenciesThisWeek,
       totalSessions,
@@ -27,9 +26,6 @@ export async function GET(req: NextRequest) {
       prisma.user.count({ where: { role: "AGENT" } }),
       prisma.lead.count(),
       prisma.whatsAppSession.count({ where: { status: "CONNECTED" } }),
-      prisma.eMI.aggregate({
-        _sum: { totalPrice: true }
-      }),
       prisma.subscription.count({ where: { status: "ACTIVE" } }),
       prisma.agency.count({
         where: {
@@ -42,12 +38,29 @@ export async function GET(req: NextRequest) {
       prisma.whatsAppSession.count({ where: { status: "DISCONNECTED" } })
     ])
 
-    const revenue = revenueData._sum.totalPrice || 0
+    // Specific Revenue logic from PAID installments
+    const paidInstallmentsAgg = await prisma.installment.aggregate({
+      where: { status: "PAID" },
+      _sum: { amount: true }
+    })
     
-    // Calculate MRR and other growth metrics
-    const mrr = revenue / 12
+    const revenue = paidInstallmentsAgg._sum.amount || 0
+    const mrr = revenue / 12 // Simplified approximation
     const ltv = totalAgencies > 0 ? revenue / totalAgencies : 0
     const churn = 0
+
+    const recentTransactions = await prisma.installment.findMany({
+      where: { status: "PAID" },
+      take: 10,
+      orderBy: { updatedAt: "desc" },
+      include: {
+        emi: {
+          include: {
+            agency: { select: { name: true } }
+          }
+        }
+      }
+    })
 
     return NextResponse.json({
       stats: {
@@ -65,8 +78,15 @@ export async function GET(req: NextRequest) {
             total: totalSessions,
             active: activeSessions,
             failed: failedSessions,
-            retrying: totalSessions - activeSessions - failedSessions
-        }
+            retrying: Math.max(0, totalSessions - activeSessions - failedSessions)
+        },
+        recentTransactions: recentTransactions.map(t => ({
+            id: t.id,
+            agency: t.emi.agency.name,
+            amount: t.amount,
+            date: t.updatedAt,
+            status: t.status
+        }))
       }
     })
   } catch (error: any) {

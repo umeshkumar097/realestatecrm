@@ -27,6 +27,21 @@ export default function BillingPage() {
     fetchStats()
   }, [])
 
+  const downloadReport = () => {
+    if (!stats?.recentTransactions) return
+    const headers = ["ID", "Agency", "Amount", "Date", "Status"]
+    const rows = stats.recentTransactions.map((t: any) => [
+        t.id, t.agency, t.amount, t.date, t.status
+    ].join(","))
+    const csv = [headers.join(","), ...rows].join("\n")
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const url = window.URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `billing-report-${new Date().toISOString().slice(0,10)}.csv`
+    a.click()
+  }
+
   const mrrIncrease = "+12.5%"
 
   return (
@@ -37,10 +52,16 @@ export default function BillingPage() {
           <p className="text-zinc-500 text-sm">Track MRR, payment history, and global agency monetization.</p>
         </div>
         <div className="flex items-center gap-3">
-            <button className="bg-white border border-zinc-200 px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-zinc-50 flex items-center gap-2">
+            <button 
+                onClick={downloadReport}
+                className="bg-white border border-zinc-200 px-4 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-zinc-50 flex items-center gap-2"
+            >
                 Download Report
             </button>
-            <button className="bg-primary text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg shadow-primary/20">
+            <button 
+                onClick={() => alert("Plowback Settings: This feature allows you to configure automatic reinvestment of platform fees into lead generation. Coming soon in v2.1.")}
+                className="bg-primary text-white px-4 py-2 rounded-xl text-sm font-bold shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95 transition-all"
+            >
                 Plowback Settings
             </button>
         </div>
@@ -105,13 +126,45 @@ export default function BillingPage() {
                 <button className="text-xs font-bold text-zinc-500 uppercase tracking-widest hover:text-zinc-900 transition-colors">View All History</button>
             </div>
         </div>
-        <div className="p-8 text-center bg-zinc-50/50">
-            <div className="w-16 h-16 bg-white border border-zinc-100 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
-                <TrendingUp className="h-8 w-8 text-zinc-200" />
+        
+        {stats?.recentTransactions?.length > 0 ? (
+            <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                    <thead>
+                        <tr className="bg-zinc-50/50 border-b border-zinc-100">
+                            <th className="px-8 py-4 text-[10px] font-black uppercase text-zinc-500 tracking-widest">Transaction ID</th>
+                            <th className="px-8 py-4 text-[10px] font-black uppercase text-zinc-500 tracking-widest">Agency</th>
+                            <th className="px-8 py-4 text-[10px] font-black uppercase text-zinc-500 tracking-widest">Amount</th>
+                            <th className="px-8 py-4 text-[10px] font-black uppercase text-zinc-500 tracking-widest">Date</th>
+                            <th className="px-8 py-4 text-[10px] font-black uppercase text-zinc-500 tracking-widest">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-zinc-50">
+                        {stats.recentTransactions.map((t: any) => (
+                            <tr key={t.id} className="hover:bg-zinc-50/80 transition-colors group">
+                                <td className="px-8 py-4 text-xs font-bold text-zinc-400 uppercase tracking-tighter">{t.id.slice(-12)}</td>
+                                <td className="px-8 py-4 text-sm font-black text-zinc-800">{t.agency}</td>
+                                <td className="px-8 py-4 text-sm font-black text-zinc-800">₹{t.amount.toLocaleString()}</td>
+                                <td className="px-8 py-4 text-xs font-bold text-zinc-500">{new Date(t.date).toLocaleDateString()}</td>
+                                <td className="px-8 py-4">
+                                    <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 uppercase">
+                                        {t.status}
+                                    </span>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
             </div>
-            <p className="text-zinc-500 font-bold">Transaction history aggregation in progress...</p>
-            <p className="text-zinc-400 text-xs mt-1">Connect your Stripe / Razorpay webhooks to see live payments.</p>
-        </div>
+        ) : (
+            <div className="p-16 text-center bg-zinc-50/50">
+                <div className="w-16 h-16 bg-white border border-zinc-100 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm">
+                    <TrendingUp className="h-8 w-8 text-zinc-200" />
+                </div>
+                <p className="text-zinc-500 font-bold">Transaction history aggregation in progress...</p>
+                <p className="text-zinc-400 text-xs mt-1">Connect your Stripe / Razorpay webhooks to see live payments.</p>
+            </div>
+        )}
       </div>
     </div>
   )
