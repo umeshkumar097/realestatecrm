@@ -10,12 +10,12 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    let settings = await prisma.systemSetting.findUnique({
+    let settings = await (prisma as any).systemSettings.findUnique({
       where: { id: "global" }
     })
 
     if (!settings) {
-      settings = await prisma.systemSetting.create({
+      settings = await (prisma as any).systemSettings.create({
         data: { id: "global" }
       })
     }
@@ -35,7 +35,7 @@ export async function PATCH(req: NextRequest) {
   const updates = await req.json()
 
   try {
-    const settings = await prisma.systemSetting.update({
+    const settings = await (prisma as any).systemSettings.update({
       where: { id: "global" },
       data: updates
     })

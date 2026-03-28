@@ -312,3 +312,13 @@ model SystemLog {
   userAgent     String?
   createdAt     DateTime @default(now())
 }
+
+model SystemSettings {
+  id            String   @id @default("global")
+  publicSignup  Boolean  @default(true)
+  maintenanceMode Boolean @default(false)
+  aiExtraction  Boolean  @default(true)
+  freeTrialDays Int      @default(14)
+  supportEmail  String   @default("support@aiclex.in")
+  updatedAt     DateTime @updatedAt
+}
