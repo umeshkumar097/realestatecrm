@@ -29,6 +29,7 @@ const navigation = [
   { name: 'Properties', href: '/properties', icon: Building2 },
   { name: 'Billing', href: '/dashboard/billing', icon: CreditCard, adminOnly: true },
   { name: 'Reports', href: '/dashboard/reports', icon: BarChart3, adminOnly: true },
+  { name: 'Master Control', href: '/super-admin', icon: ShieldCheck, superAdminOnly: true },
 ]
 
 interface DashboardClientLayoutProps {
@@ -64,9 +65,10 @@ export default function DashboardClientLayout({
         </div>
 
         <div className="flex-1 py-6 px-4 space-y-1">
-          {navigation.map((item) => {
+          {navigation.map((item: any) => {
             const userRole = (session?.user as any)?.role
             if (item.adminOnly && userRole !== 'ADMIN' && userRole !== 'SUPER_ADMIN') return null
+            if (item.superAdminOnly && userRole !== 'SUPER_ADMIN') return null
             const isActive = pathname === item.href
             return (
               <Link
