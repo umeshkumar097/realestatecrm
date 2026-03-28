@@ -2,9 +2,9 @@ import { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import prisma from "@/lib/prisma"
-import { compare, hash } from "bcrypt"
+import { compare, hash } from "bcryptjs"
 
-// Note: You'll need to install bcrypt: npm install bcrypt @types/bcrypt
+// Note: You'll need to install bcryptjs: npm install bcryptjs @types/bcryptjs
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   session: {
@@ -25,25 +25,34 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Invalid credentials")
         }
 
+        console.log(`[Auth] Login attempt for: ${credentials.email}`);
+
         // --- Bootstrap Superadmin ---
         if (credentials.email === "admin@aiclex.in" && credentials.password === "Aiclex@2026") {
-          const hashedPassword = await hash("Aiclex@2026", 10)
-          const admin = await prisma.user.upsert({
-            where: { email: credentials.email },
-            update: { role: "SUPER_ADMIN" },
-            create: {
-              email: credentials.email,
-              name: "Super Admin",
-              password: hashedPassword,
-              role: "SUPER_ADMIN",
+          console.log("[Auth] Bootstrap Superadmin detected. Ensuring account exists...");
+          try {
+            const hashedPassword = await hash("Aiclex@2026", 10)
+            const admin = await prisma.user.upsert({
+              where: { email: credentials.email },
+              update: { role: "SUPER_ADMIN" },
+              create: {
+                email: credentials.email,
+                name: "Super Admin",
+                password: hashedPassword,
+                role: "SUPER_ADMIN",
+              }
+            })
+            console.log("[Auth] Superadmin account ready.");
+            return {
+              id: admin.id,
+              email: admin.email,
+              name: admin.name,
+              role: admin.role,
+              agencyId: null,
             }
-          })
-          return {
-            id: admin.id,
-            email: admin.email,
-            name: admin.name,
-            role: admin.role,
-            agencyId: null,
+          } catch (err) {
+            console.error("[Auth] Bootstrap error:", err);
+            throw new Error("Internal Admin Setup Error")
           }
         }
         // ----------------------------
