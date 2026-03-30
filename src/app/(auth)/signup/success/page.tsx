@@ -1,19 +1,13 @@
 "use client"
 
-import { CheckCircle2, ChevronRight, LayoutDashboard, Mail } from "lucide-react"
+import { Suspense } from "react"
+import { CheckCircle2, LayoutDashboard, Mail, Loader2 } from "lucide-react"
 import Link from "next/link"
-import { useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
 
-export default function SignupSuccessPage() {
+function SignupSuccessContent() {
     const searchParams = useSearchParams()
-    const [email, setEmail] = useState("")
-
-    useEffect(() => {
-        // Stripe usually passes some metadata or we can fetch it if needed.
-        // For simplicity, we assume the session is handled by the webhook.
-    }, [searchParams])
-
+    
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-50 p-6">
             <div className="w-full max-w-lg bg-white rounded-[40px] shadow-2xl border border-zinc-200 p-12 text-center animate-in zoom-in-95 duration-500">
@@ -38,5 +32,17 @@ export default function SignupSuccessPage() {
                 </div>
             </div>
         </div>
+    )
+}
+
+export default function SignupSuccessPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center bg-zinc-50">
+                <Loader2 className="h-10 w-10 animate-spin text-primary" />
+            </div>
+        }>
+            <SignupSuccessContent />
+        </Suspense>
     )
 }
