@@ -125,7 +125,7 @@ export default function SuperAdminUsersPage() {
                   {new Date(user.createdAt).toLocaleDateString()}
                 </td>
                 <td className="px-6 py-4 text-right">
-                  <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex items-center justify-end gap-2 opacity-40 group-hover:opacity-100 transition-opacity">
                     <button onClick={() => handleEdit(user)} className="p-2 hover:bg-white rounded-lg border border-transparent hover:border-zinc-200 text-zinc-600 transition-all">
                       <Edit2 className="h-4 w-4" />
                     </button>

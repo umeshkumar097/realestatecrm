@@ -208,22 +208,24 @@ export default function AgenciesPage() {
                             <button className="p-2 bg-zinc-50 text-zinc-400 rounded-xl hover:bg-zinc-100 transition-colors">
                                 <MoreVertical className="h-4 w-4" />
                             </button>
-                            <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-2xl shadow-xl border border-zinc-100 hidden group-hover/menu:block z-20 overflow-hidden py-1">
-                                <button 
-                                    onClick={() => {
-                                        setEditingAgency(agency)
-                                        setShowEditModal(true)
-                                    }}
-                                    className="w-full px-4 py-2 text-left text-xs font-bold text-zinc-600 hover:bg-zinc-50 flex items-center gap-2"
-                                >
-                                    Edit Details
-                                </button>
-                                <button 
-                                    onClick={() => handleDeleteAgency(agency.id)}
-                                    className="w-full px-4 py-2 text-left text-xs font-bold text-red-500 hover:bg-red-50 flex items-center gap-2"
-                                >
-                                    Delete Agency
-                                </button>
+                            <div className="absolute right-0 top-full pt-2 w-48 hidden group-hover/menu:block z-20">
+                                <div className="bg-white rounded-2xl shadow-xl border border-zinc-100 overflow-hidden py-1">
+                                    <button 
+                                        onClick={() => {
+                                            setEditingAgency(agency)
+                                            setShowEditModal(true)
+                                        }}
+                                        className="w-full px-4 py-2 text-left text-xs font-bold text-zinc-600 hover:bg-zinc-50 flex items-center gap-2"
+                                    >
+                                        Edit Details
+                                    </button>
+                                    <button 
+                                        onClick={() => handleDeleteAgency(agency.id)}
+                                        className="w-full px-4 py-2 text-left text-xs font-bold text-red-500 hover:bg-red-50 flex items-center gap-2"
+                                    >
+                                        Delete Agency
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
