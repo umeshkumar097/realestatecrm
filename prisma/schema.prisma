@@ -20,6 +20,8 @@ model Agency {
   customDomain  String?        @unique
   logo          String?
   status        AgencyStatus   @default(ACTIVE)
+  stripeCustomerId     String? @unique
+  stripeSubscriptionId String? @unique
   planId        String?
   plan          SubscriptionPlan? @relation(fields: [planId], references: [id])
   users         User[]
@@ -290,6 +292,8 @@ model PasswordResetToken {
 model SubscriptionPlan {
   id            String   @id @default(cuid())
   name          String   @unique // e.g., Starter, Pro, Enterprise
+  stripeProductId String? @unique
+  stripePriceId   String? @unique
   description   String?
   monthlyPrice  Float
   yearlyPrice   Float
