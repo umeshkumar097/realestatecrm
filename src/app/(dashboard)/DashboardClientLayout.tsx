@@ -35,6 +35,7 @@ const navigation = [
   { name: 'Agencies', href: '/super-admin/agencies', icon: Building2, superAdminOnly: true },
   { name: 'WhatsApp Hub', href: '/super-admin/whatsapp', icon: MessageSquare, superAdminOnly: true },
   { name: 'Billing/MRR', href: '/super-admin/billing', icon: CreditCard, superAdminOnly: true },
+  { name: 'Subscription Plans', href: '/super-admin/plans', icon: ListTodo, superAdminOnly: true },
   { name: 'Active Users', href: '/super-admin/users', icon: Users, superAdminOnly: true },
   { name: 'Master Settings', href: '/super-admin/settings', icon: ShieldAlert, superAdminOnly: true },
   { name: 'System Logs', href: '/super-admin/logs', icon: Activity, superAdminOnly: true },

@@ -51,7 +51,7 @@ model User {
   password      String?
   role          UserRole  @default(AGENT)
   agencyId      String?
-  agency        Agency?    @relation(fields: [agencyId], references: [id])
+  agency        Agency?    @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   leads         Lead[]    @relation("AssignedLeads")
   tasks         Task[]
   tickets       Ticket[]
@@ -66,7 +66,7 @@ model WhatsAppSession {
   agentId       String   @unique
   agent         User     @relation(fields: [agentId], references: [id])
   agencyId      String
-  agency        Agency   @relation(fields: [agencyId], references: [id])
+  agency        Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   sessionData   String   // JSON string of Baileys credentials
   status        String   @default("DISCONNECTED") // CONNECTED, DISCONNECTED, CONNECTING
   phoneNumber   String?
@@ -102,7 +102,7 @@ model Lead {
   notes         String?
 
   agencyId      String
-  agency        Agency     @relation(fields: [agencyId], references: [id])
+  agency        Agency     @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   assignedToId  String?
   assignedTo    User?      @relation("AssignedLeads", fields: [assignedToId], references: [id])
   messages      Message[]
@@ -124,7 +124,7 @@ model Activity {
   userId        String
   user          User      @relation(fields: [userId], references: [id])
   agencyId      String
-  agency        Agency    @relation(fields: [agencyId], references: [id])
+  agency        Agency    @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   createdAt     DateTime  @default(now())
 }
 
@@ -134,7 +134,7 @@ model Project {
   description   String?
   location      String
   agencyId      String
-  agency        Agency     @relation(fields: [agencyId], references: [id])
+  agency        Agency     @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   properties    Property[]
   emis          EMI[]
   tickets       Ticket[]
@@ -159,7 +159,7 @@ model EMI {
   installments  Installment[]
   
   agencyId      String
-  agency        Agency     @relation(fields: [agencyId], references: [id])
+  agency        Agency     @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
 }
@@ -185,7 +185,7 @@ model Task {
   assignedToId  String
   assignedTo    User       @relation(fields: [assignedToId], references: [id])
   agencyId      String
-  agency        Agency     @relation(fields: [agencyId], references: [id])
+  agency        Agency     @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
 }
@@ -204,7 +204,7 @@ model Ticket {
   assignedToId  String?
   assignedTo    User?      @relation(fields: [assignedToId], references: [id])
   agencyId      String
-  agency        Agency     @relation(fields: [agencyId], references: [id])
+  agency        Agency     @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
 }
@@ -218,7 +218,7 @@ model Message {
   leadId        String
   lead          Lead     @relation(fields: [leadId], references: [id])
   agencyId      String
-  agency        Agency   @relation(fields: [agencyId], references: [id])
+  agency        Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   
   // Optional: tracking which agent sent the message
   senderId      String?
@@ -254,7 +254,7 @@ model Property {
   status        PropertyStatus @default(AVAILABLE)
   images        String[]
   agencyId      String
-  agency        Agency         @relation(fields: [agencyId], references: [id])
+  agency        Agency         @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   projectId     String?
   project       Project?       @relation(fields: [projectId], references: [id])
   createdAt     DateTime       @default(now())
@@ -270,7 +270,7 @@ enum SubscriptionStatus {
 model Subscription {
   id                    String             @id @default(cuid())
   agencyId              String             @unique
-  agency                Agency             @relation(fields: [agencyId], references: [id])
+  agency                Agency             @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   plan                  String
   stripeSubscriptionId  String?            @unique
   status                SubscriptionStatus @default(ACTIVE)
