@@ -33,7 +33,11 @@ export default function LoginForm({ agency }: LoginFormProps) {
       })
 
       if (res?.error) {
-        setError("Invalid email or password")
+        if (res.error === "VERIFY_EMAIL") {
+          router.push(`/verify-email?email=${encodeURIComponent(email)}`)
+        } else {
+          setError("Invalid email or password")
+        }
       } else {
         // Fetch session to get user role for proper redirection
         const sessionRes = await fetch("/api/auth/session")

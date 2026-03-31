@@ -177,7 +177,7 @@ export default function Landing() {
             {/* Dashboard Visualizer */}
             <div className="relative max-w-6xl mx-auto">
               <div className="absolute -inset-1 bg-gradient-to-r from-blue-600/20 via-indigo-600/20 to-blue-600/20 rounded-[44px] blur-2xl opacity-50" />
-              <div className="relative bg-[#0F172A] rounded-[40px] shadow-2xl border border-slate-800 overflow-hidden aspect-[16/9] group lg:scale-105 transition-transform duration-700">
+              <div className="relative bg-[#0F172A] rounded-[32px] md:rounded-[40px] shadow-2xl border border-slate-800 overflow-hidden aspect-[4/3] md:aspect-[16/9] group lg:scale-105 transition-transform duration-700">
                 
                 {/* Dashboard Sidebar Placeholder */}
                 <div className="absolute inset-y-0 left-0 w-20 lg:w-64 bg-[#020617] border-r border-slate-800 p-6 hidden md:flex flex-col gap-8">
@@ -214,7 +214,7 @@ export default function Landing() {
                 </div>
 
                 {/* Dashboard Content Mockup */}
-                <div className="absolute inset-0 pt-20 pl-20 lg:pl-64 overflow-hidden">
+                <div className="absolute inset-0 pt-16 md:pt-20 pl-0 md:pl-20 lg:pl-64 overflow-hidden">
                    <div className="p-8 h-full bg-[#020617]/50">
                       <div className="grid grid-cols-4 gap-6 mb-8">
                         {[1,2,3,4].map(i => (
@@ -244,7 +244,7 @@ export default function Landing() {
                 </div>
 
                 {/* Overlays / Notifications */}
-                <div key={currentLeadIdx} className="absolute right-10 bottom-10 w-80 bg-white/10 backdrop-blur-2xl border border-white/20 rounded-[32px] p-5 shadow-2xl animate-float">
+                <div key={currentLeadIdx} className="absolute right-4 md:right-10 bottom-4 md:bottom-10 w-[280px] md:w-80 bg-white/10 backdrop-blur-2xl border border-white/20 rounded-[24px] md:rounded-[32px] p-4 md:p-5 shadow-2xl animate-float">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white shrink-0">
                       <Star size={24} className="fill-white" />

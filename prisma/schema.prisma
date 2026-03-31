@@ -38,6 +38,7 @@ model Agency {
 model User {
   id              String           @id @default(cuid())
   email           String           @unique
+  emailVerified   DateTime?
   name            String?
   password        String?
   role            UserRole         @default(AGENT)
@@ -230,6 +231,16 @@ model Subscription {
   createdAt            DateTime           @default(now())
   updatedAt            DateTime           @updatedAt
   agency               Agency             @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expires   DateTime
+  createdAt DateTime @default(now())
+
+  @@unique([email, token])
 }
 
 model PasswordResetToken {

@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
 import { stripe } from "@/lib/stripe"
-import { prisma } from "@/lib/prisma"
+import prisma from "@/lib/prisma"
 import { hash } from "bcryptjs"
+import { sendEmail, emailWrapper } from "@/lib/mail"
+import crypto from "crypto"
 
 export async function POST(req: NextRequest) {
     const body = await req.text()
@@ -24,7 +26,7 @@ export async function POST(req: NextRequest) {
         console.log(`🔔 Provisioning Agency: ${agencyName} for ${adminEmail}`)
 
         try {
-            await prisma.$transaction(async (tx) => {
+            const result = await (prisma as any).$transaction(async (tx: any) => {
                 // 1. Create Agency
                 const agency = await tx.agency.create({
                     data: {
@@ -47,9 +49,40 @@ export async function POST(req: NextRequest) {
                         agencyId: agency.id,
                     },
                 })
+                
+                // 3. Generate Verification Token
+                const token = crypto.randomInt(100000, 999999).toString()
+                const expires = new Date(Date.now() + 24 * 60 * 60 * 1000)
+
+                await tx.verificationToken.create({
+                    data: {
+                        email: adminEmail,
+                        token,
+                        expires,
+                    },
+                })
 
                 console.log(`✅ Provisioning Complete for ${agencyName}`)
+                return { token }
             })
+
+            // 4. Send Emails (Outside transaction for speed)
+            const verificationHtml = emailWrapper(`
+              <p>Hello ${adminName},</p>
+              <p>Thank you for choosing PropGoCRM! Your professional agency space <strong>${agencyName}</strong> is ready.</p>
+              <p>To activate your account and access the dashboard, please use this verification code:</p>
+              <div style="background: #f1f5f9; padding: 24px; border-radius: 16px; text-align: center; margin: 32px 0;">
+                <span style="font-size: 32px; font-weight: 900; letter-spacing: 0.2em; color: #2563eb;">${result.token}</span>
+              </div>
+              <p>Welcome aboard!</p>
+            `, "Verify your PropGoCRM Agency")
+
+            await sendEmail({
+              to: adminEmail,
+              subject: "Action Required: Verify your PropGoCRM Account",
+              html: verificationHtml,
+            })
+
         } catch (error) {
             console.error(`❌ Provisioning Failed:`, error)
             // Note: Stripe will retry if we return 500

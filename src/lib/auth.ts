@@ -72,6 +72,10 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Invalid password")
         }
 
+        if (user.role !== "SUPER_ADMIN" && !(user as any).emailVerified) {
+          throw new Error("VERIFY_EMAIL") // Specific error for frontend handling
+        }
+
         // Domain Security Check
         const { headers } = await import("next/headers")
         const headerList = await headers()
