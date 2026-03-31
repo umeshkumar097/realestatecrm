@@ -4,9 +4,9 @@ import { syncLeadToGoogleSheets } from "@/lib/integrations/google-sheets"
 
 export async function POST(
     req: NextRequest,
-    { params }: { params: { agencyId: string } }
+    { params }: { params: Promise<{ agencyId: string }> }
 ) {
-    const { agencyId } = params
+    const { agencyId } = await params
     const apiKey = req.headers.get("x-webhook-secret") || req.nextUrl.searchParams.get("secret")
 
     if (!apiKey) {
