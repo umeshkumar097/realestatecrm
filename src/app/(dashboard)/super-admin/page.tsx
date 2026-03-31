@@ -283,12 +283,24 @@ export default function SuperAdminPage() {
                     <h2 className="text-xl font-black tracking-tight italic">Commercial Packages</h2>
                     <p className="text-xs text-zinc-500 font-bold uppercase tracking-widest mt-0.5">Control pricing, limits and addons</p>
                 </div>
-                <button 
-                    onClick={() => { setSelectedPlan(null); setShowPlanModal(true); }}
-                    className="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-2xl font-black italic tracking-tight shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all"
-                >
-                    <Plus size={18}/> New Package
-                </button>
+                <div className="flex items-center gap-3">
+                    <button 
+                        onClick={async () => {
+                            if (!confirm("Re-seed default packages?")) return
+                            await fetch("/api/auth/seed-plans")
+                            fetchData()
+                        }}
+                        className="px-6 py-3 border border-zinc-200 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-zinc-50 transition-all"
+                    >
+                        Sync Landing Packages
+                    </button>
+                    <button 
+                        onClick={() => { setSelectedPlan(null); setShowPlanModal(true); }}
+                        className="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-2xl font-black italic tracking-tight shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all"
+                    >
+                        <Plus size={18}/> New Package
+                    </button>
+                </div>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
