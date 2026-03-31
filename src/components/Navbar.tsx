@@ -35,7 +35,7 @@ export default function Navbar() {
 
           <nav className="hidden md:flex items-center gap-10">
             {navLinks.map((link) => (
-              <Link key={link.name} href={link.href} className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors relative group">
+              <Link key={link.name} href={link.href} className="text-sm font-bold tracking-tight text-slate-600 hover:text-blue-600 transition-colors relative group">
                 {link.name}
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 transition-all group-hover:w-full" />
               </Link>
@@ -46,7 +46,7 @@ export default function Navbar() {
             <Link href="/login" className="text-sm font-bold text-slate-600 hover:text-blue-600 transition-colors">Login</Link>
             <button 
               onClick={() => setIsLeadModalOpen(true)}
-              className="group px-7 py-3 bg-slate-900 text-white rounded-2xl text-sm font-black shadow-xl shadow-slate-900/10 hover:bg-blue-600 hover:-translate-y-0.5 transition-all active:scale-95 flex items-center gap-2"
+              className="group px-7 py-3 bg-slate-900 text-white rounded-2xl text-sm font-black tracking-tight shadow-xl shadow-slate-900/10 hover:bg-blue-600 hover:-translate-y-0.5 transition-all active:scale-95 flex items-center gap-2"
             >
               Book Demo <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
             </button>

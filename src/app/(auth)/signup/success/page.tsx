@@ -15,11 +15,11 @@ function SignupSuccessContent() {
                     <CheckCircle2 className="h-10 w-10" />
                 </div>
 
-                <h1 className="text-4xl font-black italic tracking-tighter mb-4">Activation Initiated!</h1>
-                <p className="text-zinc-500 font-medium mb-10 leading-relaxed">
+                <h1 className="text-4xl font-black tracking-tighter mb-4 text-slate-900 leading-none">Activation Initiated!</h1>
+                <p className="text-slate-500 font-medium mb-10 leading-relaxed">
                   Great choice! Your 3-day trial is being provisioned. 
-                  <span className="block mt-4 p-4 bg-blue-50 text-blue-700 rounded-2xl border border-blue-100 font-bold italic">
-                    Check your email and use the <span className="underline">6-digit verification code</span> to activate your agency dashboard.
+                  <span className="block mt-6 p-6 bg-blue-50 text-blue-700 rounded-3xl border border-blue-100 font-bold">
+                    Check your email and use the <span className="underline decoration-blue-200 underline-offset-4">6-digit verification code</span> to activate your agency dashboard.
                   </span>
                 </p>
 

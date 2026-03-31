@@ -93,7 +93,7 @@ export default function ContactPage() {
                                         <div className="w-24 h-24 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center shadow-xl mb-4">
                                             <CheckCircle2 size={48} />
                                         </div>
-                                        <h2 className="text-3xl font-black italic tracking-tighter">Inquiry Received!</h2>
+                                        <h2 className="text-3xl font-black tracking-tighter">Inquiry Received!</h2>
                                         <p className="text-zinc-500 text-lg max-w-sm mx-auto font-medium">One of our specialists will analyze your requirements and reach out within 4 hours.</p>
                                         <button onClick={() => setStatus(null)} className="text-blue-600 font-black tracking-widest uppercase text-[10px] hover:underline underline-offset-4 mt-8">Submit Another Inquiry</button>
                                     </div>
@@ -131,7 +131,7 @@ export default function ContactPage() {
                                             <textarea rows={5} required className="w-full px-8 py-4 bg-zinc-50 border border-zinc-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-600 transition-all font-bold placeholder:text-zinc-300 resize-none" placeholder="Tell us how we can help you scale..." />
                                         </div>
 
-                                        <button type="submit" disabled={status === "sending"} className="w-full bg-blue-600 text-white rounded-[32px] py-6 font-black text-xl italic tracking-tight shadow-xl shadow-blue-600/30 hover:scale-[1.02] active:scale-95 transition-all text-center flex items-center justify-center gap-3">
+                                        <button type="submit" disabled={status === "sending"} className="w-full bg-blue-600 text-white rounded-[32px] py-6 font-black text-xl tracking-tight shadow-xl shadow-blue-600/30 hover:scale-[1.02] active:scale-95 transition-all text-center flex items-center justify-center gap-3">
                                             {status === "sending" ? "Initialising Protocol..." : "Submit Strategic Inquiry"} <ArrowRight />
                                         </button>
 

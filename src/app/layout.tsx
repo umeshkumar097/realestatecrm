@@ -23,7 +23,7 @@ export default function RootLayout({
       lang="en"
       className={`${interFont.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-sans">
+      <body className={`${interFont.className} min-h-full flex flex-col font-sans`}>
         <Providers>{children}</Providers>
       </body>
     </html>

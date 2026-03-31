@@ -70,7 +70,7 @@ function VerifyEmailContent() {
     <div className="max-w-md w-full animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="text-center mb-12">
         <Logo className="justify-center mb-8" />
-        <h1 className="text-3xl font-black text-slate-900 tracking-tight italic mb-4">Verify your email.</h1>
+        <h1 className="text-3xl font-black text-slate-900 tracking-tight mb-4">Verify your email.</h1>
         <p className="text-slate-500 font-medium">
           We've sent a 6-digit code to <span className="text-blue-600 font-bold">{email || "your email"}</span>.
         </p>
@@ -113,7 +113,7 @@ function VerifyEmailContent() {
         </form>
 
         <div className="mt-8 text-center">
-          <p className="text-sm text-slate-500 font-bold italic">
+          <p className="text-sm text-slate-500 font-bold">
             Didn't get the code? <button className="text-blue-600 hover:underline">Resend Email</button>
           </p>
         </div>

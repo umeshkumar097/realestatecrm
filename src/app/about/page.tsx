@@ -133,18 +133,18 @@ export default function AboutPage() {
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-600/20 blur-[140px] rounded-full pointer-events-none" />
                 <div className="container mx-auto px-6 relative text-center">
                     <h2 className="text-4xl lg:text-7xl font-black italic tracking-tighter text-white mb-20">Built by Specialists,<br /><span className="text-blue-600 underline decoration-blue-600/30 underline-offset-8">Scale with Confidence.</span></h2>
-                    <div className="flex flex-wrap justify-center gap-12 lg:gap-32">
-                         {[
-                             { t: "Leadership", d: "Ex-Property Professionals" },
-                             { t: "Engineering", d: "Aiclex Tech Labs" },
-                             { t: "Support", d: "24/7 Global Response" }
-                         ].map((item, idx) => (
-                             <div key={idx} className="flex flex-col items-center">
-                                 <p className="text-3xl font-black text-blue-500 italic mb-2 tracking-tight">{item.t}</p>
-                                 <p className="text-[10px] font-black uppercase text-white/40 tracking-[0.3em]">{item.d}</p>
-                             </div>
-                         ))}
-                    </div>
+                     <div className="flex flex-wrap justify-center gap-12 lg:gap-32">
+                          {[
+                              { t: "Leadership", d: "Ex-Property Professionals" },
+                              { t: "Engineering", d: "Aiclex Tech Labs" },
+                              { t: "Support", d: "24/7 Global Response" }
+                          ].map((item, idx) => (
+                              <div key={idx} className="flex flex-col items-center">
+                                  <p className="text-3xl font-black text-blue-500 mb-2 tracking-tight">{item.t}</p>
+                                  <p className="text-[10px] font-black uppercase text-white/40 tracking-[0.3em]">{item.d}</p>
+                              </div>
+                          ))}
+                     </div>
                 </div>
             </section>
 

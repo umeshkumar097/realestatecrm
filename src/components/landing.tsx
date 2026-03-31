@@ -411,7 +411,7 @@ export default function Landing() {
           <div className="container mx-auto px-6 lg:px-12">
             <div className="text-center mb-32">
               <h2 className="text-4xl lg:text-7xl font-black text-slate-900 mb-8 leading-none tracking-tighter">Scale at Your Speed.</h2>
-              <p className="text-2xl text-slate-500 max-w-xl mx-auto font-medium italic">Transparent pricing for agencies that mean business.</p>
+              <p className="text-2xl text-slate-500 max-w-xl mx-auto font-medium">Transparent pricing for agencies that mean business.</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 max-w-6xl mx-auto hov-stack">
