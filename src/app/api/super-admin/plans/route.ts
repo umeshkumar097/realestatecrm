@@ -6,7 +6,7 @@ export async function GET(req: NextRequest) {
         const plans = await prisma.subscriptionPlan.findMany({
             orderBy: { monthlyPrice: 'asc' }
         })
-        return NextResponse.json({ plans })
+        return NextResponse.json(plans)
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 })
     }
