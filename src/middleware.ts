@@ -9,7 +9,9 @@ export function middleware(request: NextRequest) {
   const mainDomains = [
     'localhost:3000', 
     'aiclexrealestatecrm.vercel.app', 
-    'realestatecrm-psi.vercel.app'
+    'realestatecrm-psi.vercel.app',
+    'propgocrm.com',
+    'www.propgocrm.com'
   ]
   const isMainDomain = mainDomains.includes(hostname)
 

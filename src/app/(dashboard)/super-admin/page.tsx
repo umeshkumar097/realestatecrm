@@ -287,7 +287,7 @@ export default function SuperAdminPage() {
                     <button 
                         onClick={async () => {
                             if (!confirm("Re-seed default packages?")) return
-                            await fetch("/api/auth/seed-plans")
+                            await fetch("/api/auth/seed-plans?secret=aiclex-master-setup-2026")
                             fetchData()
                         }}
                         className="px-6 py-3 border border-zinc-200 rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-zinc-50 transition-all"
@@ -351,6 +351,14 @@ export default function SuperAdminPage() {
           </div>
         )}
       </div>
+      
+      {showPlanModal && (
+        <PlanModal 
+          onClose={() => setShowPlanModal(false)}
+          onSave={() => fetchData()}
+          plan={selectedPlan}
+        />
+      )}
     </div>
   )
 }

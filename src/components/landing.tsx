@@ -152,7 +152,11 @@ export default function Landing() {
           </Link>
 
           <nav className="hidden md:flex items-center gap-10">
-            {['Features', 'MarketSync', 'Pricing', 'Company'].map(i => (
+            <Link href="/features" className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors relative group">
+                Features
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 transition-all group-hover:w-full" />
+            </Link>
+            {['MarketSync', 'Pricing', 'Company'].map(i => (
               <Link key={i} href={`#${i.toLowerCase()}`} className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors relative group">
                 {i}
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 transition-all group-hover:w-full" />
@@ -182,7 +186,8 @@ export default function Landing() {
             <X className="h-8 w-8 text-slate-400" onClick={() => setMobileMenuOpen(false)} />
           </div>
           <div className="flex flex-col gap-8 text-2xl font-black text-slate-900">
-            {['Features', 'MarketSync', 'Pricing', 'Company'].map(i => (
+            <Link href="/features" onClick={() => setMobileMenuOpen(false)}>Features</Link>
+            {['MarketSync', 'Pricing', 'Company'].map(i => (
               <Link key={i} href={`#${i.toLowerCase()}`} onClick={() => setMobileMenuOpen(false)}>{i}</Link>
             ))}
           </div>
@@ -581,7 +586,8 @@ export default function Landing() {
               <div>
                 <h4 className="text-white font-black text-xs uppercase tracking-[0.3em] mb-10">Product</h4>
                 <ul className="flex flex-col gap-6">
-                  {['Features', 'MarketSync', 'WhatsApp API', 'Pricing', 'API Docs'].map(l => (
+                  <li><Link href="/features" className="text-slate-500 hover:text-white font-bold transition-all">Features</Link></li>
+                  {['MarketSync', 'WhatsApp API', 'Pricing', 'API Docs'].map(l => (
                     <li key={l}><Link href="#" className="text-slate-500 hover:text-white font-bold transition-all">{l}</Link></li>
                   ))}
                 </ul>

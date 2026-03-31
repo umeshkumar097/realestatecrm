@@ -13,30 +13,30 @@ export async function GET(req: NextRequest) {
     const plans = [
     {
       name: "Starter",
-      description: "Perfect for small agencies",
-      monthlyPrice: 1999,
-      yearlyPrice: 19990,
-      maxAgents: 3,
+      description: "Perfect for small agencies getting started.",
+      monthlyPrice: 699,
+      yearlyPrice: 6990,
+      maxAgents: 5,
       maxLeads: 500,
-      features: ["WhatsApp Integration", "Lead Management", "Basic Reports"]
+      features: ["Up to 5 Agents", "500 Leads/Month", "Basic Analytics", "Email Support", "Shared WhatsApp"]
     },
     {
-      name: "Pro",
-      description: "Best for growing teams",
-      monthlyPrice: 4999,
-      yearlyPrice: 49990,
-      maxAgents: 10,
-      maxLeads: 5000,
-      features: ["Advanced AI Extraction", "Bulk Messaging", "Team Collaboration", "EMI Tracking"]
+      name: "Professional",
+      description: "For growing agencies managing 20+ deals.",
+      monthlyPrice: 1099,
+      yearlyPrice: 10990,
+      maxAgents: 20,
+      maxLeads: 999999, // Unlimited leads
+      features: ["Up to 20 Agents", "Unlimited Leads", "AI Lead Scoring", "Priority Support", "Custom Reports", "Dedicated WhatsApp CRM"]
     },
     {
       name: "Enterprise",
-      description: "Scale without limits",
-      monthlyPrice: 9999,
-      yearlyPrice: 99990,
-      maxAgents: 50,
-      maxLeads: 50000,
-      features: ["Custom Domain", "White Labeling", "Priority Support", "Dedicated WhatsApp instance"]
+      description: "For large property companies with multiple branches.",
+      monthlyPrice: 0, // Custom pricing handled offline
+      yearlyPrice: 0,
+      maxAgents: 999,
+      maxLeads: 999999,
+      features: ["Unlimited Agents", "Multi-Branch Dashboard", "Portal Sync Integration", "API Access", "Custom Integrations", "On-premise Option"]
     }
   ]
 
