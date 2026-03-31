@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { Building2, Loader2, CheckCircle2, ChevronRight, Sparkles, IndianRupee, Users } from "lucide-react"
+import { Building2, Loader2, CheckCircle2, ChevronRight, Sparkles, IndianRupee, Users, XCircle } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 export default function SignupPage() {
@@ -131,10 +131,16 @@ export default function SignupPage() {
             {error && <div className="mb-8 p-4 bg-red-50 text-red-600 rounded-2xl border border-red-100 text-center font-bold">{error}</div>}
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                {plans.length === 0 ? (
+                {loading && plans.length === 0 ? (
                     <div className="col-span-3 text-center py-20 bg-white rounded-[40px] border border-zinc-200">
                         <Loader2 className="h-10 w-10 animate-spin text-primary mx-auto mb-4" />
                         <p className="text-zinc-500 font-bold italic">Gathering available packages...</p>
+                    </div>
+                ) : plans.length === 0 ? (
+                    <div className="col-span-3 text-center py-20 bg-white rounded-[40px] border border-zinc-200">
+                        <XCircle className="h-10 w-10 text-red-500 mx-auto mb-4" />
+                        <p className="text-zinc-500 font-bold italic">No packages available at the moment. Please contact support.</p>
+                        <button onClick={() => setStep(2)} className="mt-4 text-primary font-black uppercase text-xs tracking-widest">Retry Fetching</button>
                     </div>
                 ) : plans.map((plan) => (
                     <button 
