@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { syncLeadToGoogleSheets } from "@/lib/integrations/google-sheets"
 
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -83,20 +84,28 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Name and Phone are required" }, { status: 400 })
   }
 
-  const lead = await prisma.lead.create({
-    data: {
-      name,
-      phone,
-      email,
-      status: status || "NEW",
-      propertyType,
-      budget,
-      location,
-      notes,
-      agencyId,
-      assignedToId: userId // Default to creator
-    }
-  })
+  try {
+    const lead = await prisma.lead.create({
+      data: {
+        name,
+        phone,
+        email,
+        status: status || "NEW",
+        propertyType,
+        budget,
+        location,
+        notes,
+        agencyId,
+        assignedToId: userId // Default to creator
+      }
+    })
 
-  return NextResponse.json(lead, { status: 201 })
+    // ASYNC: Sync to Google Sheets
+    syncLeadToGoogleSheets(lead).catch(err => console.error("Sheets Async Sync failed:", err))
+
+    return NextResponse.json(lead, { status: 201 })
+  } catch (error: any) {
+    console.error("Lead Create Error:", error)
+    return NextResponse.json({ error: "Failed to create lead" }, { status: 500 })
+  }
 }

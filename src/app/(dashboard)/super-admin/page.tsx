@@ -5,22 +5,31 @@ import {
   Search, ShieldCheck, Globe, 
   ExternalLink, MoreVertical,
   Calendar, ArrowUpRight, Activity,
-  IndianRupee, Mail, Phone, X
+  IndianRupee, Mail, Phone, X,
+  Plus, Settings, Package, CheckCircle2,
+  Trash2
 } from "lucide-react"
+import PlanModal from "@/components/super-admin/PlanModal"
 
 export default function SuperAdminPage() {
-  const [activeTab, setActiveTab] = useState<"AGENCIES" | "PLATFORM_LEADS">("AGENCIES")
+  const [activeTab, setActiveTab] = useState<"AGENCIES" | "PLATFORM_LEADS" | "PLANS">("AGENCIES")
   const [agencies, setAgencies] = useState<any[]>([])
   const [platformLeads, setPlatformLeads] = useState<any[]>([])
+  const [plans, setPlans] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
+  const [selectedPlan, setSelectedPlan] = useState<any>(null)
+  const [showPlanModal, setShowPlanModal] = useState(false)
+  const [globalStats, setGlobalStats] = useState<any>(null)
 
   const fetchData = async () => {
     try {
-      const [agenciesRes, statsRes, platformLeadsRes] = await Promise.all([
+      setLoading(true)
+      const [agenciesRes, statsRes, platformLeadsRes, plansRes] = await Promise.all([
         fetch("/api/super-admin/agencies"),
         fetch("/api/super-admin/stats"),
-        fetch("/api/super-admin/platform-leads")
+        fetch("/api/super-admin/platform-leads"),
+        fetch("/api/super-admin/plans")
       ])
       
       if (agenciesRes.ok) {
@@ -37,6 +46,11 @@ export default function SuperAdminPage() {
         const data = await platformLeadsRes.json()
         setPlatformLeads(data.leads)
       }
+
+      if (plansRes.ok) {
+        const data = await plansRes.json()
+        setPlans(data.plans)
+      }
     } catch (err) {
       console.error("Failed to fetch superadmin data", err)
     } finally {
@@ -47,8 +61,6 @@ export default function SuperAdminPage() {
   useEffect(() => {
     fetchData()
   }, [])
-
-  const [globalStats, setGlobalStats] = useState<any>(null)
 
   const filteredAgencies = agencies.filter(a => 
     a.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -124,6 +136,12 @@ export default function SuperAdminPage() {
           >
             Platform Inquiries {platformLeads.length > 0 && <span className="ml-1 bg-primary text-white px-1.5 py-0.5 rounded-full text-[8px]">{platformLeads.length}</span>}
           </button>
+          <button 
+            onClick={() => setActiveTab("PLANS")}
+            className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "PLANS" ? "bg-white text-primary shadow-sm" : "text-zinc-500 hover:text-zinc-900"}`}
+          >
+            Subscription Plans
+          </button>
       </div>
 
       <div className="bg-white rounded-2xl border border-zinc-200 shadow-sm overflow-hidden">
@@ -157,18 +175,18 @@ export default function SuperAdminPage() {
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-1.5 text-zinc-600 text-sm font-bold">
                           <Globe className="h-3.5 w-3.5 text-zinc-400" />
-                          {agency.subdomain || "master"}.aiclex.in
+                          {agency.subdomain || "master"}.propgocrm.com
                       </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-4">
                         <div className="flex items-center gap-1.5" title="Users">
                           <Users className="h-3.5 w-3.5 text-zinc-400" />
-                          <span className="text-xs font-bold text-zinc-700">{agency._count.users}</span>
+                          <span className="text-xs font-bold text-zinc-700">{agency._count?.users || 0}</span>
                         </div>
                         <div className="flex items-center gap-1.5" title="Leads">
                           <Activity className="h-3.5 w-3.5 text-zinc-400" />
-                          <span className="text-xs font-bold text-zinc-700">{agency._count.leads}</span>
+                          <span className="text-xs font-bold text-zinc-700">{agency._count?.leads || 0}</span>
                         </div>
                       </div>
                     </td>
@@ -181,10 +199,6 @@ export default function SuperAdminPage() {
                           }`}>
                               {agency.plan?.name || "Free Trial"}
                           </span>
-                          <p className="text-[10px] text-zinc-400 font-bold flex items-center gap-1">
-                              <ShieldCheck className="h-2.5 w-2.5" />
-                              {agency.subscription?.status || "OPEN"}
-                          </p>
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -197,9 +211,6 @@ export default function SuperAdminPage() {
                           <button className="p-2 hover:bg-zinc-200 rounded-lg transition-colors text-zinc-400 hover:text-zinc-900">
                               <ExternalLink className="h-4 w-4" />
                           </button>
-                          <button className="p-2 hover:bg-zinc-200 rounded-lg transition-colors text-zinc-400 hover:text-zinc-900">
-                              <MoreVertical className="h-4 w-4" />
-                          </button>
                       </div>
                     </td>
                   </tr>
@@ -207,7 +218,7 @@ export default function SuperAdminPage() {
               </tbody>
             </table>
           </div>
-        ) : (
+        ) : activeTab === "PLATFORM_LEADS" ? (
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
@@ -264,6 +275,67 @@ export default function SuperAdminPage() {
                 ))}
               </tbody>
             </table>
+          </div>
+        ) : (
+          <div className="p-8">
+            <div className="flex items-center justify-between mb-8">
+                <div>
+                    <h2 className="text-xl font-black tracking-tight italic">Commercial Packages</h2>
+                    <p className="text-xs text-zinc-500 font-bold uppercase tracking-widest mt-0.5">Control pricing, limits and addons</p>
+                </div>
+                <button 
+                    onClick={() => { setSelectedPlan(null); setShowPlanModal(true); }}
+                    className="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-2xl font-black italic tracking-tight shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all"
+                >
+                    <Plus size={18}/> New Package
+                </button>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {plans.map(plan => (
+                    <div key={plan.id} className="bg-zinc-50 border border-zinc-100 rounded-[32px] p-8 relative overflow-hidden group">
+                        <div className="absolute top-0 right-0 p-6 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button onClick={() => { setSelectedPlan(plan); setShowPlanModal(true); }} className="p-2 bg-white shadow-sm rounded-xl text-zinc-400 hover:text-primary transition-colors"><Settings size={18}/></button>
+                        </div>
+                        
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm">
+                                <Package size={24} className="text-primary" />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-black tracking-tight italic">{plan.name}</h3>
+                                <p className="text-[10px] font-black uppercase text-zinc-400 tracking-widest">{plan.stripePriceId || 'NO STRIPE ID'}</p>
+                            </div>
+                        </div>
+
+                        <div className="space-y-4 mb-8">
+                            <div className="flex items-center justify-between text-xs font-bold text-zinc-600">
+                                <span>Monthly Price</span>
+                                <span className="font-black italic text-zinc-900 flex items-center gap-0.5"><IndianRupee size={12}/> {plan.monthlyPrice}</span>
+                            </div>
+                            <div className="flex items-center justify-between text-xs font-bold text-zinc-600">
+                                <span>Agent Limit</span>
+                                <span className="font-black italic text-zinc-900">{plan.maxAgents} Agents</span>
+                            </div>
+                            <div className="flex items-center justify-between text-xs font-bold text-zinc-600">
+                                <span>Lead Limit</span>
+                                <span className="font-black italic text-zinc-900">{plan.maxLeads} /mo</span>
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                             <p className="text-[10px] font-black uppercase text-zinc-400 tracking-widest mb-3">Included Services</p>
+                             {plan.features?.slice(0, 3).map((f: string, i: number) => (
+                                 <div key={i} className="flex items-center gap-2 text-[10px] font-bold text-zinc-500 uppercase tracking-tight">
+                                     <CheckCircle2 size={12} className="text-emerald-500" />
+                                     {f}
+                                 </div>
+                             ))}
+                             {plan.features?.length > 3 && <p className="text-[10px] font-bold text-primary italic">+{plan.features.length - 3} more services...</p>}
+                        </div>
+                    </div>
+                ))}
+            </div>
           </div>
         )}
       </div>

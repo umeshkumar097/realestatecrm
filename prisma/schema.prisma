@@ -31,6 +31,8 @@ model Agency {
   users                User[]
   whatsappSessions     WhatsAppSession[]
   portalIntegrations   PortalIntegration[]
+  webhookConfigs       WebhookConfig[]
+  googleSheets         GoogleSheetSync[]
 }
 
 model User {
@@ -343,4 +345,29 @@ model PortalIntegration {
   agency     Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+}
+
+model WebhookConfig {
+  id        String   @id @default(cuid())
+  agencyId  String
+  name      String   @default("Default Webhook")
+  secret    String   @unique @default(cuid())
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  agency    Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+}
+
+model GoogleSheetSync {
+  id            String    @id @default(cuid())
+  agencyId      String    @unique
+  spreadsheetId String?
+  sheetName     String    @default("Leads")
+  accessToken   String?
+  refreshToken  String?
+  isActive      Boolean   @default(true)
+  lastSyncedAt  DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  agency        Agency    @relation(fields: [agencyId], references: [id], onDelete: Cascade)
 }
