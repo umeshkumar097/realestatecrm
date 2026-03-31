@@ -6,6 +6,289 @@ datasource db {
   provider = "postgresql"
 }
 
+model Agency {
+  id                   String            @id @default(cuid())
+  name                 String
+  domain               String?           @unique
+  logo                 String?
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+  customDomain         String?           @unique
+  planId               String?
+  status               AgencyStatus      @default(ACTIVE)
+  stripeCustomerId     String?           @unique
+  stripeSubscriptionId String?           @unique
+  activities           Activity[]
+  plan                 SubscriptionPlan? @relation(fields: [planId], references: [id])
+  emis                 EMI[]
+  leads                Lead[]
+  messages             Message[]
+  projects             Project[]
+  properties           Property[]
+  subscription         Subscription?
+  tasks                Task[]
+  tickets              Ticket[]
+  users                User[]
+  whatsappSessions     WhatsAppSession[]
+  portalIntegrations   PortalIntegration[]
+}
+
+model User {
+  id              String           @id @default(cuid())
+  email           String           @unique
+  name            String?
+  password        String?
+  role            UserRole         @default(AGENT)
+  agencyId        String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  activities      Activity[]
+  leads           Lead[]           @relation("AssignedLeads")
+  tasks           Task[]
+  tickets         Ticket[]
+  agency          Agency?          @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  whatsappSession WhatsAppSession?
+  commission      Float?
+  attendance      Json?
+}
+
+model WhatsAppSession {
+  id          String   @id @default(cuid())
+  agentId     String   @unique
+  agencyId    String
+  sessionData String
+  status      String   @default("DISCONNECTED")
+  phoneNumber String?
+  qrCode      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  agency      Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  agent       User     @relation(fields: [agentId], references: [id])
+}
+
+model Lead {
+  id           String     @id @default(cuid())
+  name         String?
+  email        String?
+  phone        String
+  source       String?    @default("WHATSAPP")
+  status       LeadStatus @default(NEW)
+  priority     Int        @default(1)
+  agencyId     String
+  assignedToId String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  budget       String?
+  location     String?
+  notes        String?
+  propertyType String?
+  activities   Activity[]
+  emis         EMI[]
+  agency       Agency     @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  assignedTo   User?      @relation("AssignedLeads", fields: [assignedToId], references: [id])
+  messages     Message[]
+  tickets      Ticket[]
+
+  @@unique([phone, agencyId])
+}
+
+model Activity {
+  id        String   @id @default(cuid())
+  type      String
+  content   String
+  leadId    String
+  userId    String
+  agencyId  String
+  createdAt DateTime @default(now())
+  agency    Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  lead      Lead     @relation(fields: [leadId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Project {
+  id          String     @id @default(cuid())
+  name        String
+  description String?
+  location    String
+  agencyId    String
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  emis        EMI[]
+  agency      Agency     @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  properties  Property[]
+  tickets     Ticket[]
+}
+
+model EMI {
+  id           String        @id @default(cuid())
+  leadId       String
+  projectId    String
+  plotNumber   String
+  plotRate     Float
+  totalPrice   Float
+  planDetails  String?
+  startDate    DateTime
+  expiryDate   DateTime
+  status       String        @default("ACTIVE")
+  agencyId     String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  agency       Agency        @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  lead         Lead          @relation(fields: [leadId], references: [id])
+  project      Project       @relation(fields: [projectId], references: [id])
+  installments Installment[]
+}
+
+model Installment {
+  id        String   @id @default(cuid())
+  emiId     String
+  amount    Float
+  dueDate   DateTime
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  emi       EMI      @relation(fields: [emiId], references: [id])
+}
+
+model Task {
+  id           String    @id @default(cuid())
+  title        String
+  description  String?
+  status       String    @default("TODAY")
+  dueDate      DateTime?
+  assignedToId String
+  agencyId     String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  agency       Agency    @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  assignedTo   User      @relation(fields: [assignedToId], references: [id])
+}
+
+model Ticket {
+  id           String   @id @default(cuid())
+  subject      String
+  description  String?
+  type         String   @default("SUPPORT")
+  status       String   @default("OPEN")
+  leadId       String
+  projectId    String?
+  assignedToId String?
+  agencyId     String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  agency       Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  assignedTo   User?    @relation(fields: [assignedToId], references: [id])
+  lead         Lead     @relation(fields: [leadId], references: [id])
+  project      Project? @relation(fields: [projectId], references: [id])
+}
+
+model Message {
+  id        String   @id @default(cuid())
+  content   String
+  fromMe    Boolean
+  timestamp DateTime @default(now())
+  leadId    String
+  agencyId  String
+  senderId  String?
+  createdAt DateTime @default(now())
+  agency    Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  lead      Lead     @relation(fields: [leadId], references: [id])
+}
+
+model Property {
+  id          String         @id @default(cuid())
+  title       String
+  description String?
+  price       Float
+  address     String
+  city        String
+  state       String
+  zip         String
+  beds        Int?
+  baths       Float?
+  area        Float?
+  type        PropertyType
+  status      PropertyStatus @default(AVAILABLE)
+  images      String[]
+  agencyId    String
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  projectId   String?
+  agency      Agency         @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  project     Project?       @relation(fields: [projectId], references: [id])
+}
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  agencyId             String             @unique
+  plan                 String
+  stripeSubscriptionId String?            @unique
+  status               SubscriptionStatus @default(ACTIVE)
+  currentPeriodEnd     DateTime?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+  agency               Agency             @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  token     String   @unique
+  expires   DateTime
+  createdAt DateTime @default(now())
+}
+
+model SubscriptionPlan {
+  id              String   @id @default(cuid())
+  name            String   @unique
+  description     String?
+  monthlyPrice    Float
+  yearlyPrice     Float
+  maxAgents       Int      @default(5)
+  maxLeads        Int      @default(1000)
+  features        Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  stripePriceId   String?  @unique
+  stripeProductId String?  @unique
+  agencies        Agency[]
+}
+
+model SystemLog {
+  id        String   @id @default(cuid())
+  type      String
+  level     String   @default("INFO")
+  action    String
+  details   Json?
+  userId    String?
+  ip        String?
+  userAgent String?
+  createdAt DateTime @default(now())
+}
+
+model SystemSettings {
+  id              String   @id @default("global")
+  aiExtraction    Boolean  @default(true)
+  freeTrialDays   Int      @default(14)
+  maintenanceMode Boolean  @default(false)
+  publicSignup    Boolean  @default(true)
+  supportEmail    String   @default("support@aiclex.in")
+  updatedAt       DateTime @updatedAt
+}
+
+model PlatformLead {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  phone     String
+  company   String?
+  message   String?
+  plan      String   @default("Enterprise")
+  status    String   @default("NEW") // NEW, CONTACTED, CLOSED, SPAM
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 enum AgencyStatus {
   ACTIVE
   SUSPENDED
@@ -13,68 +296,11 @@ enum AgencyStatus {
   DELETED
 }
 
-model Agency {
-  id            String         @id @default(cuid())
-  name          String
-  domain        String?        @unique
-  customDomain  String?        @unique
-  logo          String?
-  status        AgencyStatus   @default(ACTIVE)
-  stripeCustomerId     String? @unique
-  stripeSubscriptionId String? @unique
-  planId        String?
-  plan          SubscriptionPlan? @relation(fields: [planId], references: [id])
-  users         User[]
-  leads         Lead[]
-  properties    Property[]
-  messages      Message[]
-  whatsappSessions WhatsAppSession[]
-  subscription  Subscription?
-  projects      Project[]
-  emis          EMI[]
-  tasks         Task[]
-  tickets       Ticket[]
-  activities    Activity[]
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-}
-
 enum UserRole {
   ADMIN
+  AGENT
   SUPER_ADMIN
   AGENCY_OWNER
-  AGENT
-}
-
-model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  name          String?
-  password      String?
-  role          UserRole  @default(AGENT)
-  agencyId      String?
-  agency        Agency?    @relation(fields: [agencyId], references: [id], onDelete: Cascade)
-  leads         Lead[]    @relation("AssignedLeads")
-  tasks         Task[]
-  tickets       Ticket[]
-  activities    Activity[]
-  whatsappSession WhatsAppSession?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-}
-
-model WhatsAppSession {
-  id            String   @id @default(cuid())
-  agentId       String   @unique
-  agent         User     @relation(fields: [agentId], references: [id])
-  agencyId      String
-  agency        Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
-  sessionData   String   // JSON string of Baileys credentials
-  status        String   @default("DISCONNECTED") // CONNECTED, DISCONNECTED, CONNECTING
-  phoneNumber   String?
-  qrCode        String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
 }
 
 enum LeadStatus {
@@ -86,145 +312,6 @@ enum LeadStatus {
   SITE_VISIT
   CONVERTED
   LOST
-}
-
-model Lead {
-  id            String     @id @default(cuid())
-  name          String?
-  phone         String
-  email         String?
-  source        String?    @default("WHATSAPP")
-  status        LeadStatus @default(NEW)
-  priority      Int        @default(1)
-  
-  // AI Extracted Data
-  budget        String?
-  location      String?
-  propertyType  String?
-  notes         String?
-
-  agencyId      String
-  agency        Agency     @relation(fields: [agencyId], references: [id], onDelete: Cascade)
-  assignedToId  String?
-  assignedTo    User?      @relation("AssignedLeads", fields: [assignedToId], references: [id])
-  messages      Message[]
-  emis          EMI[]
-  tickets       Ticket[]
-  activities    Activity[]
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-
-  @@unique([phone, agencyId])
-}
-
-model Activity {
-  id            String    @id @default(cuid())
-  type          String    // CALL, MESSAGE, VISIT, NOTE
-  content       String
-  leadId        String
-  lead          Lead      @relation(fields: [leadId], references: [id])
-  userId        String
-  user          User      @relation(fields: [userId], references: [id])
-  agencyId      String
-  agency        Agency    @relation(fields: [agencyId], references: [id], onDelete: Cascade)
-  createdAt     DateTime  @default(now())
-}
-
-model Project {
-  id            String     @id @default(cuid())
-  name          String
-  description   String?
-  location      String
-  agencyId      String
-  agency        Agency     @relation(fields: [agencyId], references: [id], onDelete: Cascade)
-  properties    Property[]
-  emis          EMI[]
-  tickets       Ticket[]
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-}
-
-model EMI {
-  id            String     @id @default(cuid())
-  leadId        String
-  lead          Lead       @relation(fields: [leadId], references: [id])
-  projectId     String
-  project       Project    @relation(fields: [projectId], references: [id])
-  plotNumber    String
-  plotRate      Float
-  totalPrice    Float
-  planDetails   String?
-  startDate     DateTime
-  expiryDate    DateTime
-  status        String     @default("ACTIVE") // ACTIVE, PAID, OVERDUE
-  
-  installments  Installment[]
-  
-  agencyId      String
-  agency        Agency     @relation(fields: [agencyId], references: [id], onDelete: Cascade)
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-}
-
-model Installment {
-  id            String     @id @default(cuid())
-  emiId         String
-  emi           EMI        @relation(fields: [emiId], references: [id])
-  amount        Float
-  dueDate       DateTime
-  status        String     @default("PENDING") // PENDING, PAID, OVERDUE
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-}
-
-model Task {
-  id            String     @id @default(cuid())
-  title         String
-  description   String?
-  status        String     @default("TODAY") // TODAY, PENDING, COMPLETE
-  dueDate       DateTime?
-  
-  assignedToId  String
-  assignedTo    User       @relation(fields: [assignedToId], references: [id])
-  agencyId      String
-  agency        Agency     @relation(fields: [agencyId], references: [id], onDelete: Cascade)
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-}
-
-model Ticket {
-  id            String     @id @default(cuid())
-  subject       String
-  description   String?
-  type          String     @default("SUPPORT") // EMI, PAYMENT, SUPPORT, OTHER
-  status        String     @default("OPEN") // OPEN, CLOSED, IN_PROGRESS
-  
-  leadId        String
-  lead          Lead       @relation(fields: [leadId], references: [id])
-  projectId     String?
-  project       Project?    @relation(fields: [projectId], references: [id])
-  assignedToId  String?
-  assignedTo    User?      @relation(fields: [assignedToId], references: [id])
-  agencyId      String
-  agency        Agency     @relation(fields: [agencyId], references: [id], onDelete: Cascade)
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-}
-
-model Message {
-  id            String   @id @default(cuid())
-  content       String
-  fromMe        Boolean
-  timestamp     DateTime @default(now())
-  
-  leadId        String
-  lead          Lead     @relation(fields: [leadId], references: [id])
-  agencyId      String
-  agency        Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
-  
-  // Optional: tracking which agent sent the message
-  senderId      String?
-  createdAt     DateTime @default(now())
 }
 
 enum PropertyStatus {
@@ -240,89 +327,20 @@ enum PropertyType {
   COMMERCIAL
 }
 
-model Property {
-  id            String         @id @default(cuid())
-  title         String
-  description   String?
-  price         Float
-  address       String
-  city          String
-  state         String
-  zip           String
-  beds          Int?
-  baths         Float?
-  area          Float?
-  type          PropertyType
-  status        PropertyStatus @default(AVAILABLE)
-  images        String[]
-  agencyId      String
-  agency        Agency         @relation(fields: [agencyId], references: [id], onDelete: Cascade)
-  projectId     String?
-  project       Project?       @relation(fields: [projectId], references: [id])
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-}
-
 enum SubscriptionStatus {
   ACTIVE
   CANCELED
   PAST_DUE
 }
 
-model Subscription {
-  id                    String             @id @default(cuid())
-  agencyId              String             @unique
-  agency                Agency             @relation(fields: [agencyId], references: [id], onDelete: Cascade)
-  plan                  String
-  stripeSubscriptionId  String?            @unique
-  status                SubscriptionStatus @default(ACTIVE)
-  currentPeriodEnd      DateTime?
-  createdAt             DateTime           @default(now())
-  updatedAt             DateTime           @updatedAt
-}
-
-model PasswordResetToken {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  token     String   @unique
-  expires   DateTime
-  createdAt DateTime @default(now())
-}
-
-model SubscriptionPlan {
-  id            String   @id @default(cuid())
-  name          String   @unique // e.g., Starter, Pro, Enterprise
-  stripeProductId String? @unique
-  stripePriceId   String? @unique
-  description   String?
-  monthlyPrice  Float
-  yearlyPrice   Float
-  maxAgents     Int      @default(5)
-  maxLeads      Int      @default(1000)
-  features      Json?    // Array of feature strings or structured JSON
-  agencies      Agency[]
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-}
-
-model SystemLog {
-  id            String   @id @default(cuid())
-  type          String   // API_CALL, AUTH, ERROR, SYSTEM, BROADCAST
-  level         String   @default("INFO") // INFO, WARN, ERROR, CRITICAL
-  action        String   // Concise description of what happened
-  details       Json?    // Structured payload for debugging
-  userId        String?
-  ip            String?
-  userAgent     String?
-  createdAt     DateTime @default(now())
-}
-
-model SystemSettings {
-  id            String   @id @default("global")
-  publicSignup  Boolean  @default(true)
-  maintenanceMode Boolean @default(false)
-  aiExtraction  Boolean  @default(true)
-  freeTrialDays Int      @default(14)
-  supportEmail  String   @default("support@aiclex.in")
-  updatedAt     DateTime @updatedAt
+model PortalIntegration {
+  id         String   @id @default(cuid())
+  name       String   // Bayut, Property Finder, Dubizzle, Zillow
+  apiKey     String?
+  webhookUrl String?
+  status     String   @default("ACTIVE")
+  agencyId   String
+  agency     Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }

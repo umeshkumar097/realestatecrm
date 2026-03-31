@@ -20,8 +20,8 @@ export default function InnerPageLayout({ title, subtitle, badge, children }: In
               <Building2 className="text-white h-5 w-5" />
             </div>
             <div>
-              <span className="text-lg font-black tracking-tight text-slate-900">PropCRM</span>
-              <span className="block text-[8px] font-bold text-blue-500 uppercase tracking-widest leading-none">by Aiclex Technologies</span>
+              <span className="text-lg font-black tracking-tight text-slate-900 leading-none">PropGOCrm</span>
+              <span className="block text-[8px] font-bold text-blue-500 uppercase tracking-widest leading-none mt-1">The Global Standard</span>
             </div>
           </Link>
           <Link href="/" className="flex items-center gap-1.5 text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">
@@ -53,7 +53,7 @@ export default function InnerPageLayout({ title, subtitle, badge, children }: In
       {/* Footer */}
       <footer className="bg-slate-950 py-8 px-6 lg:px-16 border-t border-slate-800">
         <div className="container mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-slate-500 text-sm">© 2026 <a href="https://aiclex.in" target="_blank" className="text-blue-400 hover:text-white transition-colors font-semibold">Aiclex Technologies</a>. All rights reserved.</p>
+          <p className="text-slate-500 text-sm">© 2026 <a href="https://aiclex.in" target="_blank" className="text-blue-400 hover:text-white transition-colors font-semibold">PropGOCrm Global</a>. All rights reserved.</p>
           <div className="flex gap-6">
             {[
               { label: "Privacy", href: "/privacy" },

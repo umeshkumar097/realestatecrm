@@ -7,7 +7,7 @@ export default function ContactPage() {
     <InnerPageLayout 
       badge="Get in Touch"
       title="Contact Us"
-      subtitle="Have questions about PropCRM? We're here to help you scale your agency."
+      subtitle="Have questions about PropGOCrm? We're here to help you scale your agency."
     >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
         <div className="space-y-8">

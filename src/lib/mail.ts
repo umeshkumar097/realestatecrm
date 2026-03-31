@@ -14,7 +14,7 @@ export const sendPasswordResetEmail = async (email: string, token: string) => {
   const resetLink = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${token}`
 
   await transporter.sendMail({
-    from: `"AICLEX CRM" <${process.env.SMTP_USER}>`,
+    from: `"PropGOCrm Global" <${process.env.SMTP_USER}>`,
     to: email,
     subject: "Reset your password",
     html: `
@@ -26,8 +26,39 @@ export const sendPasswordResetEmail = async (email: string, token: string) => {
         </div>
         <p style="color: #94a3b8; font-size: 12px;">If you didn't request this, you can safely ignore this email.</p>
         <hr style="border: 0; border-top: 1px solid #f1f5f9; margin: 24px 0;" />
-        <p style="color: #94a3b8; font-size: 12px; text-align: center;">AICLEX Technologies © 2026</p>
+        <p style="color: #94a3b8; font-size: 12px; text-align: center;">PropGOCrm © 2026</p>
       </div>
+    `,
+  })
+}
+
+export const sendPlatformLeadNotification = async (data: any) => {
+  const { name, email, phone, company, message, plan } = data
+
+  // Admin Notification
+  await transporter.sendMail({
+    from: `"PropGOCrm Platform" <${process.env.SMTP_USER}>`,
+    to: process.env.SMTP_USER,
+    subject: `New ${plan} Inquiry: ${name}`,
+    html: `
+      <h2>New Enterprise Inquiry</h2>
+      <p><strong>Name:</strong> ${name}</p>
+      <p><strong>Email:</strong> ${email}</p>
+      <p><strong>Phone:</strong> ${phone}</p>
+      <p><strong>Company:</strong> ${company || 'N/A'}</p>
+      <p><strong>Message:</strong> ${message || 'N/A'}</p>
+    `,
+  })
+
+  // User Confirmation
+  await transporter.sendMail({
+    from: `"PropGOCrm Support" <${process.env.SMTP_USER}>`,
+    to: email,
+    subject: `Thank you for your interest!`,
+    html: `
+      <h2>We've Received Your Request</h2>
+      <p>Hi ${name},</p>
+      <p>Thanks for reaching out about the ${plan} plan. Our team will contact you shortly.</p>
     `,
   })
 }

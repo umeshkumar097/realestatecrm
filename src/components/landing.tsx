@@ -21,19 +21,72 @@ import {
   MessageSquare,
   Phone,
   Zap,
-  ShieldCheck
+  ShieldCheck,
+  Globe,
+  LayoutDashboard,
+  Shield,
+  Clock,
+  ArrowUpRight,
+  MousePointer2,
+  Layers
 } from "lucide-react"
+
+import LeadModal from "./LeadModal"
 
 export default function Landing() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [currentLeadIdx, setCurrentLeadIdx] = useState(0)
+  const [isLeadModalOpen, setIsLeadModalOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState('leads')
+
+  const pricingPlans = [
+    { 
+      plan: "Starter", 
+      price: "699", 
+      period: "/month", 
+      desc: "Perfect for small agencies getting started.", 
+      features: ["Up to 5 Agents", "500 Leads/Month", "Basic Analytics", "Email Support", "Shared WhatsApp"], 
+      cta: "Start Free Trial", 
+      highlight: false, 
+      href: "/signup" 
+    },
+    { 
+      plan: "Professional", 
+      price: "1,099", 
+      period: "/month", 
+      desc: "For growing agencies managing 20+ deals.", 
+      features: ["Up to 20 Agents", "Unlimited Leads", "AI Lead Scoring", "Priority Support", "Custom Reports", "Dedicated WhatsApp CRM"], 
+      cta: "Most Popular", 
+      highlight: true, 
+      href: "/signup" 
+    },
+    { 
+      plan: "Enterprise", 
+      price: "Custom", 
+      period: "", 
+      desc: "For large property companies with multiple branches.", 
+      features: ["Unlimited Agents", "Multi-Branch Dashboard", "Portal Sync Integration", "API Access", "Custom Integrations", "On-premise Option"], 
+      cta: "Contact Sales", 
+      highlight: false, 
+      onClick: () => setIsLeadModalOpen(true) 
+    },
+  ]
 
   const mockLeads = [
     { name: "Rahul Sharma", action: "Inquired about 3BHK in Bandra", badge: "Hot Lead 🔥" },
     { name: "Priya Patel", action: "Ready to close ₹2.4Cr villa deal", badge: "Closing Soon 💰" },
     { name: "Vikram Singh", action: "Scheduled site visit this evening", badge: "Site Visit 🏠" },
     { name: "Meera Joshi", action: "New referral from existing client", badge: "Referral ⭐" }
+  ]
+
+  const portals = [
+    { name: "Property Finder", logo: "/logos/property-finder.svg", color: "bg-red-500" },
+    { name: "Bayut", logo: "/logos/bayut.svg", color: "bg-emerald-500" },
+    { name: "Dubizzle", logo: "/logos/dubizzle.svg", color: "bg-red-600" },
+    { name: "Zillow", logo: "/logos/zillow.svg", color: "bg-blue-600" },
+    { name: "MagicBricks", logo: "/logos/magicbricks.svg", color: "bg-red-100" },
+    { name: "Housing.com", logo: "/logos/housing.svg", color: "bg-pink-600" }
   ]
 
   useEffect(() => {
@@ -43,553 +96,361 @@ export default function Landing() {
     return () => { window.removeEventListener("scroll", handleScroll); clearInterval(interval) }
   }, [mockLeads.length])
 
-  const beforePains = [
-    "Leads lost in WhatsApp & Excel sheets",
-    "Agents forget followups, deals slip away",
-    "No idea which property sells best",
-    "Client documents scattered everywhere",
-    "Manager always in the dark about team",
-  ]
-
-  const afterGains = [
-    "Every lead captured & auto-assigned",
-    "Smart reminders, zero missed followups",
-    "Real-time analytics per property & agent",
-    "All docs in one secure digital vault",
-    "Boss dashboard — full team visibility",
-  ]
-
   const features = [
-    { icon: Users, title: "Lead Pipeline", desc: "Drag-drop pipeline to track every inquiry from first call to deal close.", color: "from-blue-500 to-indigo-600" },
-    { icon: Building2, title: "Property Catalog", desc: "Rich listings with photos, pricing history, and availability status.", color: "from-emerald-500 to-teal-600" },
-    { icon: Bell, title: "Smart Follow-ups", desc: "AI reminds agents at the right time — never lose a hot lead again.", color: "from-amber-500 to-orange-600" },
-    { icon: BarChart3, title: "Sales Analytics", desc: "Daily reports, agent leaderboards, and conversion funnels at a glance.", color: "from-purple-500 to-violet-600" },
-    { icon: Calendar, title: "Site Visit Planner", desc: "Schedule and track property visits with clients on an integrated calendar.", color: "from-pink-500 to-rose-600" },
-    { icon: ShieldCheck, title: "Document Vault", desc: "Store agreements, KYC docs, and property papers securely in the cloud.", color: "from-cyan-500 to-sky-600" },
-  ]
-
-  const testimonials = [
-    { name: "Rajesh Mehta", role: "MD, Mehta Realty", city: "Mumbai", stars: 5, quote: "We went from losing 3-4 leads a day to closing 40% more deals in the first month. Ek game-changer hai yeh CRM." },
-    { name: "Sunita Agarwal", role: "Sales Head, Skyline Properties", city: "Delhi NCR", stars: 5, quote: "Before this, my team was always confused. Now they know exactly which client to call and when. Stress khatam!" },
-    { name: "Kiran Reddy", role: "Founder, KR Estates", city: "Hyderabad", stars: 5, quote: "₹5Cr revenue increase in 6 months. The ROI on this SaaS is insane. Highly recommended for serious agencies." },
+    { 
+      icon: Users, 
+      title: "Automated Lead Pipeline", 
+      desc: "Every inquiry from WhatsApp, Portals, and Ads is auto-captured, scored by AI, and assigned to the right agent instantly.", 
+      color: "from-blue-600 to-indigo-700" 
+    },
+    { 
+      icon: Building2, 
+      title: "Smart Property Catalog", 
+      desc: "Manage listings with rich media, 360 virtual tours, and floor plans. Social share ready with one click.", 
+      color: "from-blue-500 to-sky-500" 
+    },
+    { 
+      icon: MessageSquare, 
+      title: "Global WhatsApp CRM", 
+      desc: "Personalized follow-ups at scale. Send property cards, brochures, and site-visit details directly via API.", 
+      color: "from-emerald-500 to-teal-600" 
+    },
+    { 
+      icon: TrendingUp, 
+      title: "Advanced HR & Analytics", 
+      desc: "Track agent performance, set revenue targets, and manage commissions. Real-time data for better decisions.", 
+      color: "from-violet-600 to-fuchsia-600" 
+    },
+    { 
+      icon: Shield, 
+      title: "Enterprise Document Vault", 
+      desc: "Securely store KYC, agreements, and payment records. AES-256 encryption compliant with global standards.", 
+      color: "from-amber-500 to-orange-600" 
+    },
+    { 
+      icon: LayoutDashboard, 
+      title: "Multi-Branch Control", 
+      desc: "Manage multiple cities or branches from a single Master dashboard. Unified reporting for global operations.", 
+      color: "from-slate-700 to-slate-900" 
+    },
   ]
 
   return (
-    <div className="flex flex-col min-h-screen bg-white overflow-x-hidden">
+    <div className="flex flex-col min-h-screen bg-[#FDFDFF] text-slate-900 font-sans selection:bg-blue-100 selection:text-blue-900 overflow-x-hidden">
 
       {/* ── NAVBAR ── */}
-      <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled ? "bg-white/95 backdrop-blur-md shadow-lg border-b border-slate-100 py-3" : "bg-transparent py-5"}`}>
-        <div className="container mx-auto px-6 lg:px-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform">
-              <Building2 className="text-white h-6 w-6" />
+      <header className={`fixed top-0 w-full z-50 transition-all duration-500 ${isScrolled ? "bg-white/80 backdrop-blur-xl shadow-sm border-b border-slate-100 py-3" : "bg-transparent py-6"}`}>
+        <div className="container mx-auto px-6 lg:px-12 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2 group">
+            <div className="w-9 h-9 bg-gradient-to-tr from-blue-700 via-blue-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/20 group-hover:rotate-6 transition-transform duration-300">
+              <Building2 className="text-white h-5 w-5" />
             </div>
-            <div>
-              <span className="text-xl font-black tracking-tighter text-slate-900">PropCRM</span>
-              <span className="block text-[9px] font-bold text-blue-600 uppercase tracking-widest leading-none -mt-0.5">Real Estate Intelligence</span>
+            <div className="flex flex-col">
+              <span className="text-xl font-black tracking-tight leading-none text-slate-900">Prop<span className="text-blue-600">TCrm</span></span>
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">The Global Standard</span>
             </div>
           </Link>
 
           <nav className="hidden md:flex items-center gap-10">
-            {['Features', 'Why Us', 'Pricing', 'Testimonials'].map(i => (
-              <Link key={i} href={`#${i.toLowerCase().replace(" ", "-")}`} className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">{i}</Link>
+            {['Features', 'MarketSync', 'Pricing', 'Company'].map(i => (
+              <Link key={i} href={`#${i.toLowerCase()}`} className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors relative group">
+                {i}
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 transition-all group-hover:w-full" />
+              </Link>
             ))}
           </nav>
 
-          <div className="hidden md:flex items-center gap-4">
-            <Link href="/login" className="text-sm font-bold text-slate-700 hover:text-blue-600 transition-colors">Login</Link>
-            <Link href="/signup" className="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl text-sm font-bold shadow-lg shadow-blue-500/25 hover:scale-105 active:scale-95 transition-all">
-              Start Free Trial →
+          <div className="hidden md:flex items-center gap-6">
+            <Link href="/login" className="text-sm font-bold text-slate-600 hover:text-blue-600 transition-colors">Login</Link>
+            <Link href="/signup" className="group px-7 py-3 bg-slate-900 text-white rounded-2xl text-sm font-black shadow-xl shadow-slate-900/10 hover:bg-blue-600 hover:-translate-y-0.5 transition-all active:scale-95 flex items-center gap-2">
+              Get Started Free <ArrowUpRight className="h-4 w-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
             </Link>
           </div>
 
-          <button className="md:hidden text-slate-800" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+          <button className="md:hidden p-2 text-slate-900" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
             {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
         </div>
 
-        {mobileMenuOpen && (
-          <div className="md:hidden bg-white border-b border-slate-100 px-6 py-6 flex flex-col gap-5">
-            {['Features', 'Why Us', 'Pricing', 'Testimonials'].map(i => (
-              <Link key={i} href={`#${i.toLowerCase()}`} className="text-base font-semibold text-slate-700" onClick={() => setMobileMenuOpen(false)}>{i}</Link>
-            ))}
-            <div className="pt-4 border-t border-slate-100 flex flex-col gap-3">
-              <Link href="/login" className="text-center py-3 font-bold text-slate-700">Login</Link>
-              <Link href="/signup" className="text-center py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl font-bold">Start Free Trial</Link>
+        {/* Mobile Menu */}
+        <div className={`fixed inset-0 bg-white z-[60] p-6 transition-transform duration-500 md:hidden ${mobileMenuOpen ? "translate-x-0" : "translate-x-full"}`}>
+          <div className="flex justify-between items-center mb-12">
+             <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white"><Building2 size={18}/></div>
+              <span className="text-xl font-black">PropGOCrm</span>
             </div>
+            <X className="h-8 w-8 text-slate-400" onClick={() => setMobileMenuOpen(false)} />
           </div>
-        )}
+          <div className="flex flex-col gap-8 text-2xl font-black text-slate-900">
+            {['Features', 'MarketSync', 'Pricing', 'Company'].map(i => (
+              <Link key={i} href={`#${i.toLowerCase()}`} onClick={() => setMobileMenuOpen(false)}>{i}</Link>
+            ))}
+          </div>
+          <div className="mt-20 flex flex-col gap-4">
+            <Link href="/login" className="text-center py-5 font-black text-slate-600">Login</Link>
+            <Link href="/signup" className="text-center py-5 bg-blue-600 text-white rounded-2xl font-black">Start Free Trial</Link>
+          </div>
+        </div>
       </header>
 
       <main className="flex-1">
 
         {/* ── HERO ── */}
-        <section className="relative pt-28 pb-20 lg:pt-40 lg:pb-32 overflow-hidden bg-gradient-to-b from-slate-50 via-blue-50/40 to-white">
-          {/* BG City Silhouette */}
-          <div className="absolute bottom-0 left-0 right-0 h-64 opacity-5" aria-hidden>
-            <svg viewBox="0 0 1440 200" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-              <rect x="0"   y="80" width="60"  height="120" fill="#1e3a5f"/>
-              <rect x="20"  y="60" width="20"  height="140" fill="#1e3a5f"/>
-              <rect x="80"  y="100" width="80" height="100" fill="#1e3a5f"/>
-              <rect x="100" y="70" width="40"  height="130" fill="#1e3a5f"/>
-              <rect x="180" y="50" width="100" height="150" fill="#1e3a5f"/>
-              <rect x="200" y="30" width="60"  height="170" fill="#1e3a5f"/>
-              <rect x="290" y="90" width="70"  height="110" fill="#1e3a5f"/>
-              <rect x="370" y="60" width="90"  height="140" fill="#1e3a5f"/>
-              <rect x="390" y="40" width="50"  height="160" fill="#1e3a5f"/>
-              <rect x="470" y="100" width="60" height="100" fill="#1e3a5f"/>
-              <rect x="540" y="55" width="120" height="145" fill="#1e3a5f"/>
-              <rect x="560" y="20" width="80"  height="180" fill="#1e3a5f"/>
-              <rect x="670" y="80" width="70"  height="120" fill="#1e3a5f"/>
-              <rect x="750" y="40" width="100" height="160" fill="#1e3a5f"/>
-              <rect x="760" y="10" width="70"  height="190" fill="#1e3a5f"/>
-              <rect x="860" y="70" width="80"  height="130" fill="#1e3a5f"/>
-              <rect x="950" y="50" width="110" height="150" fill="#1e3a5f"/>
-              <rect x="960" y="20" width="90"  height="180" fill="#1e3a5f"/>
-              <rect x="1070" y="90" width="70" height="110" fill="#1e3a5f"/>
-              <rect x="1150" y="60" width="90" height="140" fill="#1e3a5f"/>
-              <rect x="1160" y="30" width="70" height="170" fill="#1e3a5f"/>
-              <rect x="1250" y="80" width="80" height="120" fill="#1e3a5f"/>
-              <rect x="1340" y="50" width="100" height="150" fill="#1e3a5f"/>
-            </svg>
-          </div>
-
-          {/* Orbs */}
-          <div className="absolute top-0 right-0 -mr-32 w-[700px] h-[700px] bg-blue-400/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-0 -ml-32 w-[500px] h-[500px] bg-indigo-400/10 rounded-full blur-3xl pointer-events-none" />
-
-          <div className="container mx-auto px-6 lg:px-16 relative">
-            <div className="flex flex-col lg:flex-row items-center gap-16">
-              {/* Left Copy */}
-              <div className="flex-1 text-center lg:text-left">
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600/10 text-blue-700 rounded-full text-xs font-black uppercase tracking-widest mb-8 border border-blue-200">
-                  <span className="flex h-2 w-2 rounded-full bg-blue-600 animate-pulse" />
-                  Trusted by 500+ Real Estate Agencies
-                </div>
-
-                <h1 className="text-4xl lg:text-6xl font-black text-slate-900 leading-tight mb-6">
-                  Stop Losing Deals.<br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Run Your Agency</span><br />
-                  Like a Pro.
-                </h1>
-
-                <p className="text-lg text-slate-500 max-w-lg mx-auto lg:mx-0 mb-10 leading-relaxed">
-                  PropCRM is built for real estate agencies just like yours — manage leads, properties, site visits, and your entire team from one powerful dashboard.
-                </p>
-
-                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                  <Link href="/signup" className="px-10 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl font-black text-lg shadow-2xl shadow-blue-500/30 hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2">
-                    Start Free Trial <ChevronRight className="h-5 w-5" />
-                  </Link>
-                  <Link href="#why-us" className="px-10 py-4 bg-white text-slate-800 rounded-2xl font-bold text-lg border border-slate-200 hover:shadow-lg transition-all flex items-center justify-center gap-2">
-                    See How It Works
-                  </Link>
-                </div>
-
-                {/* Social Proof */}
-                <div className="flex items-center gap-4 mt-10 justify-center lg:justify-start">
-                  <div className="flex -space-x-3">
-                    {['RM','SP','VA','KR','MA'].map(n => (
-                      <div key={n} className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 border-2 border-white flex items-center justify-center text-white text-[10px] font-black">{n}</div>
-                    ))}
-                  </div>
-                  <div>
-                    <div className="flex gap-0.5">{[...Array(5)].map((_,i) => <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />)}</div>
-                    <p className="text-xs text-slate-500 font-medium mt-0.5">4.9/5 from 200+ agencies</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Right — Hero Image (Desktop only) */}
-              <div className="flex-1 w-full hidden lg:block">
-                <div className="relative">
-                  <div className="absolute -inset-4 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 rounded-[3rem] blur-2xl" />
-                  <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-white/50">
-                    <Image
-                      src="/images/hero-dashboard.png"
-                      alt="Real estate team using PropCRM"
-                      width={640}
-                      height={640}
-                      className="w-full object-cover"
-                      priority
-                    />
-                  </div>
-                  {/* Floating notification */}
-                  <div key={currentLeadIdx} className="absolute bottom-6 -left-8 w-72 bg-white/95 backdrop-blur-sm rounded-2xl p-4 shadow-2xl border border-blue-100 animate-notification">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-blue-600/10 rounded-xl flex items-center justify-center shrink-0">
-                        <Users className="h-5 w-5 text-blue-600" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-0.5">
-                          <p className="text-[10px] font-black text-blue-600 uppercase tracking-wider">New Lead</p>
-                          <span className="text-[9px] bg-blue-50 text-blue-600 border border-blue-200 px-1.5 py-0.5 rounded-full font-bold">{mockLeads[currentLeadIdx].badge}</span>
-                        </div>
-                        <p className="text-sm font-black text-slate-800 truncate">{mockLeads[currentLeadIdx].name}</p>
-                        <p className="text-[11px] text-slate-500 truncate">{mockLeads[currentLeadIdx].action}</p>
-                      </div>
-                    </div>
-                  </div>
-                  {/* Revenue badge */}
-                  <div className="absolute -top-4 -right-4 bg-emerald-500 text-white rounded-2xl px-4 py-2 text-sm font-black shadow-xl animate-float">
-                    +₹2.4Cr Closed 🎉
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── ANIMATED PRODUCT PREVIEW ── */}
-        <section className="py-20 px-6 lg:px-16 bg-gradient-to-b from-white to-slate-50 relative overflow-hidden">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[400px] bg-blue-500/5 rounded-full blur-3xl pointer-events-none" />
-          <div className="container mx-auto relative">
-            <div className="text-center mb-12">
-              <p className="text-blue-600 font-black uppercase tracking-widest text-sm mb-3">Live Product Preview</p>
-              <h2 className="text-3xl lg:text-5xl font-black text-slate-900 mb-4">One Dashboard. Total Control.</h2>
-              <p className="text-slate-500 text-lg max-w-xl mx-auto">See your entire agency — leads, properties, team performance — in one glance.</p>
+        <section className="relative pt-32 pb-20 lg:pt-52 lg:pb-40 overflow-hidden">
+          {/* Subtle Background Elements */}
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1600px] h-[800px] bg-gradient-to-b from-blue-50/50 via-indigo-50/20 to-transparent rounded-full blur-[120px] -z-10" />
+          <div className="absolute top-[20%] right-[-10%] w-[400px] h-[400px] bg-blue-200/20 rounded-full blur-[100px] -z-10" />
+          
+          <div className="container mx-auto px-6 lg:px-12 relative text-center">
+            <div className="inline-flex items-center gap-2.5 px-4 py-2 bg-white/50 backdrop-blur-md border border-blue-100 rounded-full shadow-sm mb-10 animate-fade-in-up">
+              <span className="flex h-2 w-2 rounded-full bg-blue-600 animate-pulse" />
+              <span className="text-[11px] font-black uppercase tracking-widest text-slate-500">The Power of Automation in Real Estate</span>
             </div>
 
-            {/* Animated Dashboard Mockup */}
-            <div className="relative max-w-6xl mx-auto group">
-              <div className="absolute -inset-2 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-[2.5rem] blur-xl opacity-20 group-hover:opacity-30 transition duration-1000" />
-              <div className="relative bg-white rounded-[2rem] shadow-2xl border border-slate-200 overflow-hidden">
-                {/* Browser chrome */}
-                <div className="bg-slate-800 px-6 py-4 flex items-center gap-3">
-                  <div className="flex gap-1.5">
-                    <div className="w-3 h-3 rounded-full bg-red-400" />
-                    <div className="w-3 h-3 rounded-full bg-amber-400" />
-                    <div className="w-3 h-3 rounded-full bg-emerald-400" />
-                  </div>
-                  <div className="flex-1 mx-4 h-7 bg-slate-700 rounded-lg flex items-center px-3">
-                    <span className="text-slate-400 text-xs font-medium">app.propcrm.in/dashboard</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <div className="w-6 h-6 rounded bg-slate-700" />
-                    <div className="w-6 h-6 rounded bg-slate-700" />
-                  </div>
-                </div>
+            <h1 className="text-5xl lg:text-[88px] font-black tracking-tight leading-[0.95] text-slate-900 mb-10 max-w-5xl mx-auto">
+              Real Estate Sales.<br />
+              <span className="text-blue-600">Reimagined.</span>
+            </h1>
 
-                {/* Dashboard body */}
-                <div className="flex h-[520px]">
-                  {/* Sidebar */}
-                  <div className="hidden md:flex w-56 bg-slate-900 flex-col p-4 gap-1 shrink-0">
-                    <div className="flex items-center gap-3 px-3 py-3 mb-4">
-                      <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                        <Building2 className="h-4 w-4 text-white" />
-                      </div>
-                      <span className="text-white font-black text-sm">PropCRM</span>
-                    </div>
-                    {[
-                      { icon: BarChart3, label: "Dashboard", active: true },
-                      { icon: Users, label: "Leads", active: false },
-                      { icon: Building2, label: "Properties", active: false },
-                      { icon: Calendar, label: "Site Visits", active: false },
-                      { icon: MessageSquare, label: "Follow-ups", active: false },
-                      { icon: TrendingUp, label: "Analytics", active: false },
-                    ].map(item => (
-                      <div key={item.label} className={`flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-colors ${item.active ? "bg-blue-600 text-white" : "text-slate-400 hover:bg-slate-800 hover:text-white"}`}>
-                        <item.icon className="h-4 w-4 shrink-0" />
-                        <span className="text-sm font-medium">{item.label}</span>
-                      </div>
-                    ))}
-                  </div>
+            <p className="text-xl lg:text-2xl text-slate-500 font-medium max-w-2xl mx-auto mb-14 leading-relaxed">
+              PropGOCrm empowers modern agencies to close 3x more deals with intelligent lead automation, global portal sync, and integrated WhatsApp CRM.
+            </p>
 
-                  {/* Main content */}
-                  <div className="flex-1 bg-slate-50 p-6 overflow-hidden">
-                    {/* Stats row */}
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                      {[
-                        { label: "Active Leads", value: "148", change: "+12%", color: "text-blue-600", bg: "bg-blue-50", border: "border-blue-100" },
-                        { label: "Site Visits", value: "23", change: "+8%", color: "text-emerald-600", bg: "bg-emerald-50", border: "border-emerald-100" },
-                        { label: "Deals Closing", value: "7", change: "+3", color: "text-amber-600", bg: "bg-amber-50", border: "border-amber-100" },
-                        { label: "Revenue (Cr)", value: "₹8.4", change: "+18%", color: "text-indigo-600", bg: "bg-indigo-50", border: "border-indigo-100" },
-                      ].map((s, i) => (
-                        <div key={s.label} className={`${s.bg} border ${s.border} rounded-2xl p-4 animate-float`} style={{ animationDelay: `${i * 0.2}s` }}>
-                          <p className="text-xs font-medium text-slate-500 mb-2">{s.label}</p>
-                          <p className={`text-2xl font-black ${s.color}`}>{s.value}</p>
-                          <p className="text-xs text-emerald-500 font-bold mt-1">↑ {s.change} this week</p>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Two column layout */}
-                    <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 h-[calc(100%-130px)]">
-                      {/* Lead pipeline */}
-                      <div className="lg:col-span-3 bg-white rounded-2xl border border-slate-200 p-4 overflow-hidden">
-                        <div className="flex items-center justify-between mb-4">
-                          <p className="text-sm font-black text-slate-700">Live Lead Pipeline</p>
-                          <span className="flex items-center gap-1.5 text-[10px] font-bold text-emerald-600">
-                            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />LIVE
-                          </span>
-                        </div>
-                        <div className="space-y-2.5">
-                          {[
-                            { name: "Amit Kapoor", prop: "3BHK Bandra West, ₹1.8Cr", status: "Negotiation", badge: "bg-amber-100 text-amber-700", delay: "0s" },
-                            { name: "Divya Nair", prop: "Penthouse Worli, ₹4.2Cr", status: "Site Visit", badge: "bg-blue-100 text-blue-700", delay: "0.3s" },
-                            { name: "Ravi Tiwari", prop: "Commercial BKC, ₹2.1Cr", status: "Deal Close ✅", badge: "bg-emerald-100 text-emerald-700", delay: "0.6s" },
-                            { name: "Priya Mehta", prop: "2BHK Powai, ₹95L", status: "New Lead", badge: "bg-slate-100 text-slate-600", delay: "0.9s" },
-                          ].map(lead => (
-                            <div key={lead.name} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-slate-50 transition-colors animate-float" style={{ animationDelay: lead.delay }}>
-                              <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-[10px] font-black shrink-0">
-                                {lead.name.split(' ').map(n => n[0]).join('')}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className="text-xs font-bold text-slate-800 truncate">{lead.name}</p>
-                                <p className="text-[10px] text-slate-400 truncate">{lead.prop}</p>
-                              </div>
-                              <span className={`text-[9px] font-black px-2 py-1 rounded-full shrink-0 ${lead.badge}`}>{lead.status}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Right: chart + agent perf */}
-                      <div className="lg:col-span-2 flex flex-col gap-4">
-                        {/* Chart */}
-                        <div className="bg-white rounded-2xl border border-slate-200 p-4 flex-1">
-                          <p className="text-xs font-black text-slate-700 mb-3">Monthly Revenue</p>
-                          <div className="flex items-end gap-1.5 h-[80px]">
-                            {[40, 55, 35, 70, 60, 85, 95].map((h, i) => (
-                              <div key={i} className="flex-1 rounded-t-lg animate-float" style={{ height: `${h}%`, background: `hsl(${230 + i * 5}, 80%, ${50 + i * 3}%)`, animationDelay: `${i * 0.1}s` }} />
-                            ))}
-                          </div>
-                          <div className="flex justify-between mt-2">
-                            {['Sep','Oct','Nov','Dec','Jan','Feb','Mar'].map(m => (
-                              <span key={m} className="text-[8px] text-slate-400">{m}</span>
-                            ))}
-                          </div>
-                        </div>
-                        {/* Agent leaderboard */}
-                        <div className="bg-white rounded-2xl border border-slate-200 p-4">
-                          <p className="text-xs font-black text-slate-700 mb-3">🏆 Agent Leaderboard</p>
-                          <div className="space-y-2">
-                            {[
-                              { name: "Pooja K.", deals: 12, pct: 90 },
-                              { name: "Aryan S.", deals: 9, pct: 68 },
-                              { name: "Sneha R.", deals: 7, pct: 52 },
-                            ].map((a, i) => (
-                              <div key={a.name} className="flex items-center gap-2">
-                                <span className="text-[10px] font-black text-slate-400 w-4">{i + 1}</span>
-                                <div className="flex-1">
-                                  <div className="flex justify-between mb-0.5">
-                                    <span className="text-[10px] font-bold text-slate-700">{a.name}</span>
-                                    <span className="text-[10px] font-black text-blue-600">{a.deals} deals</span>
-                                  </div>
-                                  <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                                    <div className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full animate-shimmer" style={{ width: `${a.pct}%` }} />
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Floating badge */}
-              <div key={currentLeadIdx} className="hidden lg:flex absolute -right-6 top-1/3 w-64 bg-white rounded-2xl p-3.5 shadow-2xl border border-blue-100 animate-notification items-center gap-3">
-                <div className="w-9 h-9 bg-blue-50 rounded-xl flex items-center justify-center shrink-0">
-                  <Bell className="h-4 w-4 text-blue-600" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-[10px] font-black text-blue-600 uppercase tracking-wider">Alert</p>
-                  <p className="text-xs font-black text-slate-800 truncate">{mockLeads[currentLeadIdx].name}</p>
-                  <p className="text-[10px] text-slate-400 truncate">{mockLeads[currentLeadIdx].action}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── BEFORE / AFTER ── */}
-        <section id="why-us" className="py-24 bg-slate-900 relative overflow-hidden">
-          <div className="absolute inset-0 opacity-5">
-            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-              <defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="white" strokeWidth="0.5"/></pattern></defs>
-              <rect width="100" height="100" fill="url(#grid)" />
-            </svg>
-          </div>
-
-          <div className="container mx-auto px-6 lg:px-16 relative">
-            <div className="text-center mb-16">
-              <p className="text-blue-400 font-black uppercase tracking-widest text-sm mb-3">Before vs After PropCRM</p>
-              <h2 className="text-3xl lg:text-5xl font-black text-white mb-4">Every Agency Has 2 Phases.</h2>
-              <p className="text-slate-400 text-lg">Which one are you still living in?</p>
-            </div>
-
-            {/* Before/After illustration */}
-            <div className="flex justify-center mb-12">
-              <div className="rounded-3xl overflow-hidden shadow-2xl border border-white/10 max-w-2xl w-full">
-                <Image
-                  src="/images/before-after.png"
-                  alt="Before and after using PropCRM"
-                  width={800}
-                  height={400}
-                  className="w-full object-cover"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* BEFORE */}
-              <div className="bg-red-950/40 rounded-3xl p-8 border border-red-800/50">
-                <div className="flex items-center gap-3 mb-8">
-                  <div className="w-10 h-10 bg-red-500/20 rounded-xl flex items-center justify-center">
-                    <XCircle className="h-6 w-6 text-red-400" />
-                  </div>
-                  <div>
-                    <p className="text-red-400 font-black uppercase tracking-widest text-xs">Before CRM</p>
-                    <p className="text-white font-bold text-xl">The Chaos Phase 😩</p>
-                  </div>
-                </div>
-                <ul className="space-y-4">
-                  {beforePains.map(p => (
-                    <li key={p} className="flex items-start gap-3">
-                      <XCircle className="h-5 w-5 text-red-400 mt-0.5 shrink-0" />
-                      <span className="text-slate-300 font-medium">{p}</span>
-                    </li>
-                  ))}
-                </ul>
-                <div className="mt-8 p-5 bg-red-900/30 rounded-2xl border border-red-800/40">
-                  <p className="text-red-300 text-sm font-medium italic">"Yaar, 5 deals slip ho gayi is month. Client ka call miss hua, followup bhool gaye. Boss furious hai."</p>
-                  <p className="text-red-500 text-xs font-bold mt-2">— Every agent before PropCRM</p>
-                </div>
-              </div>
-
-              {/* AFTER */}
-              <div className="bg-emerald-950/40 rounded-3xl p-8 border border-emerald-800/50">
-                <div className="flex items-center gap-3 mb-8">
-                  <div className="w-10 h-10 bg-emerald-500/20 rounded-xl flex items-center justify-center">
-                    <CheckCircle2 className="h-6 w-6 text-emerald-400" />
-                  </div>
-                  <div>
-                    <p className="text-emerald-400 font-black uppercase tracking-widest text-xs">After CRM</p>
-                    <p className="text-white font-bold text-xl">The Growth Phase 🚀</p>
-                  </div>
-                </div>
-                <ul className="space-y-4">
-                  {afterGains.map(g => (
-                    <li key={g} className="flex items-start gap-3">
-                      <CheckCircle2 className="h-5 w-5 text-emerald-400 mt-0.5 shrink-0" />
-                      <span className="text-slate-200 font-medium">{g}</span>
-                    </li>
-                  ))}
-                </ul>
-                <div className="mt-8 p-5 bg-emerald-900/30 rounded-2xl border border-emerald-800/40">
-                  <p className="text-emerald-200 text-sm font-medium italic">"Pehle bahut stress tha. Ab CRM sab handle karta hai. Team productive hai, clients khush hain. Revenue double!"</p>
-                  <p className="text-emerald-500 text-xs font-bold mt-2">— Rajesh Mehta, Mehta Realty Mumbai</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="text-center mt-12">
-              <Link href="/signup" className="inline-flex items-center gap-2 px-10 py-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl font-black text-lg shadow-2xl shadow-blue-500/30 hover:scale-105 active:scale-95 transition-all">
-                Switch to the Growth Phase <ArrowRight className="h-5 w-5" />
+            <div className="flex flex-col sm:flex-row gap-5 justify-center mb-24">
+              <Link href="/signup" className="group px-12 py-5 bg-blue-600 text-white rounded-[24px] font-black text-xl shadow-2xl shadow-blue-600/30 hover:bg-blue-700 hover:scale-[1.02] transition-all flex items-center justify-center gap-3">
+                Start 14-Day Free Trial <ArrowRight className="h-6 w-6 group-hover:translate-x-1 transition-transform" />
+              </Link>
+              <Link href="#features" className="px-12 py-5 bg-white text-slate-700 border border-slate-200 rounded-[24px] font-black text-xl shadow-sm hover:border-blue-600 hover:text-blue-600 hover:shadow-xl hover:shadow-blue-600/5 transition-all">
+                See Features
               </Link>
             </div>
+
+            {/* Dashboard Visualizer */}
+            <div className="relative max-w-6xl mx-auto">
+              <div className="absolute -inset-1 bg-gradient-to-r from-blue-600/20 via-indigo-600/20 to-blue-600/20 rounded-[44px] blur-2xl opacity-50" />
+              <div className="relative bg-[#0F172A] rounded-[40px] shadow-2xl border border-slate-800 overflow-hidden aspect-[16/9] group lg:scale-105 transition-transform duration-700">
+                
+                {/* Dashboard Sidebar Placeholder */}
+                <div className="absolute inset-y-0 left-0 w-20 lg:w-64 bg-[#020617] border-r border-slate-800 p-6 hidden md:flex flex-col gap-8">
+                   <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white"><Building2 /></div>
+                      <span className="text-white font-black text-xl hidden lg:block">PropGOCrm</span>
+                   </div>
+                   <div className="flex flex-col gap-2">
+                      {[LayoutDashboard, Users, Building2, MessageSquare, TrendingUp, Calendar].map((Icon, i) => (
+                        <div key={i} className={`flex items-center gap-4 px-4 py-3 rounded-2xl ${i === 0 ? "bg-blue-600 text-white" : "text-slate-500 hover:text-white hover:bg-slate-900"} transition-all cursor-pointer`}>
+                          <Icon size={20} />
+                          <span className="font-bold hidden lg:block">{['Dashboard', 'Leads', 'Listing', 'Mails', 'Team', 'Meeting'][i]}</span>
+                        </div>
+                      ))}
+                   </div>
+                </div>
+
+                {/* Dashboard Header Bar */}
+                <div className="absolute top-0 left-20 lg:left-64 right-0 h-20 border-b border-slate-800 flex items-center px-8 justify-between bg-[#0F172A]/80 backdrop-blur-md z-10">
+                   <div className="flex items-center gap-6">
+                      {['Leads', 'Pipeline', 'Meetings', 'HR & Accounts'].map((t, i) => (
+                        <span 
+                          key={t} 
+                          onClick={() => setActiveTab(t.toLowerCase())}
+                          className={`text-sm font-black uppercase tracking-widest cursor-pointer transition-all ${activeTab === t.toLowerCase() ? "text-blue-500" : "text-slate-500 hover:text-slate-300"}`}
+                        >
+                          {t}
+                        </span>
+                      ))}
+                   </div>
+                   <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-full bg-slate-800 border border-slate-700" />
+                   </div>
+                </div>
+
+                {/* Dashboard Content Mockup */}
+                <div className="absolute inset-0 pt-20 pl-20 lg:pl-64 overflow-hidden">
+                   <div className="p-8 h-full bg-[#020617]/50">
+                      <div className="grid grid-cols-4 gap-6 mb-8">
+                        {[1,2,3,4].map(i => (
+                          <div key={i} className="h-32 bg-slate-900/50 border border-slate-800/80 rounded-[32px] p-6 animate-pulse" style={{ animationDelay: `${i * 150}ms` }} />
+                        ))}
+                      </div>
+                      <div className="grid grid-cols-12 gap-6 h-full">
+                        <div className="col-span-8 bg-slate-900/40 border border-slate-800/50 rounded-[40px] p-8 relative overflow-hidden">
+                           {/* Floating Stats */}
+                           <div className="absolute top-10 left-10 flex gap-4">
+                              <div className="px-6 py-3 bg-blue-600 text-white rounded-2xl font-black text-sm shadow-xl">Hot Leads: 48</div>
+                              <div className="px-6 py-3 bg-emerald-600 text-white rounded-2xl font-black text-sm shadow-xl">Closing: $1.2M</div>
+                           </div>
+                           {/* Chart Lines Placeholder */}
+                           <div className="mt-20 w-full h-[300px] flex items-end gap-2">
+                             {[40, 70, 30, 90, 60, 100, 80, 110, 50, 120].map((h, i) => (
+                               <div key={i} className="flex-1 bg-blue-600/20 border-t-2 border-blue-600 rounded-t-xl transition-all hover:bg-blue-600" style={{ height: `${h}%` }} />
+                             ))}
+                           </div>
+                        </div>
+                        <div className="col-span-4 flex flex-col gap-6">
+                           <div className="flex-1 bg-slate-900/40 border border-slate-800/50 rounded-[40px] p-6" />
+                           <div className="flex-1 bg-slate-900/40 border border-slate-800/50 rounded-[40px] p-6" />
+                        </div>
+                      </div>
+                   </div>
+                </div>
+
+                {/* Overlays / Notifications */}
+                <div key={currentLeadIdx} className="absolute right-10 bottom-10 w-80 bg-white/10 backdrop-blur-2xl border border-white/20 rounded-[32px] p-5 shadow-2xl animate-float">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white shrink-0">
+                      <Star size={24} className="fill-white" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-black text-blue-500 uppercase tracking-widest leading-none mb-1.5">Lead Priority: High</p>
+                      <h4 className="text-white font-black text-sm">{mockLeads[currentLeadIdx].name}</h4>
+                      <p className="text-white/50 text-xs mt-1">{mockLeads[currentLeadIdx].action}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Floating Cursor Effect */}
+                <div className="absolute top-[60%] left-[45%] animate-bounce opacity-80 pointer-events-none">
+                  <MousePointer2 className="text-white fill-white" size={32} />
+                  <div className="mt-2 ml-4 px-3 py-1 bg-blue-600 text-white text-[10px] font-black rounded-lg">Assigning Lead...</div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Social Proof */}
+            <div className="mt-40">
+              <p className="text-slate-400 font-bold uppercase tracking-[0.2em] text-xs mb-10">Trusted by Global Luxury Portfolio Agencies</p>
+              <div className="flex flex-wrap justify-center items-center gap-10 lg:gap-20 opacity-30 grayscale hover:grayscale-0 transition-all duration-700">
+                 {['K-Knight', 'Sotheby', 'Remax', 'Engel', 'JLL', 'CBRE'].map(l => (
+                   <span key={l} className="text-2xl font-black tracking-tighter">{l}</span>
+                 ))}
+              </div>
+            </div>
           </div>
         </section>
 
-        {/* ── FEATURES ── */}
-        <section id="features" className="py-24 px-6 lg:px-16 bg-white">
-          <div className="container mx-auto">
-            <div className="text-center mb-16">
-              <p className="text-blue-600 font-black uppercase tracking-widest text-sm mb-3">Everything in One Place</p>
-              <h2 className="text-3xl lg:text-5xl font-black text-slate-900 mb-4">Built for Real Estate.<br />Period.</h2>
-              <p className="text-slate-500 max-w-xl mx-auto text-lg">No generic CRM junk. PropCRM has every feature a property agency needs to scale.</p>
+        {/* ── PORTAL INTEGRATION SECTION ── */}
+        <section id="marketsync" className="py-32 bg-white relative overflow-hidden">
+          <div className="container mx-auto px-6 lg:px-12">
+            <div className="flex flex-col lg:flex-row items-center gap-20">
+              <div className="flex-1 text-center lg:text-left">
+                <div className="w-14 h-14 bg-blue-600/10 rounded-2xl flex items-center justify-center text-blue-600 mb-8 mx-auto lg:mx-0">
+                  <Globe className="h-8 w-8" />
+                </div>
+                <h2 className="text-4xl lg:text-6xl font-black text-slate-900 leading-tight mb-8">
+                  One Sync.<br />Every Listing Portal.
+                </h2>
+                <p className="text-xl text-slate-500 mb-10 leading-relaxed max-w-lg mx-auto lg:mx-0">
+                  Capturing leads from Bayut, Property Finder, Zillow, and Dubizzle used to be manual. PropGOCrm syncs with them all in real-time, pulling every inquiry directly into your agent's dashboard.
+                </p>
+                <div className="flex flex-col gap-4 text-left max-w-sm mx-auto lg:mx-0">
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-600"><CheckCircle2 size={16}/></div>
+                    <span className="font-black text-sm text-slate-600 uppercase tracking-widest italic">Zero Lead Leakage</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-600"><CheckCircle2 size={16}/></div>
+                    <span className="font-black text-sm text-slate-600 uppercase tracking-widest italic">Auto-Response via WhatsApp</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-6 h-6 bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-600"><CheckCircle2 size={16}/></div>
+                    <span className="font-black text-sm text-slate-600 uppercase tracking-widest italic">Universal XML Sync Support</span>
+                  </div>
+                </div>
+              </div>
+              <div className="flex-1 grid grid-cols-2 md:grid-cols-3 gap-6">
+                {portals.map((p, i) => (
+                  <div key={i} className="group aspect-square bg-slate-50 rounded-[40px] border border-slate-100 flex flex-col items-center justify-center p-8 hover:bg-white hover:shadow-2xl hover:shadow-blue-600/10 transition-all duration-500 hover:-translate-y-2">
+                    <div className={`w-16 h-16 ${p.color} rounded-3xl mb-6 shadow-xl flex items-center justify-center text-white font-black text-2xl`}>
+                      {p.name[0]}
+                    </div>
+                    <p className="font-black text-slate-900 text-sm tracking-tight">{p.name}</p>
+                    <span className="mt-2 px-3 py-1 bg-emerald-100 text-emerald-700 text-[9px] font-black uppercase rounded-full tracking-widest">Active Sync</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── FEATURES GRID ── */}
+        <section id="features" className="py-32 bg-slate-50 relative overflow-hidden">
+          <div className="container mx-auto px-6 lg:px-12 relative">
+            <div className="text-center mb-24">
+              <h2 className="text-4xl lg:text-7xl font-black text-slate-900 mb-8 leading-none">The Engine for<br />Modern Agencies.</h2>
+              <p className="text-xl text-slate-500 max-w-2xl mx-auto font-medium">Built by real estate veterans to solve the hard problems — scalability, efficiency, and data-driven growth.</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {features.map((f, i) => (
-                <div key={i} className="group p-8 rounded-3xl bg-slate-50 border border-slate-100 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
-                  <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${f.color} flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform`}>
-                    <f.icon className="text-white h-7 w-7" />
+                <div key={i} className="group bg-white p-10 rounded-[48px] border border-slate-200 hover:border-blue-600/20 hover:shadow-2xl hover:shadow-blue-600/5 transition-all duration-500 flex flex-col items-start text-left">
+                  <div className={`w-16 h-16 rounded-[24px] bg-gradient-to-br ${f.color} flex items-center justify-center mb-8 shadow-xl shadow-blue-600/20 transition-transform group-hover:scale-110 group-hover:rotate-3`}>
+                    <f.icon className="text-white h-8 w-8" />
                   </div>
-                  <h3 className="text-xl font-bold text-slate-800 mb-3">{f.title}</h3>
-                  <p className="text-slate-500 text-sm leading-relaxed">{f.desc}</p>
+                  <h3 className="text-2xl font-black text-slate-900 mb-4 tracking-tight">{f.title}</h3>
+                  <p className="text-slate-500 text-lg leading-relaxed font-medium mb-8 flex-1">{f.desc}</p>
+                  <Link href="/signup" className="flex items-center gap-2 text-blue-600 font-black text-sm uppercase tracking-widest group-hover:gap-4 transition-all">
+                    Explore Feature <ArrowRight size={18}/>
+                  </Link>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* ── TEAM MANAGEMENT VISUAL ── */}
-        <section className="py-24 px-6 lg:px-16 bg-gradient-to-br from-blue-600 to-indigo-800 relative overflow-hidden">
-          <div className="absolute inset-0 opacity-10" aria-hidden>
-            <svg viewBox="0 0 400 400" className="w-full h-full">
-              {[...Array(6)].map((_,i) => <circle key={i} cx={i*80} cy="200" r="180" fill="none" stroke="white" strokeWidth="0.5" />)}
-            </svg>
-          </div>
-
-          <div className="container mx-auto relative">
-            <div className="flex flex-col lg:flex-row gap-16 items-center">
-              {/* Left: Team illustration + feed */}
-              <div className="flex-1 w-full max-w-md mx-auto lg:mx-0">
-                <div className="rounded-3xl overflow-hidden shadow-2xl border border-white/20 mb-6">
-                  <Image
-                    src="/images/team-management.png"
-                    alt="Real estate team managed with PropCRM"
-                    width={500}
-                    height={400}
-                    className="w-full object-cover"
-                  />
-                </div>
-                <div className="bg-white/10 backdrop-blur rounded-3xl p-6 border border-white/20">
-                  <div className="flex items-center justify-between mb-6">
-                    <p className="text-white font-black text-sm uppercase tracking-widest">🏢 Team Live Feed</p>
-                    <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse" />
-                  </div>
-                  <div className="space-y-3">
-                    {[
-                      { agent: "Pooja", action: "Added new lead: Suresh Gupta", time: "2m ago", avatar: "PK", color: "from-pink-500 to-rose-500" },
-                      { agent: "Aryan", action: "Closed deal — Andheri 2BHK ₹85L", time: "15m ago", avatar: "AS", color: "from-emerald-500 to-teal-500" },
-                      { agent: "Sneha", action: "Scheduled site visit: Juhu Villa", time: "32m ago", avatar: "SR", color: "from-blue-500 to-indigo-500" },
-                      { agent: "Rahul", action: "Followed up with 8 pending leads", time: "1h ago", avatar: "RM", color: "from-amber-500 to-orange-500" },
-                      { agent: "Divya", action: "Uploaded KYC docs for Kapoor family", time: "2h ago", avatar: "DN", color: "from-purple-500 to-violet-500" },
-                    ].map((a, i) => (
-                      <div key={i} className="flex items-start gap-3 p-3 bg-white/5 rounded-xl border border-white/10">
-                        <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${a.color} flex items-center justify-center text-white text-xs font-black shrink-0`}>{a.avatar}</div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-white text-sm font-bold truncate">{a.agent} <span className="font-normal text-white/60 text-xs">{a.action}</span></p>
-                          <p className="text-white/40 text-xs">{a.time}</p>
-                        </div>
+        {/* ── WHATSAPP SECTION ── */}
+        <section className="py-32 bg-[#F0F7FF] relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-40 -mr-60 -mt-20 bg-blue-600/5 rounded-full blur-3xl pointer-events-none" />
+          <div className="container mx-auto px-6 lg:px-12">
+            <div className="flex flex-col lg:flex-row items-center gap-24">
+              <div className="flex-1 relative">
+                {/* Chat Mockup */}
+                <div className="relative bg-white rounded-[48px] shadow-2xl border border-blue-100 p-8 pt-12 overflow-hidden max-w-sm mx-auto">
+                   <div className="bg-[#075E54] absolute top-0 inset-x-0 h-16 flex items-center px-6 gap-3">
+                      <div className="w-10 h-10 rounded-full bg-slate-200" />
+                      <div className="flex flex-col">
+                        <span className="text-white font-black text-sm">Lead: Amit Kapoor</span>
+                        <span className="text-white/60 text-[10px] font-bold">Online · WhatsApp API</span>
                       </div>
-                    ))}
-                  </div>
+                   </div>
+                   <div className="mt-10 flex flex-col gap-4">
+                      <div className="self-end bg-[#DCF8C6] p-4 rounded-[20px] rounded-tr-none text-sm text-slate-800 shadow-sm max-w-[80%]">
+                         Hi Amit, thank you for inquiring about the **Bandra Penthouse**. Would you like to schedule a site visit this Saturday? 🏡
+                      </div>
+                      <div className="self-start bg-white border border-slate-100 p-4 rounded-[20px] rounded-tl-none text-sm text-slate-800 shadow-sm max-w-[80%]">
+                         Yes! Please send me the brochure as well.
+                      </div>
+                      <div className="self-end bg-blue-600 text-white p-5 rounded-[24px] shadow-xl max-w-[90%]">
+                         <div className="flex items-center gap-3 mb-2">
+                           <Layers size={20}/>
+                           <span className="font-black text-xs uppercase tracking-widest">Property PDF Sent</span>
+                         </div>
+                         <div className="h-1 w-full bg-white/20 rounded-full overflow-hidden">
+                            <div className="h-full bg-white w-full animate-progress" />
+                         </div>
+                      </div>
+                   </div>
+                </div>
+                {/* Floating badged */}
+                <div className="absolute -left-10 top-1/2 bg-white rounded-[32px] p-6 shadow-2xl border border-blue-100 max-w-[200px] animate-bounce-slow">
+                   <p className="text-2xl mb-2">🤖</p>
+                   <p className="text-sm font-black text-slate-900 leading-tight">AI handling 84% of basic queries...</p>
                 </div>
               </div>
-
-              {/* Right: Copy */}
-              <div className="flex-1 text-center lg:text-left">
-                <p className="text-blue-200 font-black uppercase tracking-widest text-sm mb-4">For Managers & Owners</p>
-                <h2 className="text-3xl lg:text-5xl font-black text-white mb-6">
-                  See What Your<br />
-                  Entire Team<br />
-                  Is Doing.<br />
-                  <span className="text-blue-200">Right Now.</span>
-                </h2>
-                <p className="text-blue-100 text-lg leading-relaxed mb-8">
-                  No more calling agents for updates. PropCRM gives you a live bird's-eye view — who's calling, who's closing, and who needs a nudge.
-                </p>
-                <ul className="space-y-4 text-left mb-10">
-                  {[
-                    "Agent leaderboard — gamify your team's hustle",
-                    "Set targets & track them in real-time",
-                    "Get alerts when a hot lead is left unattended",
-                    "Daily team performance email digest"
-                  ].map(p => (
-                    <li key={p} className="flex items-start gap-3">
-                      <Zap className="h-5 w-5 text-amber-400 mt-0.5 shrink-0" />
-                      <span className="text-blue-100 font-medium">{p}</span>
-                    </li>
-                  ))}
-                </ul>
-                <Link href="/signup" className="inline-flex items-center gap-2 px-8 py-4 bg-white text-blue-700 rounded-2xl font-black hover:scale-105 transition-all shadow-xl">
-                  Get The Boss Dashboard <ArrowRight className="h-5 w-5" />
+              <div className="flex-1 py-10">
+                <h2 className="text-4xl lg:text-7xl font-black text-slate-900 mb-10 leading-none">The Future is<br />Conversational.</h2>
+                <p className="text-xl text-slate-500 font-medium mb-12 leading-relaxed italic">"WhatsApp is no longer optional for real estate. It's the primary sales channel. We just made it professional."</p>
+                <div className="grid grid-cols-2 gap-8 mb-14">
+                   <div>
+                     <p className="text-4xl font-black text-blue-600 mb-2">98%</p>
+                     <p className="text-slate-500 font-bold uppercase text-[10px] tracking-widest">Open Rate</p>
+                   </div>
+                   <div>
+                     <p className="text-4xl font-black text-blue-600 mb-2">4.5x</p>
+                     <p className="text-slate-500 font-bold uppercase text-[10px] tracking-widest">Higher Conversion</p>
+                   </div>
+                </div>
+                <Link href="/signup" className="inline-flex items-center gap-3 px-10 py-5 bg-slate-900 text-white rounded-2xl font-black hover:bg-blue-600 transition-all shadow-2xl">
+                   Connect WhatsApp API <MousePointer2 />
                 </Link>
               </div>
             </div>
@@ -597,39 +458,47 @@ export default function Landing() {
         </section>
 
         {/* ── PRICING ── */}
-        <section id="pricing" className="py-24 px-6 lg:px-16 bg-slate-50">
-          <div className="container mx-auto">
-            <div className="text-center mb-16">
-              <p className="text-blue-600 font-black uppercase tracking-widest text-sm mb-3">Simple Pricing</p>
-              <h2 className="text-3xl lg:text-5xl font-black text-slate-900 mb-4">One Price.<br />Unlimited Growth.</h2>
-              <p className="text-slate-500 text-lg">No per-agent fees. No hidden costs. Just results.</p>
+        <section id="pricing" className="py-40 bg-white">
+          <div className="container mx-auto px-6 lg:px-12">
+            <div className="text-center mb-32">
+              <h2 className="text-4xl lg:text-[100px] font-black text-slate-900 mb-8 leading-none tracking-tighter">Scale at Your Speed.</h2>
+              <p className="text-2xl text-slate-500 max-w-xl mx-auto font-medium italic">Transparent pricing for agencies that mean business.</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-5xl mx-auto">
-              {[
-                { plan: "Starter", price: "₹2,999", period: "/month", desc: "Perfect for small agencies getting started.", features: ["Up to 5 Agents", "500 Leads/Month", "Basic Analytics", "Email Support"], cta: "Start Free Trial", highlight: false },
-                { plan: "Professional", price: "₹5,999", period: "/month", desc: "For growing agencies managing 20+ deals.", features: ["Up to 20 Agents", "Unlimited Leads", "AI Lead Scoring", "Priority Support", "Custom Reports", "WhatsApp Integration"], cta: "Most Popular", highlight: true },
-                { plan: "Enterprise", price: "Custom", period: "", desc: "For large property companies with multiple branches.", features: ["Unlimited Agents", "Multi-Branch Dashboard", "Dedicated Account Manager", "API Access", "Custom Integrations", "On-premise Option"], cta: "Contact Sales", highlight: false },
-              ].map((p, i) => (
-                <div key={i} className={`rounded-3xl p-8 border ${p.highlight ? "bg-gradient-to-br from-blue-600 to-indigo-700 border-transparent shadow-2xl shadow-blue-500/30 scale-105" : "bg-white border-slate-200"} relative`}>
-                  {p.highlight && <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-amber-400 text-slate-900 text-xs font-black px-4 py-1.5 rounded-full shadow-lg">⭐ Most Popular</div>}
-                  <p className={`font-black text-sm uppercase tracking-widest mb-2 ${p.highlight ? "text-blue-200" : "text-blue-600"}`}>{p.plan}</p>
-                  <div className="flex items-end gap-1 mb-2">
-                    <span className={`text-4xl font-black ${p.highlight ? "text-white" : "text-slate-900"}`}>{p.price}</span>
-                    <span className={`text-sm font-medium mb-1 ${p.highlight ? "text-blue-200" : "text-slate-500"}`}>{p.period}</span>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 max-w-6xl mx-auto hov-stack">
+              {pricingPlans.map((p, i) => (
+                <div key={i} className={`group relative rounded-[56px] p-12 border ${p.highlight ? "bg-slate-900 text-white border-transparent shadow-[0_40px_100px_-20px_rgba(0,0,0,0.25)] scale-105 z-10" : "bg-white border-slate-200 hover:border-blue-600/30"} transition-all duration-500 flex flex-col`}>
+                  {p.highlight && <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-[10px] font-black px-6 py-2.5 rounded-full uppercase tracking-[0.2em] shadow-xl">The Benchmark</div>}
+                  
+                  <div className="mb-10">
+                    <p className={`font-black text-sm uppercase tracking-[0.2em] mb-4 ${p.highlight ? "text-blue-500" : "text-slate-400"}`}>{p.plan}</p>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-6xl font-black tracking-tight">{p.price === 'Custom' ? '' : '₹'}{p.price}</span>
+                      <span className={`text-xl font-bold ${p.highlight ? "text-slate-500" : "text-slate-400"}`}>{p.period}</span>
+                    </div>
+                    <p className={`text-base mt-4 font-medium ${p.highlight ? "text-slate-400" : "text-slate-500"}`}>{p.desc}</p>
                   </div>
-                  <p className={`text-sm mb-8 ${p.highlight ? "text-blue-200" : "text-slate-500"}`}>{p.desc}</p>
-                  <ul className="space-y-3 mb-8">
+
+                  <div className="flex-1 space-y-5 mb-14">
                     {p.features.map(f => (
-                      <li key={f} className={`flex items-center gap-2 text-sm font-medium ${p.highlight ? "text-white" : "text-slate-700"}`}>
-                        <CheckCircle2 className={`h-4 w-4 shrink-0 ${p.highlight ? "text-blue-300" : "text-emerald-500"}`} />
-                        {f}
-                      </li>
+                      <div key={f} className="flex items-center gap-4">
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${p.highlight ? "bg-blue-600/20 text-blue-500" : "bg-slate-100 text-blue-600"}`}>
+                           <CheckCircle2 size={14}/>
+                        </div>
+                        <span className={`text-base font-bold ${p.highlight ? "text-slate-200" : "text-slate-700"}`}>{f}</span>
+                      </div>
                     ))}
-                  </ul>
-                  <Link href="/signup" className={`block text-center py-3.5 rounded-2xl font-black transition-all hover:scale-105 ${p.highlight ? "bg-white text-blue-700 hover:shadow-xl" : "bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg"}`}>
-                    {p.cta}
-                  </Link>
+                  </div>
+
+                  {p.href ? (
+                    <Link href={p.href} className={`block text-center py-6 rounded-[32px] font-black text-lg transition-all ${p.highlight ? "bg-blue-600 text-white hover:bg-white hover:text-black shadow-2xl shadow-blue-600/30" : "bg-slate-100 text-slate-900 hover:bg-blue-600 hover:text-white"}`}>
+                      {p.cta}
+                    </Link>
+                  ) : (
+                    <button onClick={p.onClick} className="w-full text-center py-6 rounded-[32px] font-black text-lg bg-blue-600 text-white hover:bg-white hover:text-black transition-all shadow-2xl shadow-blue-600/30">
+                      {p.cta}
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
@@ -637,145 +506,139 @@ export default function Landing() {
         </section>
 
         {/* ── TESTIMONIALS ── */}
-        <section id="testimonials" className="py-24 px-6 lg:px-16 bg-white">
-          <div className="container mx-auto">
-            <div className="text-center mb-16">
-              <p className="text-blue-600 font-black uppercase tracking-widest text-sm mb-3">Real Stories, Real Results</p>
-              <h2 className="text-3xl lg:text-5xl font-black text-slate-900">Agency Owners<br />Who Made the Switch</h2>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {testimonials.map((t, i) => (
-                <div key={i} className="p-8 rounded-3xl bg-slate-50 border border-slate-100 hover:shadow-xl transition-all">
-                  <div className="flex gap-1 mb-4">{[...Array(t.stars)].map((_,j) => <Star key={j} className="h-4 w-4 fill-amber-400 text-amber-400" />)}</div>
-                  <p className="text-slate-700 italic leading-relaxed mb-6">"{t.quote}"</p>
-                  <div className="flex items-center gap-3">
-                    <div className="w-11 h-11 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white text-sm font-black">
-                      {t.name.split(' ').map(n=>n[0]).join('')}
-                    </div>
-                    <div>
-                      <p className="font-bold text-slate-800">{t.name}</p>
-                      <p className="text-xs text-slate-500">{t.role} · {t.city}</p>
-                    </div>
+        <section className="py-40 bg-slate-50 overflow-hidden relative">
+           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1600px] h-[1600px] border border-blue-600/5 rounded-full pointer-events-none" />
+           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[1200px] border border-blue-600/5 rounded-full pointer-events-none" />
+           
+           <div className="container mx-auto px-6 lg:px-12 relative">
+             <div className="max-w-4xl mx-auto text-center">
+               <div className="flex justify-center gap-2 mb-10">
+                 {[1,2,3,4,5].map(i => <Star key={i} className="fill-blue-600 text-blue-600" size={24}/>)}
+               </div>
+               <h2 className="text-4xl lg:text-7xl font-black text-slate-900 leading-[1.1] mb-14">"PropGOCrm isn't just software. It's our entire business brain. We closed more in Q1 than all of last year."</h2>
+               <div className="flex items-center justify-center gap-6">
+                  <div className="w-20 h-20 bg-blue-600 rounded-3xl shrink-0" />
+                  <div className="text-left">
+                    <p className="text-2xl font-black text-slate-900">Arjun Deshmukh</p>
+                    <p className="text-lg text-slate-500 font-bold">CEO, Platinum Realty Global</p>
                   </div>
-                </div>
-              ))}
-            </div>
-          </div>
+               </div>
+             </div>
+           </div>
         </section>
 
-        {/* ── CTA BANNER ── */}
-        <section className="py-24 px-6 lg:px-16 bg-slate-900">
-          <div className="container mx-auto text-center">
-            <div className="inline-block text-5xl mb-6">🏙️</div>
-            <h2 className="text-3xl lg:text-5xl font-black text-white mb-6">Ready to Transform<br />Your Agency?</h2>
-            <p className="text-slate-400 text-lg mb-10 max-w-xl mx-auto">Join 500+ agencies who scaled their business with PropCRM. Start your 14-day free trial — no credit card needed.</p>
-            <Link href="/signup" className="inline-flex items-center gap-3 px-12 py-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl font-black text-xl shadow-2xl shadow-blue-500/30 hover:scale-105 active:scale-95 transition-all">
-              Start Free — No Card Needed <ArrowRight className="h-6 w-6" />
-            </Link>
+        {/* ── CTA FINAL ── */}
+        <section className="py-40 px-6 lg:px-12">
+          <div className="container mx-auto max-w-7xl">
+            <div className="bg-[#020617] rounded-[80px] p-16 lg:p-32 text-center relative overflow-hidden group">
+               <div className="absolute top-0 right-0 p-80 -mr-40 bg-blue-600/20 rounded-full blur-[160px] group-hover:scale-125 transition-transform duration-1000" />
+               <div className="absolute bottom-0 left-0 p-80 -ml-40 bg-indigo-600/10 rounded-full blur-[160px]" />
+               
+               <div className="relative">
+                 <h2 className="text-5xl lg:text-[100px] font-black text-white leading-none tracking-tighter mb-14">Become a Global<br /><span className="text-blue-600">Powerhouse.</span></h2>
+                 <p className="text-2xl text-slate-400 max-w-2xl mx-auto font-medium mb-20 leading-relaxed">
+                   Join 1,200+ top-tier agencies worldwide using PropGOCrm to dominate their local markets.
+                 </p>
+                 <div className="flex flex-col sm:flex-row gap-6 justify-center">
+                   <Link href="/signup" className="px-16 py-7 bg-blue-600 text-white rounded-full font-black text-2xl shadow-3xl shadow-blue-600/40 hover:scale-105 transition-all">
+                     Join PropGOCrm Today
+                   </Link>
+                   <Link href="/contact" className="px-16 py-7 bg-white/5 backdrop-blur-xl border border-white/20 text-white rounded-full font-black text-2xl hover:bg-white hover:text-black transition-all">
+                     Talk to Sales
+                   </Link>
+                 </div>
+                 <p className="mt-12 text-slate-500 font-black text-sm uppercase tracking-widest">No credit card required · Instant setup</p>
+               </div>
+            </div>
           </div>
         </section>
       </main>
 
       {/* ── FOOTER ── */}
-      <footer className="bg-slate-950 pt-16 pb-8 px-6 lg:px-16 border-t border-slate-800">
+      <footer className="bg-[#020617] border-t border-slate-900 pt-32 pb-16 px-6 lg:px-12 relative">
         <div className="container mx-auto">
-          {/* Main grid */}
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-10 mb-14">
-            {/* Brand */}
-            <div className="col-span-2 md:col-span-2">
-              <div className="flex items-center gap-2.5 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-lg">
-                  <Building2 className="text-white h-5 w-5" />
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-20 mb-32">
+            <div className="lg:col-span-5">
+              <Link href="/" className="inline-flex items-center gap-3 group mb-10">
+                <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-xl">
+                  <Building2 size={28}/>
                 </div>
-                <div>
-                  <span className="text-white font-black text-lg tracking-tight">PropCRM</span>
-                  <span className="block text-[9px] font-bold text-blue-400 uppercase tracking-widest leading-none">by Aiclex Technologies</span>
-                </div>
-              </div>
-              <p className="text-slate-400 text-sm leading-relaxed max-w-xs mb-6">
-                The all-in-one CRM built for Indian real estate agencies. Manage leads, properties, site visits, and your entire team from one powerful dashboard.
+                <span className="text-3xl font-black text-white tracking-tighter">PropGOCrm</span>
+              </Link>
+              <p className="text-xl text-slate-500 leading-relaxed max-w-md font-medium mb-12">
+                The world's most advanced CRM platform built specifically for real estate professionals. Scale faster, close more, and dominate your market.
               </p>
-              <div className="flex gap-3">
-                {[
-                  { label: "WhatsApp", href: "https://wa.me/919999999999", icon: Phone },
-                  { label: "Email", href: "mailto:hello@aiclex.in", icon: MessageSquare },
-                ].map(s => (
-                  <Link key={s.label} href={s.href} className="w-9 h-9 rounded-xl bg-slate-800 hover:bg-blue-600 flex items-center justify-center text-slate-400 hover:text-white transition-all">
-                    <s.icon className="h-4 w-4" />
-                  </Link>
+              <div className="flex gap-4">
+                {[MessageSquare, Phone, Globe, Shield].map((Icon, i) => (
+                  <div key={i} className="w-14 h-14 bg-slate-900 rounded-3xl border border-slate-800 flex items-center justify-center text-slate-500 hover:text-white hover:bg-blue-600 transition-all cursor-pointer">
+                    <Icon size={24}/>
+                  </div>
                 ))}
               </div>
             </div>
-
-            {/* Product */}
-            <div>
-              <p className="text-white font-black text-xs uppercase tracking-widest mb-5">Product</p>
-              <ul className="space-y-3">
-                {[
-                  { label: "Features", href: "#features" },
-                  { label: "Pricing", href: "#pricing" },
-                  { label: "Changelog", href: "/changelog" },
-                  { label: "Roadmap", href: "/roadmap" },
-                  { label: "API Docs", href: "/docs/api" },
-                  { label: "Integrations", href: "/integrations" },
-                ].map(l => (
-                  <li key={l.label}>
-                    <Link href={l.href} className="text-slate-400 hover:text-white text-sm transition-colors">{l.label}</Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Company */}
-            <div>
-              <p className="text-white font-black text-xs uppercase tracking-widest mb-5">Company</p>
-              <ul className="space-y-3">
-                {[
-                  { label: "About Us", href: "/about" },
-                  { label: "Blog", href: "/blog" },
-                  { label: "Careers", href: "/careers" },
-                  { label: "Press Kit", href: "/press" },
-                  { label: "Partners", href: "/partners" },
-                  { label: "Contact Us", href: "/contact" },
-                ].map(l => (
-                  <li key={l.label}>
-                    <Link href={l.href} className="text-slate-400 hover:text-white text-sm transition-colors">{l.label}</Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Legal & Support */}
-            <div>
-              <p className="text-white font-black text-xs uppercase tracking-widest mb-5">Legal & Support</p>
-              <ul className="space-y-3">
-                {[
-                  { label: "Privacy Policy", href: "/privacy" },
-                  { label: "Terms of Service", href: "/terms" },
-                  { label: "Refund Policy", href: "/refund" },
-                  { label: "Help Center", href: "/help" },
-                  { label: "Security", href: "/security" },
-                  { label: "Status Page", href: "/status" },
-                ].map(l => (
-                  <li key={l.label}>
-                    <Link href={l.href} className="text-slate-400 hover:text-white text-sm transition-colors">{l.label}</Link>
-                  </li>
-                ))}
-              </ul>
+            
+            <div className="lg:col-span-7 grid grid-cols-2 lg:grid-cols-3 gap-12">
+              <div>
+                <h4 className="text-white font-black text-xs uppercase tracking-[0.3em] mb-10">Product</h4>
+                <ul className="flex flex-col gap-6">
+                  {['Features', 'MarketSync', 'WhatsApp API', 'Pricing', 'API Docs'].map(l => (
+                    <li key={l}><Link href="#" className="text-slate-500 hover:text-white font-bold transition-all">{l}</Link></li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h4 className="text-white font-black text-xs uppercase tracking-[0.3em] mb-10">Resources</h4>
+                <ul className="flex flex-col gap-6">
+                  {['Sales Guide', 'Blog', 'Case Studies', 'Partner Program', 'Status'].map(l => (
+                    <li key={l}><Link href="#" className="text-slate-500 hover:text-white font-bold transition-all">{l}</Link></li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h4 className="text-white font-black text-xs uppercase tracking-[0.3em] mb-10">Legal</h4>
+                <ul className="flex flex-col gap-6">
+                  {['Privacy', 'Terms', 'Cookie Policy', 'Security', 'Refunds'].map(l => (
+                    <li key={l}><Link href="#" className="text-slate-500 hover:text-white font-bold transition-all">{l}</Link></li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
-
-          {/* Bottom bar */}
-          <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-slate-500 text-sm">© 2026 <a href="https://aiclex.in" target="_blank" className="text-blue-400 hover:text-white transition-colors font-semibold">Aiclex Technologies</a>. All rights reserved.</p>
-            <div className="flex items-center gap-2">
-              <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-emerald-400 text-xs font-bold">All systems operational</span>
+          
+          <div className="pt-16 border-t border-slate-900 flex flex-col md:flex-row items-center justify-between gap-10">
+            <p className="text-slate-600 font-bold text-sm">© 2026 PropGOCrm Global. Engineering excellence by <a href="https://aiclex.in" className="text-slate-400 hover:text-blue-500">Aiclex</a>.</p>
+            <div className="flex items-center gap-2 px-6 py-3 bg-slate-900/50 rounded-full border border-slate-800">
+               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+               <span className="text-emerald-500 font-black text-[10px] uppercase tracking-widest">Global Ingress: Operational</span>
             </div>
-            <p className="text-slate-600 text-xs">Made with ❤️ in India 🇮🇳</p>
           </div>
         </div>
       </footer>
+      
+      <LeadModal 
+        isOpen={isLeadModalOpen} 
+        onClose={() => setIsLeadModalOpen(false)} 
+        plan="Enterprise" 
+      />
+      
+      <style jsx global>{`
+        @keyframes float {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-20px); }
+        }
+        @keyframes bounce-slow {
+          0%, 100% { transform: translateY(-5%); }
+          50% { transform: translateY(0); }
+        }
+        @keyframes progress {
+          0% { width: 0; }
+          100% { width: 100%; }
+        }
+        .animate-float { animation: float 6s ease-in-out infinite; }
+        .animate-bounce-slow { animation: bounce-slow 4s ease-in-out infinite; }
+        .animate-progress { animation: progress 2s linear forwards; }
+        .font-sans { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; }
+      `}</style>
     </div>
   )
 }
