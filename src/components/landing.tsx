@@ -32,6 +32,8 @@ import {
 } from "lucide-react"
 
 import LeadModal from "./LeadModal"
+import Logo from "./Logo"
+import WhatsAppButton from "./WhatsAppButton"
 
 export default function Landing() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -142,13 +144,7 @@ export default function Landing() {
       <header className={`fixed top-0 w-full z-50 transition-all duration-500 ${isScrolled ? "bg-white/80 backdrop-blur-xl shadow-sm border-b border-slate-100 py-3" : "bg-transparent py-6"}`}>
         <div className="container mx-auto px-6 lg:px-12 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-9 h-9 bg-gradient-to-tr from-blue-700 via-blue-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/20 group-hover:rotate-6 transition-transform duration-300">
-              <Building2 className="text-white h-5 w-5" />
-            </div>
-            <div className="flex flex-col">
-              <span className="text-xl font-black tracking-tight leading-none text-slate-900">Prop<span className="text-blue-600">GOCrm</span></span>
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">The Global Standard</span>
-            </div>
+            <Logo />
           </Link>
 
           <nav className="hidden md:flex items-center gap-10">
@@ -156,12 +152,14 @@ export default function Landing() {
                 Features
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 transition-all group-hover:w-full" />
             </Link>
-            {['MarketSync', 'Pricing', 'Company'].map(i => (
-              <Link key={i} href={`#${i.toLowerCase()}`} className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors relative group">
-                {i}
+            <Link href="/about" className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors relative group">
+                About
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 transition-all group-hover:w-full" />
-              </Link>
-            ))}
+            </Link>
+            <Link href="/contact" className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors relative group">
+                Contact
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 transition-all group-hover:w-full" />
+            </Link>
           </nav>
 
           <div className="hidden md:flex items-center gap-6">
@@ -187,9 +185,8 @@ export default function Landing() {
           </div>
           <div className="flex flex-col gap-8 text-2xl font-black text-slate-900">
             <Link href="/features" onClick={() => setMobileMenuOpen(false)}>Features</Link>
-            {['MarketSync', 'Pricing', 'Company'].map(i => (
-              <Link key={i} href={`#${i.toLowerCase()}`} onClick={() => setMobileMenuOpen(false)}>{i}</Link>
-            ))}
+            <Link href="/about" onClick={() => setMobileMenuOpen(false)}>About Us</Link>
+            <Link href="/contact" onClick={() => setMobileMenuOpen(false)}>Contact</Link>
           </div>
           <div className="mt-20 flex flex-col gap-4">
             <Link href="/login" className="text-center py-5 font-black text-slate-600">Login</Link>
@@ -565,10 +562,7 @@ export default function Landing() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-20 mb-32">
             <div className="lg:col-span-5">
               <Link href="/" className="inline-flex items-center gap-3 group mb-10">
-                <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-xl">
-                  <Building2 size={28}/>
-                </div>
-                <span className="text-3xl font-black text-white tracking-tighter">PropGOCrm</span>
+                <Logo light />
               </Link>
               <p className="text-xl text-slate-500 leading-relaxed max-w-md font-medium mb-12">
                 The world's most advanced CRM platform built specifically for real estate professionals. Scale faster, close more, and dominate your market.
@@ -586,10 +580,8 @@ export default function Landing() {
               <div>
                 <h4 className="text-white font-black text-xs uppercase tracking-[0.3em] mb-10">Product</h4>
                 <ul className="flex flex-col gap-6">
-                  <li><Link href="/features" className="text-slate-500 hover:text-white font-bold transition-all">Features</Link></li>
-                  {['MarketSync', 'WhatsApp API', 'Pricing', 'API Docs'].map(l => (
-                    <li key={l}><Link href="#" className="text-slate-500 hover:text-white font-bold transition-all">{l}</Link></li>
-                  ))}
+                  <li><Link href="/about" className="text-slate-500 hover:text-white font-bold transition-all">About Us</Link></li>
+                  <li><Link href="/contact" className="text-slate-500 hover:text-white font-bold transition-all">Contact Us</Link></li>
                 </ul>
               </div>
               <div>
@@ -645,6 +637,7 @@ export default function Landing() {
         .animate-progress { animation: progress 2s linear forwards; }
         .font-sans { font-family: var(--font-inter), sans-serif; }
       `}</style>
+      <WhatsAppButton />
     </div>
   )
 }

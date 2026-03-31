@@ -1,81 +1,189 @@
 "use client"
-import InnerPageLayout from "@/components/inner-page-layout"
-import { Mail, Phone, MapPin, Send, MessageSquare } from "lucide-react"
+
+import { Mail, Phone, MapPin, MessageSquare, Zap, Clock, Globe, ArrowRight, CheckCircle2, Building2 } from "lucide-react"
+import Link from "next/link"
+import React, { useEffect, useState } from "react"
+import Logo from "@/components/Logo"
+
+const ContactMethod = ({ icon: Icon, title, value, sub, color }: { icon: any, title: string, value: string, sub: string, color: string }) => (
+    <div className="flex gap-6 p-8 bg-white rounded-[32px] border border-zinc-100 shadow-sm hover:shadow-xl transition-all duration-500 group">
+        <div className={`w-14 h-14 ${color} rounded-2xl flex items-center justify-center text-white shadow-lg shadow-zinc-100 group-hover:scale-110 transition-transform`}>
+            <Icon size={24} />
+        </div>
+        <div>
+            <p className="text-[10px] font-black uppercase text-zinc-400 tracking-[0.25em] mb-1">{title}</p>
+            <p className="text-lg font-black text-zinc-900 tracking-tight italic mb-1">{value}</p>
+            <p className="text-xs text-zinc-500 font-medium">{sub}</p>
+        </div>
+    </div>
+)
 
 export default function ContactPage() {
-  return (
-    <InnerPageLayout 
-      badge="Get in Touch"
-      title="Contact Us"
-      subtitle="Have questions about PropGOCrm? We're here to help you scale your agency."
-    >
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-        <div className="space-y-8">
-          <div>
-            <h2 className="text-xl font-black text-slate-900 mb-4">Contact Information</h2>
-            <div className="space-y-4">
-              <div className="flex gap-4">
-                <div className="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 shrink-0">
-                  <Mail className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-slate-800">Email</p>
-                  <a href="mailto:hello@aiclex.in" className="text-sm text-slate-500 hover:text-blue-600">hello@aiclex.in</a>
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <div className="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 shrink-0">
-                  <Phone className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-slate-800">Phone / WhatsApp</p>
-                  <a href="https://wa.me/919999999999" className="text-sm text-slate-500 hover:text-emerald-600">+91 99999 99999</a>
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <div className="w-10 h-10 bg-amber-50 rounded-xl flex items-center justify-center text-amber-600 shrink-0">
-                  <MapPin className="h-5 w-5" />
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-slate-800">Office</p>
-                  <p className="text-sm text-slate-500">Pune, Maharashtra, India</p>
-                </div>
-              </div>
-            </div>
-          </div>
+    const [scrolled, setScrolled] = useState(false)
+    const [status, setStatus] = useState<string | null>(null)
 
-          <div className="bg-slate-900 rounded-3xl p-6 text-white">
-            <div className="flex items-center gap-2 mb-4">
-              <MessageSquare className="h-5 w-5 text-blue-400" />
-              <p className="font-black">Direct Support</p>
-            </div>
-            <p className="text-slate-400 text-sm leading-relaxed mb-6">
-              Our technical team is available Mon–Fri, 10 AM – 6 PM IST to help with your WhatsApp integration.
-            </p>
-            <button className="w-full py-3 bg-blue-600 rounded-xl text-sm font-black hover:bg-blue-700 transition-colors">
-              Chat on WhatsApp
-            </button>
-          </div>
+    useEffect(() => {
+        const handleScroll = () => setScrolled(window.scrollY > 20)
+        window.addEventListener("scroll", handleScroll)
+        return () => window.removeEventListener("scroll", handleScroll)
+    }, [])
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault()
+        setStatus("sending")
+        setTimeout(() => setStatus("success"), 1500)
+    }
+
+    return (
+        <div className="min-h-screen bg-zinc-50/50 font-sans selection:bg-blue-100 selection:text-blue-900 overflow-x-hidden">
+            {/* Header / Nav Overlay */}
+            <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? 'bg-white/80 backdrop-blur-xl shadow-sm py-4' : 'bg-transparent py-8'}`}>
+                <div className="container mx-auto px-6 flex items-center justify-between">
+                    <Link href="/">
+                        <Logo />
+                    </Link>
+                    <div className="hidden md:flex items-center gap-12">
+                        <Link href="/" className="text-sm font-black uppercase tracking-widest text-zinc-500 hover:text-blue-600 transition-colors">Home</Link>
+                        <Link href="/features" className="text-sm font-black uppercase tracking-widest text-zinc-500 hover:text-blue-600 transition-colors">Features</Link>
+                        <Link href="/about" className="text-sm font-black uppercase tracking-widest text-zinc-500 hover:text-blue-600 transition-colors">About Us</Link>
+                        <Link href="/contact" className="text-sm font-black uppercase tracking-widest text-blue-600">Contact</Link>
+                    </div>
+                    <Link href="/signup" className="hidden md:block bg-zinc-900 text-white px-8 py-3 rounded-2xl text-sm font-black italic tracking-tight hover:bg-blue-600 transition-all shadow-xl shadow-zinc-200">
+                        Get Started
+                    </Link>
+                </div>
+            </nav>
+
+            <section className="pt-48 pb-24">
+                <div className="container mx-auto px-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-20">
+                        
+                        {/* LEFT: INFO */}
+                        <div className="lg:col-span-5 space-y-12">
+                            <div className="space-y-6">
+                                <h1 className="text-5xl md:text-7xl font-black italic tracking-tighter text-zinc-900 leading-tight">Let's Define Your <span className="text-blue-600">Growth OS.</span></h1>
+                                <p className="text-xl text-zinc-500 font-medium leading-relaxed italic">"Global agencies don't just happen. They are built on robust, automated foundations. Let's build yours."</p>
+                            </div>
+
+                            <div className="flex flex-col gap-6">
+                                <ContactMethod 
+                                    icon={Mail} 
+                                    title="Email Support" 
+                                    value="hello@propgocrm.com" 
+                                    sub="Response time: Under 4 hours."
+                                    color="bg-blue-600"
+                                />
+                                <ContactMethod 
+                                    icon={MessageSquare} 
+                                    title="Engineering Partnership" 
+                                    value="team@aiclex.in" 
+                                    sub="For complex enterprise integrations."
+                                    color="bg-zinc-900"
+                                />
+                                <ContactMethod 
+                                    icon={Phone} 
+                                    title="Sales Direct" 
+                                    value="+91 8449488090" 
+                                    sub="Available Mon-Sat, 10am-7pm IST."
+                                    color="bg-accent"
+                                />
+                            </div>
+
+                            <div className="p-8 bg-zinc-900 rounded-[40px] text-white relative overflow-hidden group shadow-2xl">
+                                <div className="absolute top-0 right-0 p-20 -mr-20 bg-blue-600/30 rounded-full blur-[60px]" />
+                                <div className="relative space-y-4">
+                                    <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center"><Globe size={20}/></div>
+                                    <h3 className="text-xl font-black italic">Operating Globally.</h3>
+                                    <p className="text-white/50 text-sm font-medium">Supporting property agencies across UAE, India, UK, and North America.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* RIGHT: FORM */}
+                        <div className="lg:col-span-7">
+                            <div className="bg-white rounded-[56px] border border-zinc-100 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.05)] p-12 lg:p-16 relative overflow-hidden">
+                                {status === "success" ? (
+                                    <div className="h-[400px] flex flex-col items-center justify-center text-center space-y-6 animate-in zoom-in duration-500">
+                                        <div className="w-24 h-24 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center shadow-xl mb-4">
+                                            <CheckCircle2 size={48} />
+                                        </div>
+                                        <h2 className="text-3xl font-black italic tracking-tighter">Inquiry Received!</h2>
+                                        <p className="text-zinc-500 text-lg max-w-sm mx-auto font-medium">One of our specialists will analyze your requirements and reach out within 4 hours.</p>
+                                        <button onClick={() => setStatus(null)} className="text-blue-600 font-black tracking-widest uppercase text-[10px] hover:underline underline-offset-4 mt-8">Submit Another Inquiry</button>
+                                    </div>
+                                ) : (
+                                    <form onSubmit={handleSubmit} className="space-y-8 animate-in fade-in duration-700">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-4">Full Name</label>
+                                                <input required className="w-full px-8 py-4 bg-zinc-50 border border-zinc-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-600 transition-all font-bold placeholder:text-zinc-300" placeholder="Agent or CEO Name" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-4">Email Address</label>
+                                                <input type="email" required className="w-full px-8 py-4 bg-zinc-50 border border-zinc-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-600 transition-all font-bold placeholder:text-zinc-300" placeholder="work@agency.com" />
+                                            </div>
+                                        </div>
+
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-4">Agency Name</label>
+                                                <input required className="w-full px-8 py-4 bg-zinc-50 border border-zinc-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-600 transition-all font-bold placeholder:text-zinc-300" placeholder="Your Real Estate Firm" />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-4">Platform Goals</label>
+                                                <select className="w-full px-8 py-4 bg-zinc-50 border border-zinc-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-600 transition-all font-bold text-zinc-500">
+                                                    <option>Portal Sync Automation</option>
+                                                    <option>WhatsApp CRM Setup</option>
+                                                    <option>Enterprise Scaling (Multi-Branch)</option>
+                                                    <option>Aiclex Tech Consulting</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 ml-4">Your Vision / Requirements</label>
+                                            <textarea rows={5} required className="w-full px-8 py-4 bg-zinc-50 border border-zinc-100 rounded-2xl outline-none focus:ring-2 focus:ring-blue-600 transition-all font-bold placeholder:text-zinc-300 resize-none" placeholder="Tell us how we can help you scale..." />
+                                        </div>
+
+                                        <button type="submit" disabled={status === "sending"} className="w-full bg-blue-600 text-white rounded-[32px] py-6 font-black text-xl italic tracking-tight shadow-xl shadow-blue-600/30 hover:scale-[1.02] active:scale-95 transition-all text-center flex items-center justify-center gap-3">
+                                            {status === "sending" ? "Initialising Protocol..." : "Submit Strategic Inquiry"} <ArrowRight />
+                                        </button>
+
+                                        <p className="text-center text-[10px] font-black uppercase text-zinc-400 tracking-[0.3em]">Confidentiality: AES-256 Protected Submission</p>
+                                    </form>
+                                )}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            {/* LOCATION / LOGISTICS */}
+            <section className="py-24 border-t border-zinc-100">
+                <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+                     <div className="space-y-4">
+                        <div className="w-10 h-10 bg-zinc-100 rounded-xl flex items-center justify-center text-zinc-400"><Clock size={20}/></div>
+                        <p className="text-xs font-black uppercase tracking-widest text-zinc-400">Global Response</p>
+                        <p className="text-sm font-bold text-zinc-600">24/7 Monitoring for portal sync services.</p>
+                     </div>
+                     <div className="space-y-4">
+                        <div className="w-10 h-10 bg-zinc-100 rounded-xl flex items-center justify-center text-zinc-400"><MapPin size={20}/></div>
+                        <p className="text-xs font-black uppercase tracking-widest text-zinc-400">Hub India</p>
+                        <p className="text-sm font-bold text-zinc-600">Aiclex Technology Labs, Pune & Bangalore.</p>
+                     </div>
+                     <div className="space-y-4">
+                        <div className="w-10 h-10 bg-zinc-100 rounded-xl flex items-center justify-center text-zinc-400"><Zap size={20}/></div>
+                        <p className="text-xs font-black uppercase tracking-widest text-zinc-400">Integrations</p>
+                        <p className="text-sm font-bold text-zinc-600">Zapier, Pabbly, n8n Certifed Engineers.</p>
+                     </div>
+                     <div className="space-y-4">
+                        <div className="w-10 h-10 bg-zinc-100 rounded-xl flex items-center justify-center text-zinc-400"><Globe size={20}/></div>
+                        <p className="text-xs font-black uppercase tracking-widest text-zinc-400">Compliance</p>
+                        <p className="text-sm font-bold text-zinc-600">GDPR & UAE Data Protection Ready.</p>
+                     </div>
+                </div>
+            </section>
         </div>
-
-        <form className="space-y-4 bg-white p-8 rounded-3xl border border-slate-200 shadow-sm" onSubmit={(e) => e.preventDefault()}>
-          <div>
-            <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Full Name</label>
-            <input type="text" placeholder="John Doe" className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all text-sm" />
-          </div>
-          <div>
-            <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Email Address</label>
-            <input type="email" placeholder="john@agency.com" className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all text-sm" />
-          </div>
-          <div>
-            <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5 ml-1">Message</label>
-            <textarea rows={4} placeholder="How can we help?" className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all text-sm resize-none"></textarea>
-          </div>
-          <button className="w-full py-4 bg-primary text-white rounded-xl font-black text-sm shadow-lg shadow-primary/20 hover:opacity-90 transition-all flex items-center justify-center gap-2">
-            Send Message <Send className="h-4 w-4" />
-          </button>
-        </form>
-      </div>
-    </InnerPageLayout>
-  )
+    )
 }
