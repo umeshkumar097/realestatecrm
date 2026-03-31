@@ -51,7 +51,7 @@ export default function FeaturesPage() {
     }, [])
 
     return (
-        <div className="bg-white selection:bg-primary selection:text-white font-['Plus_Jakarta_Sans',sans-serif]">
+        <div className="bg-white selection:bg-primary selection:text-white font-sans">
             {/* Header / Nav Overlay */}
             <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/80 backdrop-blur-xl shadow-sm py-4' : 'bg-transparent py-8'}`}>
                 <div className="container mx-auto px-6 flex items-center justify-between">
@@ -223,8 +223,8 @@ export default function FeaturesPage() {
                         </div>
                         <div className="bg-white/5 backdrop-blur-md p-10 rounded-[40px] border border-white/10 border-b-orange-500/30 group">
                             <Zap className="text-orange-500 h-10 w-10 mb-6 group-hover:scale-110 transition-transform" />
-                            <h3 className="text-2xl font-black text-white italic mb-4">Zapier Integration</h3>
-                            <p className="text-white/60 text-sm font-medium leading-relaxed">Connect with 5000+ apps for automated lead workflows.</p>
+                            <h3 className="text-2xl font-black text-white italic mb-4">Automation Hub</h3>
+                            <p className="text-white/60 text-sm font-medium leading-relaxed">Connect with **Zapier, Pabbly, or n8n** for infinite automated lead workflows.</p>
                         </div>
                     </div>
 
@@ -234,7 +234,7 @@ export default function FeaturesPage() {
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-4">
                                 {[
                                     { t: "100% Lead Capture", d: "Every inquiry accounted for." },
-                                    { t: "Instant Sync Speed", d: "Zero delay in routing." },
+                                    { t: "Multichannel Sync", d: "Zapier, Pabbly & n8n Support." },
                                     { t: "5000+ App Integrations", d: "Infinite workflow possibilities." },
                                     { t: "24/7 Automated", d: "Works while you sleep." }
                                 ].map((item, idx) => (
@@ -253,6 +253,7 @@ export default function FeaturesPage() {
                              <div className="space-y-3">
                                  {[
                                      { s: "Facebook Ads", t: "Just now" },
+                                     { s: "Pabbly / n8n", t: "1 min ago" },
                                      { s: "Portal (PF)", t: "2 mins ago" },
                                      { s: "Website Chat", t: "5 mins ago" }
                                  ].map((l, i) => (
@@ -320,7 +321,7 @@ export default function FeaturesPage() {
                         <div className="relative group">
                             <div className="absolute inset-0 bg-primary/10 blur-3xl -z-10 group-hover:scale-110 transition-transform" />
                             <img 
-                                src="https://images.unsplash.com/photo-1512403754473-27855fbc499b?auto=format&fit=crop&q=80&w=2400&h=1600" 
+                                src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&q=80&w=2400&h=1600" 
                                 className="rounded-[48px] shadow-2xl border-4 border-white" 
                                 alt="Listing Management" 
                             />

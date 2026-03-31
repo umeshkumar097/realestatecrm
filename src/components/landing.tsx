@@ -345,7 +345,7 @@ export default function Landing() {
                   One Sync.<br />Every Listing Portal.
                 </h2>
                 <p className="text-xl text-slate-500 mb-10 leading-relaxed max-w-lg mx-auto lg:mx-0">
-                  Capturing leads from Bayut, Property Finder, Zillow, and Dubizzle used to be manual. PropGOCrm syncs with them all in real-time, pulling every inquiry directly into your agent's dashboard.
+                  Capturing leads from Bayut, Property Finder, Pabbly, n8n, and Dubizzle used to be manual. PropGOCrm syncs with them all in real-time, pulling every inquiry directly into your agent's dashboard.
                 </p>
                 <div className="flex flex-col gap-4 text-left max-w-sm mx-auto lg:mx-0">
                   <div className="flex items-center gap-3">
@@ -369,7 +369,7 @@ export default function Landing() {
                       {p.name[0]}
                     </div>
                     <p className="font-black text-slate-900 text-sm tracking-tight">{p.name}</p>
-                    <span className="mt-2 px-3 py-1 bg-emerald-100 text-emerald-700 text-[9px] font-black uppercase rounded-full tracking-widest">Active Sync</span>
+                    <span className="mt-2 px-3 py-1 bg-blue-100 text-blue-700 text-[9px] font-black uppercase rounded-full tracking-widest">Zapier/Pabbly/n8n</span>
                   </div>
                 ))}
               </div>
@@ -643,7 +643,7 @@ export default function Landing() {
         .animate-float { animation: float 6s ease-in-out infinite; }
         .animate-bounce-slow { animation: bounce-slow 4s ease-in-out infinite; }
         .animate-progress { animation: progress 2s linear forwards; }
-        .font-sans { font-family: 'Plus Jakarta Sans', 'Inter', sans-serif; }
+        .font-sans { font-family: var(--font-inter), sans-serif; }
       `}</style>
     </div>
   )
