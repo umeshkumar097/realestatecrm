@@ -146,7 +146,7 @@ export default function Landing() {
               <Building2 className="text-white h-5 w-5" />
             </div>
             <div className="flex flex-col">
-              <span className="text-xl font-black tracking-tight leading-none text-slate-900">Prop<span className="text-blue-600">TCrm</span></span>
+              <span className="text-xl font-black tracking-tight leading-none text-slate-900">Prop<span className="text-blue-600">GOCrm</span></span>
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">The Global Standard</span>
             </div>
           </Link>
@@ -207,7 +207,7 @@ export default function Landing() {
               <span className="text-[11px] font-black uppercase tracking-widest text-slate-500">The Power of Automation in Real Estate</span>
             </div>
 
-            <h1 className="text-5xl lg:text-[88px] font-black tracking-tight leading-[0.95] text-slate-900 mb-10 max-w-5xl mx-auto">
+            <h1 className="text-4xl lg:text-7xl font-black tracking-tight leading-[1.1] text-slate-900 mb-10 max-w-5xl mx-auto">
               Real Estate Sales.<br />
               <span className="text-blue-600">Reimagined.</span>
             </h1>
@@ -461,7 +461,7 @@ export default function Landing() {
         <section id="pricing" className="py-40 bg-white">
           <div className="container mx-auto px-6 lg:px-12">
             <div className="text-center mb-32">
-              <h2 className="text-4xl lg:text-[100px] font-black text-slate-900 mb-8 leading-none tracking-tighter">Scale at Your Speed.</h2>
+              <h2 className="text-4xl lg:text-7xl font-black text-slate-900 mb-8 leading-none tracking-tighter">Scale at Your Speed.</h2>
               <p className="text-2xl text-slate-500 max-w-xl mx-auto font-medium italic">Transparent pricing for agencies that mean business.</p>
             </div>
 
@@ -515,7 +515,7 @@ export default function Landing() {
                <div className="flex justify-center gap-2 mb-10">
                  {[1,2,3,4,5].map(i => <Star key={i} className="fill-blue-600 text-blue-600" size={24}/>)}
                </div>
-               <h2 className="text-4xl lg:text-7xl font-black text-slate-900 leading-[1.1] mb-14">"PropGOCrm isn't just software. It's our entire business brain. We closed more in Q1 than all of last year."</h2>
+               <h2 className="text-3xl lg:text-5xl font-black text-slate-900 leading-[1.1] mb-14">"PropGOCrm isn't just software. It's our entire business brain. We closed more in Q1 than all of last year."</h2>
                <div className="flex items-center justify-center gap-6">
                   <div className="w-20 h-20 bg-blue-600 rounded-3xl shrink-0" />
                   <div className="text-left">
@@ -535,7 +535,7 @@ export default function Landing() {
                <div className="absolute bottom-0 left-0 p-80 -ml-40 bg-indigo-600/10 rounded-full blur-[160px]" />
                
                <div className="relative">
-                 <h2 className="text-5xl lg:text-[100px] font-black text-white leading-none tracking-tighter mb-14">Become a Global<br /><span className="text-blue-600">Powerhouse.</span></h2>
+                 <h2 className="text-4xl lg:text-7xl font-black text-white leading-none tracking-tighter mb-14">Become a Global<br /><span className="text-blue-600">Powerhouse.</span></h2>
                  <p className="text-2xl text-slate-400 max-w-2xl mx-auto font-medium mb-20 leading-relaxed">
                    Join 1,200+ top-tier agencies worldwide using PropGOCrm to dominate their local markets.
                  </p>
