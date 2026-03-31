@@ -15,6 +15,14 @@ export default function IntegrationsPage() {
     const [webhook, setWebhook] = useState<any>(null)
     const [googleSync, setGoogleSync] = useState<any>(null)
 
+    const [origin, setOrigin] = useState("")
+
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            setOrigin(window.location.origin)
+        }
+    }, [])
+
     const fetchIntegrations = async () => {
         try {
             const [webRes, googleRes] = await Promise.all([
@@ -52,7 +60,7 @@ export default function IntegrationsPage() {
         setLoading(false)
     }
 
-    const webhookUrl = `${window.location.origin}/api/webhooks/incoming/${session?.user?.agencyId}?secret=${webhook?.secret}`
+    const webhookUrl = `${origin}/api/webhooks/incoming/${session?.user?.agencyId}?secret=${webhook?.secret}`
 
     if (loading) return (
         <div className="flex items-center justify-center h-full">
