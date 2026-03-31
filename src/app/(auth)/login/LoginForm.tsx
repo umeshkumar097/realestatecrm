@@ -120,7 +120,7 @@ export default function LoginForm({ agency }: LoginFormProps) {
         <div className="mt-8 pt-6 border-t border-zinc-100 dark:border-zinc-800 text-center">
             <p className="text-zinc-500 text-sm">
                 Don't have an account?{" "}
-                <Link href="/signup" className="text-primary font-bold hover:underline italic">Create Agency</Link>
+                <Link href="/signup" className="text-primary font-bold hover:underline">Create Agency</Link>
             </p>
         </div>
       )}

@@ -82,7 +82,7 @@ export default function IntegrationsPage() {
                             <Webhook className="h-8 w-8 text-blue-600" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-black italic tracking-tight">Incoming Webhooks</h2>
+                            <h2 className="text-xl font-black tracking-tight">Incoming Webhooks</h2>
                             <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest">Connect Pabbly, Zapier, WebFlow</p>
                         </div>
                     </div>
@@ -92,7 +92,7 @@ export default function IntegrationsPage() {
                             <p className="text-zinc-500 text-sm font-bold mb-6">Receive real-time lead data from any external source.</p>
                             <button 
                                 onClick={generateWebhook}
-                                className="bg-primary text-white px-8 py-3 rounded-2xl font-black italic tracking-tight hover:scale-105 active:scale-95 transition-all shadow-xl shadow-primary/20"
+                                className="bg-primary text-white px-8 py-3 rounded-2xl font-black tracking-tight hover:scale-105 active:scale-95 transition-all shadow-xl shadow-primary/20"
                             >
                                 Generate Webhook URL
                             </button>
@@ -122,14 +122,14 @@ export default function IntegrationsPage() {
                                         <CheckCircle2 size={14} />
                                         <span className="text-[10px] font-black uppercase tracking-widest">Status</span>
                                     </div>
-                                    <p className="text-xs font-black text-emerald-700 italic">Active & Ready</p>
+                                    <p className="text-xs font-black text-emerald-700">Active & Ready</p>
                                 </div>
                                 <div className="p-4 bg-blue-50 rounded-2xl border border-blue-100">
                                     <div className="flex items-center gap-2 text-blue-600 mb-1">
                                         <Zap size={14} />
                                         <span className="text-[10px] font-black uppercase tracking-widest">Protocol</span>
                                     </div>
-                                    <p className="text-xs font-black text-blue-700 italic">JSON Post</p>
+                                    <p className="text-xs font-black text-blue-700">JSON Post</p>
                                 </div>
                             </div>
 
@@ -155,7 +155,7 @@ export default function IntegrationsPage() {
                             <Sheet className="h-8 w-8 text-emerald-600" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-black italic tracking-tight">Google Sheets Sync</h2>
+                            <h2 className="text-xl font-black tracking-tight">Google Sheets Sync</h2>
                             <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest">Two-way real-time spreadsheet sync</p>
                         </div>
                     </div>
@@ -165,7 +165,7 @@ export default function IntegrationsPage() {
                             <p className="text-zinc-500 text-sm font-bold mb-6">Automatically export leads to a Google Sheet in real-time.</p>
                             <button 
                                 onClick={() => window.location.href = "/api/integrations/google/auth"}
-                                className="bg-emerald-600 text-white px-8 py-3 rounded-2xl font-black italic tracking-tight hover:scale-105 active:scale-95 transition-all shadow-xl shadow-emerald-100"
+                                className="bg-emerald-600 text-white px-8 py-3 rounded-2xl font-black tracking-tight hover:scale-105 active:scale-95 transition-all shadow-xl shadow-emerald-100"
                             >
                                 Connect Google Account
                             </button>
@@ -176,7 +176,7 @@ export default function IntegrationsPage() {
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Connected Spreadsheet</p>
-                                        <h3 className="text-sm font-black italic text-zinc-800">PropGOCrm Leads Sync</h3>
+                                        <h3 className="text-sm font-black text-zinc-800">PropGOCrm Leads Sync</h3>
                                     </div>
                                     <div className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-[10px] font-black uppercase tracking-widest">
                                         Synced
@@ -195,11 +195,11 @@ export default function IntegrationsPage() {
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between text-xs font-bold text-zinc-600">
                                     <span className="flex items-center gap-2"><RefreshCcw size={14} /> Last Synced</span>
-                                    <span className="font-black italic text-zinc-900">{googleSync.lastSyncedAt ? new Date(googleSync.lastSyncedAt).toLocaleString() : 'Never'}</span>
+                                    <span className="font-black text-zinc-900">{googleSync.lastSyncedAt ? new Date(googleSync.lastSyncedAt).toLocaleString() : 'Never'}</span>
                                 </div>
                                 <div className="flex items-center justify-between text-xs font-bold text-zinc-600">
                                     <span className="flex items-center gap-2"><LayoutGrid size={14} /> Sync Status</span>
-                                    <span className="font-black italic text-primary">Real-time Enabled</span>
+                                    <span className="font-black text-primary">Real-time Enabled</span>
                                 </div>
                             </div>
 

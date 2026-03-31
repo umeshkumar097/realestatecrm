@@ -135,7 +135,7 @@ export default function WhatsAppControlsPage() {
          <div className="px-8 py-4 border-b border-zinc-100 flex items-center justify-between bg-zinc-50/50">
             <div className="flex items-center gap-2">
                 <Activity className="h-4 w-4 text-primary animate-pulse" />
-                <h2 className="text-sm font-black uppercase tracking-widest text-zinc-800 italic">Advanced Message Flows</h2>
+                <h2 className="text-sm font-black uppercase tracking-widest text-zinc-800">Advanced Message Flows</h2>
             </div>
             <div className="flex items-center gap-4">
                 <span className="flex items-center gap-1.5">

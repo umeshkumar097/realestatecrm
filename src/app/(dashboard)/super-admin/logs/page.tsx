@@ -149,12 +149,12 @@ export default function SystemLogsPage() {
                                     {log.type} / {log.level}
                                 </span>
                             </td>
-                            <td className="px-8 py-4 text-xs font-medium text-zinc-300 font-mono italic">{log.action}</td>
+                            <td className="px-8 py-4 text-xs font-medium text-zinc-300 font-mono">{log.action}</td>
                             <td className="px-8 py-4 text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{log.actor || 'system'}</td>
                             </tr>
                         )) : (
                             <tr>
-                                <td colSpan={4} className="px-8 py-16 text-center text-zinc-500 text-sm italic">
+                                <td colSpan={4} className="px-8 py-16 text-center text-zinc-500 text-sm">
                                     No system logs found.
                                 </td>
                             </tr>

@@ -46,7 +46,7 @@ export default function PlanModal({ plan, onClose, onSave }: PlanModalProps) {
             <div className="bg-white rounded-[32px] w-full max-w-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
                 <div className="px-8 py-6 border-b border-zinc-100 flex items-center justify-between bg-zinc-50/50">
                     <div>
-                        <h2 className="text-xl font-black tracking-tight italic">{plan?.id ? 'Edit Plan' : 'Create New Plan'}</h2>
+                        <h2 className="text-xl font-black tracking-tight">{plan?.id ? 'Edit Plan' : 'Create New Plan'}</h2>
                         <p className="text-xs text-zinc-500 font-bold uppercase tracking-widest mt-0.5">Define pricing and limits</p>
                     </div>
                     <button onClick={onClose} className="p-2 hover:bg-zinc-200 rounded-full transition-colors"><X size={20}/></button>
@@ -141,7 +141,7 @@ export default function PlanModal({ plan, onClose, onSave }: PlanModalProps) {
                     </div>
 
                     <div className="flex gap-3 pt-4 border-t border-zinc-100">
-                        <button type="submit" className="flex-1 py-4 bg-primary text-white rounded-2xl font-black italic tracking-tight shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2">
+                        <button type="submit" className="flex-1 py-4 bg-primary text-white rounded-2xl font-black tracking-tight shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2">
                             <Save size={18}/>
                             {plan?.id ? 'Update Package' : 'Publish Package'}
                         </button>

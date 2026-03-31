@@ -24,7 +24,7 @@ export default function ChangelogPage() {
           <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-slate-200 border-4 border-white" />
           <h3 className="text-lg font-black text-slate-900 mb-2">v2.0.4 — Premium Lead UI</h3>
           <p className="text-xs text-slate-400 font-bold uppercase mb-4">March 15, 2026</p>
-          <p className="text-sm text-slate-600 italic">Initial release of the high-fidelity lead management table.</p>
+          <p className="text-sm text-slate-600">Initial release of the high-fidelity lead management table.</p>
         </div>
       </div>
     </InnerPageLayout>

@@ -157,7 +157,7 @@ export default function AgenciesPage() {
                                 {agency.subscription?.status || "OPEN"}
                             </span>
                         </div>
-                        <p className="text-[10px] text-zinc-400 font-bold italic">Renewal: {new Date(agency.createdAt).toLocaleDateString()}</p>
+                        <p className="text-[10px] text-zinc-400 font-bold">Renewal: {new Date(agency.createdAt).toLocaleDateString()}</p>
                     </div>
                   </td>
                   <td className="px-6 py-6">
@@ -247,7 +247,7 @@ export default function AgenciesPage() {
         <div className="fixed inset-0 bg-zinc-950/20 backdrop-blur-sm flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl border border-zinc-200 p-8">
                 <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-xl font-black italic">Register New Agency</h2>
+                    <h2 className="text-xl font-black">Register New Agency</h2>
                     <button onClick={() => setShowRegisterModal(false)} className="text-zinc-400 hover:text-zinc-600 transition-colors">
                         <XCircle className="h-6 w-6" />
                     </button>
@@ -292,7 +292,7 @@ export default function AgenciesPage() {
         <div className="fixed inset-0 bg-zinc-950/20 backdrop-blur-sm flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-3xl w-full max-w-md shadow-2xl border border-zinc-200 p-8">
                 <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-xl font-black italic">Edit Agency</h2>
+                    <h2 className="text-xl font-black">Edit Agency</h2>
                     <button onClick={() => setShowEditModal(false)} className="text-zinc-400 hover:text-zinc-600 transition-colors">
                         <XCircle className="h-6 w-6" />
                     </button>

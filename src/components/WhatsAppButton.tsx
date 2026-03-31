@@ -38,7 +38,7 @@ export default function WhatsAppButton() {
                 </div>
                 <div className="text-left">
                     <p className="text-[10px] font-black uppercase text-zinc-400 tracking-widest leading-none mb-1">WhatsApp Sales</p>
-                    <p className="text-sm font-black text-zinc-900 italic leading-none">Inquire Now</p>
+                    <p className="text-sm font-black text-zinc-900 leading-none">Inquire Now</p>
                 </div>
             </button>
 
@@ -50,7 +50,7 @@ export default function WhatsAppButton() {
                         {/* Header */}
                         <div className="p-8 bg-zinc-50 border-b border-zinc-100 flex items-center justify-between">
                             <div>
-                                <h3 className="text-2xl font-black italic tracking-tighter text-zinc-900">Start Conversation</h3>
+                                <h3 className="text-2xl font-black tracking-tighter text-zinc-900">Start Conversation</h3>
                                 <p className="text-[10px] font-black uppercase text-zinc-400 tracking-widest mt-1">Direct to Specialist (+91 8449488090)</p>
                             </div>
                             <button onClick={() => setIsOpen(false)} className="p-2 hover:bg-zinc-200 rounded-full transition-colors">
@@ -105,7 +105,7 @@ export default function WhatsAppButton() {
                             <button 
                                 type="submit" 
                                 disabled={status !== "idle"}
-                                className={`w-full py-5 rounded-[24px] font-black text-xl italic tracking-tight transition-all flex items-center justify-center gap-3 shadow-xl ${status === "success" ? "bg-emerald-500 text-white" : "bg-zinc-900 text-white hover:bg-emerald-600 shadow-zinc-200"}`}
+                                className={`w-full py-5 rounded-[24px] font-black text-xl tracking-tight transition-all flex items-center justify-center gap-3 shadow-xl ${status === "success" ? "bg-emerald-500 text-white" : "bg-zinc-900 text-white hover:bg-emerald-600 shadow-zinc-200"}`}
                             >
                                 {status === "idle" && <><Send size={20} /> Open WhatsApp</>}
                                 {status === "submitting" && "Redirecting..."}

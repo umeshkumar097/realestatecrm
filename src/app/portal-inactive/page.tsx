@@ -29,7 +29,7 @@ export default function PortalInactivePage() {
             Reactivate Plan
         </Link>
         
-        <p className="text-[10px] text-zinc-400 uppercase font-black tracking-widest italic pt-4"> Enterprise White-label Protection Active</p>
+        <p className="text-[10px] text-zinc-400 uppercase font-black tracking-widest pt-4"> Enterprise White-label Protection Active</p>
       </div>
     </div>
   )

@@ -130,7 +130,7 @@ export default function ContactsPage() {
       {showEditModal && editingMember && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
           <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl">
-            <h2 className="text-xl font-black text-slate-900 mb-6 uppercase tracking-tighter italic">Edit Team Member</h2>
+            <h2 className="text-xl font-black text-slate-900 mb-6 uppercase tracking-tighter">Edit Team Member</h2>
             <form onSubmit={handleUpdate} className="space-y-4">
               <div className="space-y-1">
                 <label className="text-[10px] font-black uppercase text-slate-400">Full Name</label>

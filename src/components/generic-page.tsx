@@ -6,7 +6,7 @@ export default function GenericPage({ title, badge, content }: { title: string, 
       <div className="space-y-6 text-slate-600">
         <p className="leading-relaxed">{content}</p>
         <div className="p-12 bg-slate-50 border border-slate-100 rounded-3xl text-center">
-            <p className="text-sm font-black text-slate-400 italic">Page under construction — PropCRM is launching soon!</p>
+            <p className="text-sm font-black text-slate-400">Page under construction — PropCRM is launching soon!</p>
         </div>
       </div>
     </InnerPageLayout>

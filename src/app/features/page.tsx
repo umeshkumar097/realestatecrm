@@ -25,7 +25,7 @@ const SectionHeader = ({ icon: Icon, title, subtitle, badge }: { icon: any, titl
         <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center shadow-2xl shadow-primary/30 mb-2">
             <Icon className="text-white h-8 w-8" />
         </div>
-        <h2 className="text-3xl md:text-5xl font-black tracking-tight text-zinc-900 balance italic">
+        <h2 className="text-3xl md:text-5xl font-black tracking-tight text-zinc-900 balance">
             {title}
         </h2>
         <p className="text-zinc-500 text-lg md:text-xl max-w-2xl font-medium leading-relaxed">
@@ -39,7 +39,7 @@ const FeatureBox = ({ title, desc, icon: Icon }: { title: string, desc: string, 
         <div className="w-12 h-12 bg-zinc-50 rounded-2xl flex items-center justify-center text-primary mb-6 group-hover:scale-110 transition-transform">
             <Icon size={24} />
         </div>
-        <h3 className="text-xl font-black text-zinc-900 mb-3 italic">{title}</h3>
+        <h3 className="text-xl font-black text-zinc-900 mb-3">{title}</h3>
         <p className="text-zinc-500 text-sm font-medium leading-relaxed">{desc}</p>
     </div>
 )
@@ -64,17 +64,17 @@ export default function FeaturesPage() {
                         <div className="inline-flex items-center gap-2 px-6 py-2 bg-emerald-50 text-emerald-600 rounded-full text-xs font-black uppercase tracking-widest border border-emerald-100 animate-bounce">
                             <Zap size={14} /> NEW: PORTAL SYNC 2.0
                         </div>
-                        <h1 className="text-5xl md:text-8xl font-black tracking-tight text-zinc-900 leading-[0.95] italic balance">
-                            Everything You Need To <span className="text-primary italic">Scale Profitably</span>.
+                        <h1 className="text-5xl md:text-8xl font-black tracking-tight text-zinc-900 leading-[0.95] balance">
+                            Everything You Need To <span className="text-primary">Scale Profitably</span>.
                         </h1>
                         <p className="text-xl md:text-2xl text-zinc-500 font-medium max-w-2xl mx-auto leading-relaxed">
                             Stop juggling multiple tabs. PropGOCrm centralizes your leads, sales, and marketing into one high-performance OS.
                         </p>
                         <div className="flex flex-wrap items-center justify-center gap-6 pt-8">
-                            <Link href="/signup" className="group bg-primary text-white px-10 py-5 rounded-[24px] text-lg font-black italic tracking-tight flex items-center gap-3 shadow-2xl shadow-primary/40 hover:scale-105 active:scale-95 transition-all">
+                            <Link href="/signup" className="group bg-primary text-white px-10 py-5 rounded-[24px] text-lg font-black tracking-tight flex items-center gap-3 shadow-2xl shadow-primary/40 hover:scale-105 active:scale-95 transition-all">
                                 Start Free Trial <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                             </Link>
-                            <Link href="/contact" className="px-10 py-5 border-2 border-zinc-900 text-zinc-900 rounded-[24px] text-lg font-black italic tracking-tight hover:bg-zinc-900 hover:text-white transition-all">
+                            <Link href="/contact" className="px-10 py-5 border-2 border-zinc-900 text-zinc-900 rounded-[24px] text-lg font-black tracking-tight hover:bg-zinc-900 hover:text-white transition-all">
                                 Book Live Demo
                             </Link>
                         </div>
@@ -95,7 +95,7 @@ export default function FeaturesPage() {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
                         <div className="space-y-10 order-2 lg:order-1">
                             <div className="space-y-6">
-                                <h3 className="text-3xl font-black italic text-zinc-900">Centralized Lead Capture</h3>
+                                <h3 className="text-3xl font-black text-zinc-900">Centralized Lead Capture</h3>
                                 <p className="text-zinc-500 text-lg font-medium leading-relaxed">
                                     Automatically capture and organize leads from all your marketing channels. Our system enriches lead data and allows manual scoring for better organization.
                                 </p>
@@ -113,7 +113,7 @@ export default function FeaturesPage() {
                                             <CheckCircle2 size={20} />
                                         </div>
                                         <div>
-                                            <h4 className="font-black text-zinc-900 italic text-sm">{item.t}</h4>
+                                            <h4 className="font-black text-zinc-900 text-sm">{item.t}</h4>
                                             <p className="text-zinc-500 text-xs mt-1 font-medium leading-relaxed">{item.d}</p>
                                         </div>
                                     </div>
@@ -138,7 +138,7 @@ export default function FeaturesPage() {
                         <p className="text-center text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400 mb-12">Automatic Lead Capture Sources</p>
                         <div className="flex flex-wrap justify-center items-center gap-8 md:gap-20 opacity-60">
                              {['Property Finder', 'Bayut', 'Dubizzle', 'Instagram', 'Facebook', 'Website'].map(src => (
-                                 <span key={src} className="text-2xl font-black italic tracking-tighter text-zinc-300 hover:text-primary transition-colors cursor-default">{src}</span>
+                                 <span key={src} className="text-2xl font-black tracking-tighter text-zinc-300 hover:text-primary transition-colors cursor-default">{src}</span>
                              ))}
                         </div>
                     </div>
@@ -160,7 +160,7 @@ export default function FeaturesPage() {
                             <div className="w-16 h-16 bg-emerald-500 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-xl shadow-emerald-200">
                                 <MessageSquare className="text-white h-8 w-8" />
                             </div>
-                            <h2 className="text-4xl md:text-5xl font-black tracking-tight text-zinc-900 leading-tight italic balance">
+                            <h2 className="text-4xl md:text-5xl font-black tracking-tight text-zinc-900 leading-tight balance">
                                 WhatsApp & SMS Integration
                             </h2>
                             <p className="text-zinc-500 text-lg font-medium leading-relaxed">
@@ -173,7 +173,7 @@ export default function FeaturesPage() {
                                     "Message templates and quick replies",
                                     "Conversation history and tracking"
                                 ].map((item, idx) => (
-                                    <li key={idx} className="flex items-center gap-3 text-zinc-600 font-bold italic">
+                                    <li key={idx} className="flex items-center gap-3 text-zinc-600 font-bold">
                                         <CheckCircle2 size={18} className="text-emerald-500" /> {item}
                                     </li>
                                 ))}
@@ -197,24 +197,24 @@ export default function FeaturesPage() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                         <div className="bg-white/5 backdrop-blur-md p-10 rounded-[40px] border border-white/10 border-b-primary/30 group">
                             <Facebook className="text-blue-500 h-10 w-10 mb-6 group-hover:scale-110 transition-transform" />
-                            <h3 className="text-2xl font-black text-white italic mb-4">Facebook Lead Ads</h3>
+                            <h3 className="text-2xl font-black text-white mb-4">Facebook Lead Ads</h3>
                             <p className="text-white/60 text-sm font-medium leading-relaxed">Direct integration with Facebook Lead Ads forms for instant sync.</p>
                         </div>
                         <div className="bg-white/5 backdrop-blur-md p-10 rounded-[40px] border border-white/10 border-b-pink-500/30 group">
                             <Instagram className="text-pink-500 h-10 w-10 mb-6 group-hover:scale-110 transition-transform" />
-                            <h3 className="text-2xl font-black text-white italic mb-4">Instagram Lead Ads</h3>
+                            <h3 className="text-2xl font-black text-white mb-4">Instagram Lead Ads</h3>
                             <p className="text-white/60 text-sm font-medium leading-relaxed">Automatic lead capture from Instagram campaign forms.</p>
                         </div>
                         <div className="bg-white/5 backdrop-blur-md p-10 rounded-[40px] border border-white/10 border-b-orange-500/30 group">
                             <Zap className="text-orange-500 h-10 w-10 mb-6 group-hover:scale-110 transition-transform" />
-                            <h3 className="text-2xl font-black text-white italic mb-4">Automation Hub</h3>
+                            <h3 className="text-2xl font-black text-white mb-4">Automation Hub</h3>
                             <p className="text-white/60 text-sm font-medium leading-relaxed">Connect with **Zapier, Pabbly, or n8n** for infinite automated lead workflows.</p>
                         </div>
                     </div>
 
                     <div className="mt-20 p-10 bg-white/5 backdrop-blur-md border border-white/10 rounded-[48px] flex flex-col md:flex-row items-center justify-between gap-12">
                         <div className="space-y-6">
-                            <h3 className="text-3xl font-black text-white italic">Zapier Automation & Lead Sync</h3>
+                            <h3 className="text-3xl font-black text-white">Zapier Automation & Lead Sync</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-4">
                                 {[
                                     { t: "100% Lead Capture", d: "Every inquiry accounted for." },
@@ -223,7 +223,7 @@ export default function FeaturesPage() {
                                     { t: "24/7 Automated", d: "Works while you sleep." }
                                 ].map((item, idx) => (
                                     <div key={idx} className="space-y-1">
-                                        <p className="text-primary font-black italic">{item.t}</p>
+                                        <p className="text-primary font-black">{item.t}</p>
                                         <p className="text-white/40 text-[10px] font-black uppercase tracking-widest">{item.d}</p>
                                     </div>
                                 ))}
@@ -260,7 +260,7 @@ export default function FeaturesPage() {
                             <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center flex-shrink-0">
                                 <Mail className="text-primary h-8 w-8" />
                             </div>
-                            <h2 className="text-4xl md:text-5xl font-black tracking-tight text-zinc-900 leading-tight italic balance">
+                            <h2 className="text-4xl md:text-5xl font-black tracking-tight text-zinc-900 leading-tight balance">
                                 Email Tracking & Automation
                             </h2>
                             <p className="text-zinc-500 text-lg font-medium leading-relaxed">
@@ -275,7 +275,7 @@ export default function FeaturesPage() {
                                 ].map((item, idx) => (
                                     <div key={idx} className="flex gap-3">
                                         <CheckCircle2 size={18} className="text-primary flex-shrink-0" />
-                                        <span className="text-zinc-600 font-bold text-sm italic">{item}</span>
+                                        <span className="text-zinc-600 font-bold text-sm">{item}</span>
                                     </div>
                                 ))}
                             </div>
@@ -313,7 +313,7 @@ export default function FeaturesPage() {
 
                         <div className="space-y-10">
                             <div className="space-y-6">
-                                <h3 className="text-3xl font-black italic text-zinc-900">Centralized Listing Management</h3>
+                                <h3 className="text-3xl font-black text-zinc-900">Centralized Listing Management</h3>
                                 <p className="text-zinc-500 text-lg font-medium leading-relaxed">
                                     Create professional property listings once and automatically distribute them across multiple platforms. Save time while maximizing your property exposure.
                                 </p>
@@ -328,7 +328,7 @@ export default function FeaturesPage() {
                                 ].map((item, idx) => (
                                     <div key={idx} className="p-6 bg-white rounded-3xl border border-zinc-100 shadow-sm">
                                         <CheckCircle2 size={24} className="text-emerald-500 mb-4" />
-                                        <h4 className="font-black text-zinc-900 italic text-sm">{item.t}</h4>
+                                        <h4 className="font-black text-zinc-900 text-sm">{item.t}</h4>
                                         <p className="text-zinc-500 text-xs mt-2 font-medium leading-relaxed">{item.d}</p>
                                     </div>
                                 ))}
@@ -337,7 +337,7 @@ export default function FeaturesPage() {
                     </div>
 
                     <div className="mt-20 text-center">
-                         <Link href="/signup" className="inline-flex items-center gap-3 bg-zinc-900 text-white px-12 py-6 rounded-[32px] text-xl font-black italic tracking-tight hover:bg-primary transition-all shadow-2xl shadow-zinc-200">
+                         <Link href="/signup" className="inline-flex items-center gap-3 bg-zinc-900 text-white px-12 py-6 rounded-[32px] text-xl font-black tracking-tight hover:bg-primary transition-all shadow-2xl shadow-zinc-200">
                              Launch My Marketplace <ArrowUpRight />
                          </Link>
                     </div>

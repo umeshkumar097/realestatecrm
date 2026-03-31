@@ -294,15 +294,15 @@ export default function Landing() {
                 <div className="flex flex-col gap-4 text-left max-w-sm mx-auto lg:mx-0">
                   <div className="flex items-center gap-3">
                     <div className="w-6 h-6 bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-600"><CheckCircle2 size={16}/></div>
-                    <span className="font-black text-sm text-slate-600 uppercase tracking-widest italic">Zero Lead Leakage</span>
+                    <span className="font-black text-sm text-slate-600 uppercase tracking-widest">Zero Lead Leakage</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="w-6 h-6 bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-600"><CheckCircle2 size={16}/></div>
-                    <span className="font-black text-sm text-slate-600 uppercase tracking-widest italic">Auto-Response via WhatsApp</span>
+                    <span className="font-black text-sm text-slate-600 uppercase tracking-widest">Auto-Response via WhatsApp</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="w-6 h-6 bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-600"><CheckCircle2 size={16}/></div>
-                    <span className="font-black text-sm text-slate-600 uppercase tracking-widest italic">Universal XML Sync Support</span>
+                    <span className="font-black text-sm text-slate-600 uppercase tracking-widest">Universal XML Sync Support</span>
                   </div>
                 </div>
               </div>
@@ -387,7 +387,7 @@ export default function Landing() {
               </div>
               <div className="flex-1 py-10">
                 <h2 className="text-4xl lg:text-7xl font-black text-slate-900 mb-10 leading-none">The Future is<br />Conversational.</h2>
-                <p className="text-xl text-slate-500 font-medium mb-12 leading-relaxed italic">"WhatsApp is no longer optional for real estate. It's the primary sales channel. We just made it professional."</p>
+                <p className="text-xl text-slate-500 font-medium mb-12 leading-relaxed">"WhatsApp is no longer optional for real estate. It's the primary sales channel. We just made it professional."</p>
                 <div className="grid grid-cols-2 gap-8 mb-14">
                    <div>
                      <p className="text-4xl font-black text-blue-600 mb-2">98%</p>

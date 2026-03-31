@@ -14,7 +14,7 @@ const ContactMethod = ({ icon: Icon, title, value, sub, color }: { icon: any, ti
         </div>
         <div>
             <p className="text-[10px] font-black uppercase text-zinc-400 tracking-[0.25em] mb-1">{title}</p>
-            <p className="text-lg font-black text-zinc-900 tracking-tight italic mb-1">{value}</p>
+            <p className="text-lg font-black text-zinc-900 tracking-tight mb-1">{value}</p>
             <p className="text-xs text-zinc-500 font-medium">{sub}</p>
         </div>
     </div>
@@ -47,8 +47,8 @@ export default function ContactPage() {
                         {/* LEFT: INFO */}
                         <div className="lg:col-span-5 space-y-12">
                             <div className="space-y-6">
-                                <h1 className="text-5xl md:text-7xl font-black italic tracking-tighter text-zinc-900 leading-tight">Let's Define Your <span className="text-blue-600">Growth OS.</span></h1>
-                                <p className="text-xl text-zinc-500 font-medium leading-relaxed italic">"Global agencies don't just happen. They are built on robust, automated foundations. Let's build yours."</p>
+                                <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-zinc-900 leading-tight">Let's Define Your <span className="text-blue-600">Growth OS.</span></h1>
+                                <p className="text-xl text-zinc-500 font-medium leading-relaxed">"Global agencies don't just happen. They are built on robust, automated foundations. Let's build yours."</p>
                             </div>
 
                             <div className="flex flex-col gap-6">
@@ -79,7 +79,7 @@ export default function ContactPage() {
                                 <div className="absolute top-0 right-0 p-20 -mr-20 bg-blue-600/30 rounded-full blur-[60px]" />
                                 <div className="relative space-y-4">
                                     <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center"><Globe size={20}/></div>
-                                    <h3 className="text-xl font-black italic">Operating Globally.</h3>
+                                    <h3 className="text-xl font-black">Operating Globally.</h3>
                                     <p className="text-white/50 text-sm font-medium">Supporting property agencies across UAE, India, UK, and North America.</p>
                                 </div>
                             </div>

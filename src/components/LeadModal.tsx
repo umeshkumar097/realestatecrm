@@ -43,7 +43,7 @@ export default function LeadModal({ isOpen, onClose, plan }: { isOpen: boolean, 
                     <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center mb-4">
                         <Building2 className="h-6 w-6" />
                     </div>
-                    <h2 className="text-2xl font-black italic tracking-tighter">Enterprise Inquiry</h2>
+                    <h2 className="text-2xl font-black tracking-tighter">Enterprise Inquiry</h2>
                     <p className="text-blue-100 text-sm font-medium mt-1">Scale your property empire with custom solutions.</p>
                 </div>
 

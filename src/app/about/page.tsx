@@ -12,7 +12,7 @@ const StoryCard = ({ title, desc, icon: Icon, delay }: { title: string, desc: st
         <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mb-8 group-hover:scale-110 transition-transform">
             <Icon size={32} />
         </div>
-        <h3 className="text-2xl font-black text-zinc-900 mb-4 italic tracking-tight">{title}</h3>
+        <h3 className="text-2xl font-black text-zinc-900 mb-4 tracking-tight">{title}</h3>
         <p className="text-zinc-500 text-lg font-medium leading-relaxed">{desc}</p>
     </div>
 )
@@ -37,7 +37,7 @@ export default function AboutPage() {
                         <div className="inline-flex items-center gap-2 px-6 py-2 bg-emerald-50 text-emerald-600 rounded-full text-xs font-black uppercase tracking-widest border border-emerald-100 animate-bounce">
                             <Zap size={14} /> Global Standard 2026
                         </div>
-                        <h1 className="text-6xl md:text-8xl font-black tracking-tight text-zinc-900 leading-[0.9] italic balance">
+                        <h1 className="text-6xl md:text-8xl font-black tracking-tight text-zinc-900 leading-[0.9] balance">
                             The Brain Behind <span className="text-blue-600">Global</span> Real Estate Excellence.
                         </h1>
                         <p className="text-xl md:text-2xl text-zinc-500 font-medium max-w-2xl mx-auto leading-relaxed">
@@ -54,7 +54,7 @@ export default function AboutPage() {
                         <div className="space-y-10">
                             <div className="space-y-4">
                                 <span className="text-sm font-black text-blue-600 uppercase tracking-[0.3em]">Our Engineering Heritage</span>
-                                <h2 className="text-4xl md:text-6xl font-black italic tracking-tight text-zinc-900">
+                                <h2 className="text-4xl md:text-6xl font-black tracking-tight text-zinc-900">
                                     Powered by <span className="text-zinc-400">AICLEX</span> <span className="text-blue-600">TECHNOLOGIES</span>.
                                 </h2>
                             </div>
@@ -82,7 +82,7 @@ export default function AboutPage() {
                                     <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-xl">
                                         <Building2 size={32} />
                                     </div>
-                                    <h3 className="text-3xl font-black italic text-zinc-900 leading-tight">Global Ingress & Portal Sync Excellence.</h3>
+                                    <h3 className="text-3xl font-black text-zinc-900 leading-tight">Global Ingress & Portal Sync Excellence.</h3>
                                     <p className="text-zinc-500 font-medium">We monitor 50+ property portals every second to ensure zero lead leakage for our partners.</p>
                                 </div>
                                 <div className="relative mt-8">
@@ -103,8 +103,8 @@ export default function AboutPage() {
             {/* THREE PILLARS */}
             <section className="py-40">
                 <div className="container mx-auto px-6 text-center mb-20">
-                    <h2 className="text-4xl lg:text-7xl font-black italic tracking-tighter text-zinc-900 mb-8">Our Core Philosophies.</h2>
-                    <p className="text-xl text-zinc-500 font-medium max-w-2xl mx-auto leading-relaxed italic">Everything we build serves three primary directives:</p>
+                    <h2 className="text-4xl lg:text-7xl font-black tracking-tighter text-zinc-900 mb-8">Our Core Philosophies.</h2>
+                    <p className="text-xl text-zinc-500 font-medium max-w-2xl mx-auto leading-relaxed">Everything we build serves three primary directives:</p>
                 </div>
                 <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-10">
                     <StoryCard 
@@ -132,7 +132,7 @@ export default function AboutPage() {
             <section className="py-32 bg-zinc-900 relative overflow-hidden">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-blue-600/20 blur-[140px] rounded-full pointer-events-none" />
                 <div className="container mx-auto px-6 relative text-center">
-                    <h2 className="text-4xl lg:text-7xl font-black italic tracking-tighter text-white mb-20">Built by Specialists,<br /><span className="text-blue-600 underline decoration-blue-600/30 underline-offset-8">Scale with Confidence.</span></h2>
+                    <h2 className="text-4xl lg:text-7xl font-black tracking-tighter text-white mb-20">Built by Specialists,<br /><span className="text-blue-600 underline decoration-blue-600/30 underline-offset-8">Scale with Confidence.</span></h2>
                      <div className="flex flex-wrap justify-center gap-12 lg:gap-32">
                           {[
                               { t: "Leadership", d: "Ex-Property Professionals" },

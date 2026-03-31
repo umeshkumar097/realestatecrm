@@ -142,7 +142,7 @@ export default function PlatformLeadsPage() {
                 <div className="flex flex-col md:flex-row items-start md:items-center gap-6 flex-1 lg:max-w-md">
                     <div className="flex-1 bg-zinc-50 rounded-2xl p-4 text-xs font-medium text-zinc-600 min-w-0">
                          <span className="font-black text-[9px] uppercase tracking-widest text-zinc-400 block mb-1">Message / Requirements</span>
-                         <p className="line-clamp-2 italic">“{lead.message || "No specific message provided."}”</p>
+                         <p className="line-clamp-2">“{lead.message || "No specific message provided."}”</p>
                     </div>
 
                     <div className="flex items-center gap-2">

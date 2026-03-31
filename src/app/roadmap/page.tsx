@@ -27,7 +27,7 @@ export default function RoadmapPage() {
           </div>
         ))}
         <div className="p-6 bg-blue-50 border border-blue-100 rounded-2xl text-center">
-            <p className="text-sm font-bold text-blue-800 italic">Have a feature request? Let us know at <a href="mailto:hello@aiclex.in" className="underline">hello@aiclex.in</a></p>
+            <p className="text-sm font-bold text-blue-800">Have a feature request? Let us know at <a href="mailto:hello@aiclex.in" className="underline">hello@aiclex.in</a></p>
         </div>
       </div>
     </InnerPageLayout>

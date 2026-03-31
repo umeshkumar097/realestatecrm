@@ -80,7 +80,7 @@ export default function BillingPage() {
             </div>
             <p className="text-zinc-400 text-xs font-bold uppercase tracking-widest mb-1">Monthly Recurring Revenue</p>
             <h2 className="text-4xl font-black mb-2">{stats?.mrr || "₹0L"}</h2>
-            <p className="text-zinc-500 text-[10px] font-bold italic">* Excludes one-time setup fees.</p>
+            <p className="text-zinc-500 text-[10px] font-bold">* Excludes one-time setup fees.</p>
          </div>
 
          <div className="bg-white p-8 rounded-3xl border border-zinc-200 shadow-sm flex flex-col justify-between">
@@ -112,7 +112,7 @@ export default function BillingPage() {
                 <p className="text-zinc-400 text-xs font-bold uppercase tracking-widest mb-1">Average Customer LTV</p>
                 <div className="flex items-baseline gap-2">
                     <h2 className="text-3xl font-black text-zinc-800">{stats?.ltv || "₹0"}</h2>
-                    <span className="text-zinc-400 text-xs font-bold italic">Dynamic</span>
+                    <span className="text-zinc-400 text-xs font-bold">Dynamic</span>
                 </div>
             </div>
          </div>

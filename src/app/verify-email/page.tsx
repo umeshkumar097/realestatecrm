@@ -55,7 +55,7 @@ function VerifyEmailContent() {
         <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-8">
           <CheckCircle2 size={44} />
         </div>
-        <h1 className="text-3xl font-black text-slate-900 tracking-tight italic">Account Verified!</h1>
+        <h1 className="text-3xl font-black text-slate-900 tracking-tight">Account Verified!</h1>
         <p className="text-lg text-slate-500 font-medium max-w-sm mx-auto">
           Your PropGoCRM account is now active. Redirecting you to login...
         </p>

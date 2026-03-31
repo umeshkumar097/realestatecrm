@@ -185,7 +185,7 @@ export default function PropertiesPage() {
       {isEditModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
           <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl">
-            <h2 className="text-xl font-black text-slate-900 mb-6 uppercase italic tracking-tighter">Edit Listing</h2>
+            <h2 className="text-xl font-black text-slate-900 mb-6 uppercase tracking-tighter">Edit Listing</h2>
             <form onSubmit={handleEditSubmit} className="space-y-4">
               <input type="text" placeholder="Listing Title" required className="w-full px-4 py-3 rounded-xl border border-slate-200 font-bold" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} />
               <div className="grid grid-cols-2 gap-4">

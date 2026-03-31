@@ -73,7 +73,7 @@ export default function SignupPage() {
               <div className="w-14 h-14 bg-primary rounded-2xl flex items-center justify-center mb-4 shadow-xl shadow-primary/20">
                 <Building2 className="text-white h-8 w-8" />
               </div>
-              <h1 className="text-3xl font-black italic tracking-tighter">Launch Your Agency</h1>
+              <h1 className="text-3xl font-black tracking-tighter">Launch Your Agency</h1>
               <p className="text-zinc-500 text-sm mt-1 text-center font-medium">Set up your workspace in seconds.</p>
             </div>
 
@@ -122,7 +122,7 @@ export default function SignupPage() {
         ) : (
           <div className="animate-in fade-in slide-in-from-bottom-5 duration-500">
             <div className="text-center mb-12">
-                <h2 className="text-4xl font-black tracking-tighter italic mb-2">Choose Your Power Plan</h2>
+                <h2 className="text-4xl font-black tracking-tighter mb-2">Choose Your Power Plan</h2>
                 <p className="text-zinc-500 font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-2">
                     <Sparkles className="h-4 w-4 text-amber-500" /> All plans include a 38-hour priority setup
                 </p>
@@ -134,12 +134,12 @@ export default function SignupPage() {
                 {loading && plans.length === 0 ? (
                     <div className="col-span-3 text-center py-20 bg-white rounded-[40px] border border-zinc-200">
                         <Loader2 className="h-10 w-10 animate-spin text-primary mx-auto mb-4" />
-                        <p className="text-zinc-500 font-bold italic">Gathering available packages...</p>
+                        <p className="text-zinc-500 font-bold">Gathering available packages...</p>
                     </div>
                 ) : plans.length === 0 ? (
                     <div className="col-span-3 text-center py-20 bg-white rounded-[40px] border border-zinc-200">
                         <XCircle className="h-10 w-10 text-red-500 mx-auto mb-4" />
-                        <p className="text-zinc-500 font-bold italic">No packages available at the moment. Please contact support.</p>
+                        <p className="text-zinc-500 font-bold">No packages available at the moment. Please contact support.</p>
                         <button onClick={() => setStep(2)} className="mt-4 text-primary font-black uppercase text-xs tracking-widest">Retry Fetching</button>
                     </div>
                 ) : plans.map((plan) => (
@@ -159,7 +159,7 @@ export default function SignupPage() {
                         <h3 className="text-2xl font-black mb-1">{plan.name}</h3>
                         <p className="text-sm font-bold text-zinc-500 mb-6">{plan.description}</p>
                         
-                        <div className="text-3xl font-black italic mb-8 flex items-baseline gap-1">
+                        <div className="text-3xl font-black mb-8 flex items-baseline gap-1">
                             <IndianRupee className="h-5 w-5" /> {plan.monthlyPrice}
                             <span className="text-xs font-bold text-zinc-400 not-italic">/mo</span>
                         </div>
@@ -190,7 +190,7 @@ export default function SignupPage() {
                 <button 
                     disabled={!selectedPlan || loading}
                     onClick={handleStartTrial}
-                    className="px-12 py-5 bg-zinc-950 text-white rounded-[24px] font-black text-lg shadow-2xl hover:scale-105 active:scale-95 disabled:opacity-50 transition-all flex items-center gap-3 italic"
+                    className="px-12 py-5 bg-zinc-950 text-white rounded-[24px] font-black text-lg shadow-2xl hover:scale-105 active:scale-95 disabled:opacity-50 transition-all flex items-center gap-3"
                 >
                     {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : "Authorize 3-Day Trial Checkout"}
                     <ChevronRight className="h-6 w-6" />

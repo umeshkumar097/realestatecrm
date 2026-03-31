@@ -155,7 +155,7 @@ export default function DashboardPage() {
                 </div>
               ))}
             </div>
-            <p className="mt-6 text-[11px] text-slate-400 font-bold italic leading-tight">* Based on the last 30 days of incoming traffic.</p>
+            <p className="mt-6 text-[11px] text-slate-400 font-bold leading-tight">* Based on the last 30 days of incoming traffic.</p>
           </div>
 
           <div className="bg-primary p-6 rounded-3xl shadow-xl shadow-primary/20 text-white relative overflow-hidden group">

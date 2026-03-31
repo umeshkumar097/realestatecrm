@@ -100,7 +100,7 @@ export default function SuperAdminPage() {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black tracking-tight italic">PropGOCrm Command Center</h1>
+          <h1 className="text-2xl font-black tracking-tight">PropGOCrm Command Center</h1>
           <p className="text-zinc-500 text-sm mt-0.5">Global oversight of all agencies, portal integrations, and enterprise inquiries.</p>
         </div>
         
@@ -246,7 +246,7 @@ export default function SuperAdminPage() {
                     </td>
                     <td className="px-6 py-4">
                         <p className="text-sm font-black text-blue-600">{lead.company || "N/A"}</p>
-                        {lead.message && <p className="text-[10px] text-zinc-400 italic line-clamp-1 max-w-xs">{lead.message}</p>}
+                        {lead.message && <p className="text-[10px] text-zinc-400 line-clamp-1 max-w-xs">{lead.message}</p>}
                     </td>
                     <td className="px-6 py-4">
                         <select 
@@ -280,7 +280,7 @@ export default function SuperAdminPage() {
           <div className="p-8">
             <div className="flex items-center justify-between mb-8">
                 <div>
-                    <h2 className="text-xl font-black tracking-tight italic">Commercial Packages</h2>
+                    <h2 className="text-xl font-black tracking-tight">Commercial Packages</h2>
                     <p className="text-xs text-zinc-500 font-bold uppercase tracking-widest mt-0.5">Control pricing, limits and addons</p>
                 </div>
                 <div className="flex items-center gap-3">
@@ -296,7 +296,7 @@ export default function SuperAdminPage() {
                     </button>
                     <button 
                         onClick={() => { setSelectedPlan(null); setShowPlanModal(true); }}
-                        className="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-2xl font-black italic tracking-tight shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all"
+                        className="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-2xl font-black tracking-tight shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all"
                     >
                         <Plus size={18}/> New Package
                     </button>
@@ -315,7 +315,7 @@ export default function SuperAdminPage() {
                                 <Package size={24} className="text-primary" />
                             </div>
                             <div>
-                                <h3 className="text-lg font-black tracking-tight italic">{plan.name}</h3>
+                                <h3 className="text-lg font-black tracking-tight">{plan.name}</h3>
                                 <p className="text-[10px] font-black uppercase text-zinc-400 tracking-widest">{plan.stripePriceId || 'NO STRIPE ID'}</p>
                             </div>
                         </div>
@@ -323,15 +323,15 @@ export default function SuperAdminPage() {
                         <div className="space-y-4 mb-8">
                             <div className="flex items-center justify-between text-xs font-bold text-zinc-600">
                                 <span>Monthly Price</span>
-                                <span className="font-black italic text-zinc-900 flex items-center gap-0.5"><IndianRupee size={12}/> {plan.monthlyPrice}</span>
+                                <span className="font-black text-zinc-900 flex items-center gap-0.5"><IndianRupee size={12}/> {plan.monthlyPrice}</span>
                             </div>
                             <div className="flex items-center justify-between text-xs font-bold text-zinc-600">
                                 <span>Agent Limit</span>
-                                <span className="font-black italic text-zinc-900">{plan.maxAgents} Agents</span>
+                                <span className="font-black text-zinc-900">{plan.maxAgents} Agents</span>
                             </div>
                             <div className="flex items-center justify-between text-xs font-bold text-zinc-600">
                                 <span>Lead Limit</span>
-                                <span className="font-black italic text-zinc-900">{plan.maxLeads} /mo</span>
+                                <span className="font-black text-zinc-900">{plan.maxLeads} /mo</span>
                             </div>
                         </div>
 
@@ -343,7 +343,7 @@ export default function SuperAdminPage() {
                                      {f}
                                  </div>
                              ))}
-                             {plan.features?.length > 3 && <p className="text-[10px] font-bold text-primary italic">+{plan.features.length - 3} more services...</p>}
+                             {plan.features?.length > 3 && <p className="text-[10px] font-bold text-primary">+{plan.features.length - 3} more services...</p>}
                         </div>
                     </div>
                 ))}

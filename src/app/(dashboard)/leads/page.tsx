@@ -470,7 +470,7 @@ export default function LeadsPage() {
                   </td>
                   <td className="px-6 py-4">
                     <p className="text-[11px] font-medium text-slate-500">{new Date(lead.updatedAt).toLocaleDateString("en-IN", { day: 'numeric', month: 'short' })}</p>
-                    <p className="text-[10px] text-slate-400 italic">{lead.budget ? `Budget: ${lead.budget}` : 'Interested'}</p>
+                    <p className="text-[10px] text-slate-400">{lead.budget ? `Budget: ${lead.budget}` : 'Interested'}</p>
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2" onClick={e => e.stopPropagation()}>
@@ -661,7 +661,7 @@ export default function LeadsPage() {
                       <div className="h-12 bg-slate-50 rounded-xl" />
                     </div>
                   ) : activities.length === 0 ? (
-                    <p className="text-[10px] text-slate-400 italic text-center py-4">No activity logged yet.</p>
+                    <p className="text-[10px] text-slate-400 text-center py-4">No activity logged yet.</p>
                   ) : (
                     activities.map((act: any) => (
                       <div key={act.id} className="relative pl-6 border-l-2 border-slate-50 pb-4 last:pb-0">
@@ -770,7 +770,7 @@ export default function LeadsPage() {
                     <FileType className="h-5 w-5" />
                   </div>
                   <p className="text-[10px] font-bold text-slate-500 uppercase leading-none mb-2">Manual Format</p>
-                  <p className="text-[9px] text-slate-400 italic">Name, Phone, Email, Budget, Location (One per line)</p>
+                  <p className="text-[9px] text-slate-400">Name, Phone, Email, Budget, Location (One per line)</p>
                </div>
             </div>
 

@@ -260,7 +260,7 @@ export default function WhatsAppWebPage() {
               <p>💰 <strong>Budget:</strong> ₹1.8 Cr</p>
               <p>📌 <strong>Source:</strong> Website Form</p>
               <p></p>
-              <p className="text-[10px] text-slate-400 italic">Log in to PropCRM to take action</p>
+              <p className="text-[10px] text-slate-400">Log in to PropCRM to take action</p>
               <p className="text-[9px] text-slate-400 text-right">17:34 ✓✓</p>
             </div>
           </div>

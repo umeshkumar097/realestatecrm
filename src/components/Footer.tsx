@@ -13,7 +13,7 @@ export default function Footer() {
             <Link href="/" className="inline-flex items-center gap-3 group mb-10">
               <Logo light />
             </Link>
-            <p className="text-xl text-slate-500 leading-relaxed max-w-md font-medium mb-12 italic">
+            <p className="text-xl text-slate-500 leading-relaxed max-w-md font-medium mb-12">
               Scale faster, close more, and dominate your real estate market with the world's most advanced CRM platform.
             </p>
             <div className="flex gap-4">
