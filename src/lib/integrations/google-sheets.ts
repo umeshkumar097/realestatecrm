@@ -68,3 +68,95 @@ export async function syncLeadToGoogleSheets(lead: any) {
         console.error("Google Sheets Sync Error:", error)
     }
 }
+
+export async function syncFromSheetsToCrm(agencyId: string) {
+    try {
+        const config = await prisma.googleSheetSync.findUnique({
+            where: { agencyId }
+        })
+
+        if (!config || !config.isActive || !config.spreadsheetId) return { success: false, message: "No active sync" }
+
+        let accessToken = config.accessToken
+
+        const readVal = async (token: string) => {
+            const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${config.spreadsheetId}/values/Sheet1!A2:G1000`, {
+                headers: { Authorization: `Bearer ${token}` }
+            })
+            return res
+        }
+
+        let response = await readVal(accessToken!)
+
+        // Handle token refresh
+        if (response.status === 401 && config.refreshToken) {
+            const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
+                method: "POST",
+                body: new URLSearchParams({
+                    client_id: process.env.GOOGLE_CLIENT_ID!,
+                    client_secret: process.env.GOOGLE_CLIENT_SECRET!,
+                    refresh_token: config.refreshToken,
+                    grant_type: "refresh_token",
+                }),
+            })
+            const tokens = await tokenRes.json()
+            if (tokenRes.ok) {
+                accessToken = tokens.access_token
+                await prisma.googleSheetSync.update({
+                    where: { agencyId },
+                    data: { accessToken }
+                })
+                response = await readVal(accessToken!)
+            }
+        }
+
+        if (!response.ok) throw new Error("Could not read sheet data")
+
+        const data = await response.json()
+        const rows = data.values || []
+        let imported = 0
+
+        for (const row of rows) {
+            const [createdAt, name, email, phone, location, budget, notes] = row
+            
+            if (!phone || !name) continue
+
+            await prisma.lead.upsert({
+                where: { 
+                    phone_agencyId: { 
+                        phone: phone.toString(),
+                        agencyId 
+                    } 
+                },
+                update: {
+                    name: name || undefined,
+                    email: email || undefined,
+                    location: location || undefined,
+                    budget: budget?.toString() || undefined,
+                    notes: notes || undefined,
+                    updatedAt: new Date()
+                },
+                create: {
+                    name,
+                    phone: phone.toString(),
+                    email: email || "",
+                    location: location || "",
+                    budget: budget?.toString() || "",
+                    notes: notes || "Imported from Google Sheets",
+                    agencyId,
+                }
+            })
+            imported++
+        }
+
+        await prisma.googleSheetSync.update({
+            where: { agencyId },
+            data: { lastSyncedAt: new Date() }
+        })
+
+        return { success: true, imported }
+    } catch (error: any) {
+        console.error("Google Sheets Inbound Sync Error:", error)
+        return { success: false, error: error.message }
+    }
+}
