@@ -4,6 +4,8 @@ import { Mail, Phone, MapPin, MessageSquare, Zap, Clock, Globe, ArrowRight, Chec
 import Link from "next/link"
 import React, { useEffect, useState } from "react"
 import Logo from "@/components/Logo"
+import Navbar from "@/components/Navbar"
+import Footer from "@/components/Footer"
 
 const ContactMethod = ({ icon: Icon, title, value, sub, color }: { icon: any, title: string, value: string, sub: string, color: string }) => (
     <div className="flex gap-6 p-8 bg-white rounded-[32px] border border-zinc-100 shadow-sm hover:shadow-xl transition-all duration-500 group">
@@ -36,23 +38,7 @@ export default function ContactPage() {
 
     return (
         <div className="min-h-screen bg-zinc-50/50 font-sans selection:bg-blue-100 selection:text-blue-900 overflow-x-hidden">
-            {/* Header / Nav Overlay */}
-            <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? 'bg-white/80 backdrop-blur-xl shadow-sm py-4' : 'bg-transparent py-8'}`}>
-                <div className="container mx-auto px-6 flex items-center justify-between">
-                    <Link href="/">
-                        <Logo />
-                    </Link>
-                    <div className="hidden md:flex items-center gap-12">
-                        <Link href="/" className="text-sm font-black uppercase tracking-widest text-zinc-500 hover:text-blue-600 transition-colors">Home</Link>
-                        <Link href="/features" className="text-sm font-black uppercase tracking-widest text-zinc-500 hover:text-blue-600 transition-colors">Features</Link>
-                        <Link href="/about" className="text-sm font-black uppercase tracking-widest text-zinc-500 hover:text-blue-600 transition-colors">About Us</Link>
-                        <Link href="/contact" className="text-sm font-black uppercase tracking-widest text-blue-600">Contact</Link>
-                    </div>
-                    <Link href="/signup" className="hidden md:block bg-zinc-900 text-white px-8 py-3 rounded-2xl text-sm font-black italic tracking-tight hover:bg-blue-600 transition-all shadow-xl shadow-zinc-200">
-                        Get Started
-                    </Link>
-                </div>
-            </nav>
+            <Navbar />
 
             <section className="pt-48 pb-24">
                 <div className="container mx-auto px-6">
@@ -159,31 +145,7 @@ export default function ContactPage() {
                 </div>
             </section>
 
-            {/* LOCATION / LOGISTICS */}
-            <section className="py-24 border-t border-zinc-100">
-                <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
-                     <div className="space-y-4">
-                        <div className="w-10 h-10 bg-zinc-100 rounded-xl flex items-center justify-center text-zinc-400"><Clock size={20}/></div>
-                        <p className="text-xs font-black uppercase tracking-widest text-zinc-400">Global Response</p>
-                        <p className="text-sm font-bold text-zinc-600">24/7 Monitoring for portal sync services.</p>
-                     </div>
-                     <div className="space-y-4">
-                        <div className="w-10 h-10 bg-zinc-100 rounded-xl flex items-center justify-center text-zinc-400"><MapPin size={20}/></div>
-                        <p className="text-xs font-black uppercase tracking-widest text-zinc-400">Hub India</p>
-                        <p className="text-sm font-bold text-zinc-600">Aiclex Technology Labs, Pune & Bangalore.</p>
-                     </div>
-                     <div className="space-y-4">
-                        <div className="w-10 h-10 bg-zinc-100 rounded-xl flex items-center justify-center text-zinc-400"><Zap size={20}/></div>
-                        <p className="text-xs font-black uppercase tracking-widest text-zinc-400">Integrations</p>
-                        <p className="text-sm font-bold text-zinc-600">Zapier, Pabbly, n8n Certifed Engineers.</p>
-                     </div>
-                     <div className="space-y-4">
-                        <div className="w-10 h-10 bg-zinc-100 rounded-xl flex items-center justify-center text-zinc-400"><Globe size={20}/></div>
-                        <p className="text-xs font-black uppercase tracking-widest text-zinc-400">Compliance</p>
-                        <p className="text-sm font-bold text-zinc-600">GDPR & UAE Data Protection Ready.</p>
-                     </div>
-                </div>
-            </section>
+            <Footer />
         </div>
     )
 }

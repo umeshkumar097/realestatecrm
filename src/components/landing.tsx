@@ -32,7 +32,8 @@ import {
 } from "lucide-react"
 
 import LeadModal from "./LeadModal"
-import Logo from "./Logo"
+import Navbar from "./Navbar"
+import Footer from "./Footer"
 import WhatsAppButton from "./WhatsAppButton"
 
 export default function Landing() {
@@ -139,61 +140,7 @@ export default function Landing() {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#FDFDFF] text-slate-900 font-sans selection:bg-blue-100 selection:text-blue-900 overflow-x-hidden">
-
-      {/* ── NAVBAR ── */}
-      <header className={`fixed top-0 w-full z-50 transition-all duration-500 ${isScrolled ? "bg-white/80 backdrop-blur-xl shadow-sm border-b border-slate-100 py-3" : "bg-transparent py-6"}`}>
-        <div className="container mx-auto px-6 lg:px-12 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 group">
-            <Logo />
-          </Link>
-
-          <nav className="hidden md:flex items-center gap-10">
-            <Link href="/features" className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors relative group">
-                Features
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 transition-all group-hover:w-full" />
-            </Link>
-            <Link href="/about" className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors relative group">
-                About
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 transition-all group-hover:w-full" />
-            </Link>
-            <Link href="/contact" className="text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors relative group">
-                Contact
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 transition-all group-hover:w-full" />
-            </Link>
-          </nav>
-
-          <div className="hidden md:flex items-center gap-6">
-            <Link href="/login" className="text-sm font-bold text-slate-600 hover:text-blue-600 transition-colors">Login</Link>
-            <Link href="/signup" className="group px-7 py-3 bg-slate-900 text-white rounded-2xl text-sm font-black shadow-xl shadow-slate-900/10 hover:bg-blue-600 hover:-translate-y-0.5 transition-all active:scale-95 flex items-center gap-2">
-              Get Started Free <ArrowUpRight className="h-4 w-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-            </Link>
-          </div>
-
-          <button className="md:hidden p-2 text-slate-900" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
-        </div>
-
-        {/* Mobile Menu */}
-        <div className={`fixed inset-0 bg-white z-[60] p-6 transition-transform duration-500 md:hidden ${mobileMenuOpen ? "translate-x-0" : "translate-x-full"}`}>
-          <div className="flex justify-between items-center mb-12">
-             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white"><Building2 size={18}/></div>
-              <span className="text-xl font-black">PropGOCrm</span>
-            </div>
-            <X className="h-8 w-8 text-slate-400" onClick={() => setMobileMenuOpen(false)} />
-          </div>
-          <div className="flex flex-col gap-8 text-2xl font-black text-slate-900">
-            <Link href="/features" onClick={() => setMobileMenuOpen(false)}>Features</Link>
-            <Link href="/about" onClick={() => setMobileMenuOpen(false)}>About Us</Link>
-            <Link href="/contact" onClick={() => setMobileMenuOpen(false)}>Contact</Link>
-          </div>
-          <div className="mt-20 flex flex-col gap-4">
-            <Link href="/login" className="text-center py-5 font-black text-slate-600">Login</Link>
-            <Link href="/signup" className="text-center py-5 bg-blue-600 text-white rounded-2xl font-black">Start Free Trial</Link>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       <main className="flex-1">
 
@@ -556,62 +503,7 @@ export default function Landing() {
         </section>
       </main>
 
-      {/* ── FOOTER ── */}
-      <footer className="bg-[#020617] border-t border-slate-900 pt-32 pb-16 px-6 lg:px-12 relative">
-        <div className="container mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-20 mb-32">
-            <div className="lg:col-span-5">
-              <Link href="/" className="inline-flex items-center gap-3 group mb-10">
-                <Logo light />
-              </Link>
-              <p className="text-xl text-slate-500 leading-relaxed max-w-md font-medium mb-12">
-                The world's most advanced CRM platform built specifically for real estate professionals. Scale faster, close more, and dominate your market.
-              </p>
-              <div className="flex gap-4">
-                {[MessageSquare, Phone, Globe, Shield].map((Icon, i) => (
-                  <div key={i} className="w-14 h-14 bg-slate-900 rounded-3xl border border-slate-800 flex items-center justify-center text-slate-500 hover:text-white hover:bg-blue-600 transition-all cursor-pointer">
-                    <Icon size={24}/>
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            <div className="lg:col-span-7 grid grid-cols-2 lg:grid-cols-3 gap-12">
-              <div>
-                <h4 className="text-white font-black text-xs uppercase tracking-[0.3em] mb-10">Product</h4>
-                <ul className="flex flex-col gap-6">
-                  <li><Link href="/about" className="text-slate-500 hover:text-white font-bold transition-all">About Us</Link></li>
-                  <li><Link href="/contact" className="text-slate-500 hover:text-white font-bold transition-all">Contact Us</Link></li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="text-white font-black text-xs uppercase tracking-[0.3em] mb-10">Resources</h4>
-                <ul className="flex flex-col gap-6">
-                  {['Sales Guide', 'Blog', 'Case Studies', 'Partner Program', 'Status'].map(l => (
-                    <li key={l}><Link href="#" className="text-slate-500 hover:text-white font-bold transition-all">{l}</Link></li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <h4 className="text-white font-black text-xs uppercase tracking-[0.3em] mb-10">Legal</h4>
-                <ul className="flex flex-col gap-6">
-                  {['Privacy', 'Terms', 'Cookie Policy', 'Security', 'Refunds'].map(l => (
-                    <li key={l}><Link href="#" className="text-slate-500 hover:text-white font-bold transition-all">{l}</Link></li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-          
-          <div className="pt-16 border-t border-slate-900 flex flex-col md:flex-row items-center justify-between gap-10">
-            <p className="text-slate-600 font-bold text-sm">© 2026 PropGOCrm Global. Engineering excellence by <a href="https://aiclex.in" className="text-slate-400 hover:text-blue-500">Aiclex</a>.</p>
-            <div className="flex items-center gap-2 px-6 py-3 bg-slate-900/50 rounded-full border border-slate-800">
-               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-               <span className="text-emerald-500 font-black text-[10px] uppercase tracking-widest">Global Ingress: Operational</span>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
       
       <LeadModal 
         isOpen={isLeadModalOpen} 

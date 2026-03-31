@@ -12,6 +12,8 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import React, { useEffect, useState } from "react"
+import Navbar from "@/components/Navbar"
+import Footer from "@/components/Footer"
 
 const SectionHeader = ({ icon: Icon, title, subtitle, badge }: { icon: any, title: string, subtitle: string, badge?: string }) => (
     <div className="flex flex-col items-center text-center mb-16 space-y-4">
@@ -52,25 +54,7 @@ export default function FeaturesPage() {
 
     return (
         <div className="bg-white selection:bg-primary selection:text-white font-sans">
-            {/* Header / Nav Overlay */}
-            <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/80 backdrop-blur-xl shadow-sm py-4' : 'bg-transparent py-8'}`}>
-                <div className="container mx-auto px-6 flex items-center justify-between">
-                    <Link href="/" className="flex items-center gap-2 group">
-                        <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center shadow-lg group-hover:rotate-12 transition-transform">
-                            <Building2 className="text-white h-5 w-5" />
-                        </div>
-                        <span className="font-black text-2xl tracking-tighter italic">PropGOCrm</span>
-                    </Link>
-                    <div className="hidden md:flex items-center gap-12">
-                        <Link href="/" className="text-sm font-black uppercase tracking-widest text-zinc-500 hover:text-primary transition-colors">Home</Link>
-                        <Link href="/features" className="text-sm font-black uppercase tracking-widest text-primary">Features</Link>
-                        <Link href="/#pricing" className="text-sm font-black uppercase tracking-widest text-zinc-500 hover:text-primary transition-colors">Pricing</Link>
-                    </div>
-                    <Link href="/login" className="bg-zinc-900 text-white px-8 py-3 rounded-2xl text-sm font-black italic tracking-tight hover:bg-primary transition-all shadow-xl shadow-zinc-200">
-                        Get Started
-                    </Link>
-                </div>
-            </nav>
+            <Navbar />
 
             {/* HERO SECTION */}
             <section className="pt-40 pb-20 overflow-hidden relative">
@@ -360,24 +344,7 @@ export default function FeaturesPage() {
                 </div>
             </section>
 
-            {/* FOOTER CALL TO ACTION */}
-            <section className="py-24 bg-primary relative overflow-hidden">
-                <div className="container mx-auto px-6 relative z-10">
-                    <div className="max-w-4xl mx-auto text-center space-y-8">
-                        <h2 className="text-4xl md:text-7xl font-black text-white italic tracking-tight balance">
-                            Ready to experience the PropGOCrm standard?
-                        </h2>
-                        <div className="flex flex-wrap justify-center gap-6">
-                            <Link href="/signup" className="px-10 py-5 bg-white text-primary rounded-[24px] text-lg font-black italic tracking-tight shadow-2xl shadow-black/10 hover:scale-105 active:scale-95 transition-all">
-                                Get Started Free
-                            </Link>
-                            <Link href="/contact" className="px-10 py-5 bg-transparent border-2 border-white/30 text-white rounded-[24px] text-lg font-black italic tracking-tight hover:bg-white/10 transition-all">
-                                Request Custom Demo
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            <Footer />
         </div>
     )
 }

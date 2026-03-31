@@ -4,6 +4,8 @@ import { Building2, Globe, ShieldCheck, Users, Zap, ArrowRight, Heart, Target, L
 import Link from "next/link"
 import React, { useEffect, useState } from "react"
 import Logo from "@/components/Logo"
+import Navbar from "@/components/Navbar"
+import Footer from "@/components/Footer"
 
 const StoryCard = ({ title, desc, icon: Icon, delay }: { title: string, desc: string, icon: any, delay: string }) => (
     <div className={`p-10 bg-white rounded-[40px] border border-zinc-100 shadow-sm hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 group animate-in fade-in slide-in-from-bottom-8 fill-mode-both ${delay}`}>
@@ -25,23 +27,7 @@ export default function AboutPage() {
 
     return (
         <div className="min-h-screen bg-white font-sans selection:bg-blue-100 selection:text-blue-900 overflow-x-hidden">
-            {/* Header / Nav Overlay */}
-            <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled ? 'bg-white/80 backdrop-blur-xl shadow-sm py-4' : 'bg-transparent py-8'}`}>
-                <div className="container mx-auto px-6 flex items-center justify-between">
-                    <Link href="/">
-                        <Logo />
-                    </Link>
-                    <div className="hidden md:flex items-center gap-12">
-                        <Link href="/" className="text-sm font-black uppercase tracking-widest text-zinc-500 hover:text-blue-600 transition-colors">Home</Link>
-                        <Link href="/features" className="text-sm font-black uppercase tracking-widest text-zinc-500 hover:text-blue-600 transition-colors">Features</Link>
-                        <Link href="/about" className="text-sm font-black uppercase tracking-widest text-blue-600">About Us</Link>
-                        <Link href="/contact" className="text-sm font-black uppercase tracking-widest text-zinc-500 hover:text-blue-600 transition-colors">Contact</Link>
-                    </div>
-                    <Link href="/signup" className="hidden md:block bg-zinc-900 text-white px-8 py-3 rounded-2xl text-sm font-black italic tracking-tight hover:bg-blue-600 transition-all shadow-xl shadow-zinc-200">
-                        Get Started
-                    </Link>
-                </div>
-            </nav>
+            <Navbar />
 
             {/* HERO SECTION */}
             <section className="pt-48 pb-24 relative overflow-hidden">
@@ -162,25 +148,7 @@ export default function AboutPage() {
                 </div>
             </section>
 
-            {/* CALL TO ACTION */}
-            <section className="py-40 bg-white">
-                <div className="container mx-auto px-6">
-                    <div className="bg-blue-600 rounded-[80px] p-16 lg:p-32 text-center relative overflow-hidden text-white group shadow-[0_40px_100px_-20px_rgba(29,78,216,0.5)]">
-                        <div className="absolute top-0 right-0 p-80 -mr-40 bg-black/10 rounded-full blur-[100px] group-hover:scale-125 transition-transform duration-1000" />
-                        <div className="relative space-y-12">
-                             <h2 className="text-4xl lg:text-7xl font-black italic tracking-tighter leading-none">Ready to define your<br />next chapter?</h2>
-                             <div className="flex flex-wrap items-center justify-center gap-6">
-                                 <Link href="/signup" className="px-12 py-6 bg-white text-blue-600 rounded-full font-black text-xl hover:scale-105 transition-all flex items-center gap-3">
-                                     Start Building Now <ArrowRight size={24} />
-                                 </Link>
-                                 <Link href="/contact" className="px-12 py-6 bg-zinc-900 text-white border border-white/20 rounded-full font-black text-xl hover:bg-white hover:text-black transition-all">
-                                     Consult Our Team
-                                 </Link>
-                             </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            <Footer />
         </div>
     )
 }

@@ -1,54 +1,31 @@
-import InnerPageLayout from "@/components/inner-page-layout"
+"use client"
+
+import React from "react"
+import Navbar from "@/components/Navbar"
+import Footer from "@/components/Footer"
 
 export default function PrivacyPage() {
-  return (
-    <InnerPageLayout 
-      badge="Legal"
-      title="Privacy Policy"
-      subtitle="Last updated: March 26, 2026. Your privacy is our priority at PropCRM by Aiclex Technologies."
-    >
-      <div className="prose prose-slate max-w-none space-y-8 text-slate-600">
-        <section>
-          <h2 className="text-xl font-black text-slate-900 mb-3">1. Information We Collect</h2>
-          <p className="leading-relaxed">
-            We collect information you provide directly to us when you create an account, such as your name, email address, agency name, and phone number. We also collect data from your connected WhatsApp sessions to provide the CRM services.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-xl font-black text-slate-900 mb-3">2. How We Use Your Information</h2>
-          <p className="leading-relaxed">
-            We use the information we collect to:
-          </p>
-          <ul className="list-disc pl-5 mt-2 space-y-1">
-            <li>Provide, maintain, and improve our services.</li>
-            <li>Process transactions and send related information.</li>
-            <li>Send you technical notices, updates, and support messages.</li>
-            <li>Respond to your comments and questions.</li>
-          </ul>
-        </section>
-
-        <section>
-          <h2 className="text-xl font-black text-slate-900 mb-3">3. Data Security</h2>
-          <p className="leading-relaxed">
-            We use industry-standard security measures to protect your information. WhatsApp sessions are stored using local authentication tokens and are never shared with third parties.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-xl font-black text-slate-900 mb-3">4. Your Rights</h2>
-          <p className="leading-relaxed">
-            You have the right to access, correct, or delete your personal data at any time through your dashboard or by contacting us.
-          </p>
-        </section>
-
-        <section className="bg-blue-50 p-6 rounded-2xl border border-blue-100">
-          <p className="text-sm font-bold text-blue-800">Questions about our Privacy Policy?</p>
-          <p className="text-xs text-blue-600 mt-1">
-            Contact us at <a href="mailto:privacy@aiclex.in" className="underline">privacy@aiclex.in</a>
-          </p>
-        </section>
-      </div>
-    </InnerPageLayout>
-  )
+    return (
+        <div className="min-h-screen bg-white font-sans text-zinc-900">
+            <Navbar />
+            <main className="pt-40 pb-20 container mx-auto px-6 max-w-4xl">
+                <h1 className="text-4xl md:text-6xl font-black italic tracking-tighter mb-12">Privacy Policy.</h1>
+                <div className="space-y-10 text-lg font-medium text-zinc-600 leading-relaxed italic">
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-black text-zinc-900 italic tracking-tight">1. Data Collection</h2>
+                        <p>We collect only the data necessary to provide you with world-class CRM services. This includes contact information, property listing data, and lead interaction history captured through our portal synchronization engine.</p>
+                    </section>
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-black text-zinc-900 italic tracking-tight">2. Information Security</h2>
+                        <p>Your data is protected using AES-256 military-grade encryption. We employ strict access controls and regular security audits to ensure your agency's proprietary information remains confidential.</p>
+                    </section>
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-black text-zinc-900 italic tracking-tight">3. Global Compliance</h2>
+                        <p>PropGoCRM is built to comply with international data protection standards, including GDPR and UAE data sovereignty regulations. We do not sell your data to third parties.</p>
+                    </section>
+                </div>
+            </main>
+            <Footer />
+        </div>
+    )
 }

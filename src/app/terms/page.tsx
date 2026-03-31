@@ -1,48 +1,31 @@
-import InnerPageLayout from "@/components/inner-page-layout"
+"use client"
+
+import React from "react"
+import Navbar from "@/components/Navbar"
+import Footer from "@/components/Footer"
 
 export default function TermsPage() {
-  return (
-    <InnerPageLayout 
-      badge="Legal"
-      title="Terms of Service"
-      subtitle="By using PropCRM, you agree to these terms. Please read them carefully."
-    >
-      <div className="prose prose-slate max-w-none space-y-8 text-slate-600">
-        <section>
-          <h2 className="text-xl font-black text-slate-900 mb-3">1. Acceptance of Terms</h2>
-          <p className="leading-relaxed">
-            By accessing or using PropCRM (a product of Aiclex Technologies), you agree to be bound by these Terms of Service.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-xl font-black text-slate-900 mb-3">2. Use of Services</h2>
-          <p className="leading-relaxed">
-            You must be a real estate professional or agency to use this service. You are responsible for maintaining the confidentiality of your account and for all activities that occur under your account.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-xl font-black text-slate-900 mb-3">3. WhatsApp Integration</h2>
-          <p className="leading-relaxed">
-            PropCRM uses the Baileys library to connect to WhatsApp. You agree to use this integration in compliance with WhatsApp's Terms of Service and Anti-Spam policies. We are not responsible for any issues resulting from your use of WhatsApp.
-          </p>
-        </section>
-
-        <section>
-          <h2 className="text-xl font-black text-slate-900 mb-3">4. Fees and Payment</h2>
-          <p className="leading-relaxed">
-            Certain aspects of the service are provided for a fee. You agree to pay all fees and charges associated with your account on time.
-          </p>
-        </section>
-
-        <section className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
-          <p className="text-sm font-bold text-slate-800">Detailed Terms</p>
-          <p className="text-xs text-slate-500 mt-1">
-            These terms are governed by the laws of India. Any disputes will be subject to the exclusive jurisdiction of the courts in Pune, Maharashtra.
-          </p>
-        </section>
-      </div>
-    </InnerPageLayout>
-  )
+    return (
+        <div className="min-h-screen bg-white font-sans text-zinc-900">
+            <Navbar />
+            <main className="pt-40 pb-20 container mx-auto px-6 max-w-4xl">
+                <h1 className="text-4xl md:text-6xl font-black italic tracking-tighter mb-12">Terms of Service.</h1>
+                <div className="space-y-10 text-lg font-medium text-zinc-600 leading-relaxed italic">
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-black text-zinc-900 italic tracking-tight">1. Acceptance of Terms</h2>
+                        <p>By accessing PropGoCRM, you agree to be bound by these Terms of Service and all applicable laws and regulations.</p>
+                    </section>
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-black text-zinc-900 italic tracking-tight">2. License to Use</h2>
+                        <p>We grant you a non-exclusive, non-transferable license to use our CRM software for your real estate business operations.</p>
+                    </section>
+                    <section className="space-y-4">
+                        <h2 className="text-2xl font-black text-zinc-900 italic tracking-tight">3. Service Availability</h2>
+                        <p>While we strive for 99.9% uptime, we do not guarantee uninterrupted service. Maintenance is scheduled during low-traffic periods.</p>
+                    </section>
+                </div>
+            </main>
+            <Footer />
+        </div>
+    )
 }
