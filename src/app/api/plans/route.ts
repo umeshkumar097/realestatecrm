@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
                     maxAgents: 5,
                     maxLeads: 500,
                     features: ["Up to 5 Agents", "500 Leads/Month", "Basic Analytics", "Email Support", "Shared WhatsApp"],
-                    stripePriceId: "price_placeholder_starter"
+                    stripePriceId: "price_starter_699"
                 },
                 {
                     name: "Professional",
@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
                     maxAgents: 20,
                     maxLeads: 999999,
                     features: ["Up to 20 Agents", "Unlimited Leads", "AI Lead Scoring", "Priority Support", "Custom Reports", "Dedicated WhatsApp CRM"],
-                    stripePriceId: "price_placeholder_pro"
+                    stripePriceId: "price_pro_1099"
                 },
                 {
                     name: "Enterprise",
@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
                     maxAgents: 999,
                     maxLeads: 999999,
                     features: ["Unlimited Agents", "Multi-Branch Dashboard", "Portal Sync Integration", "API Access", "Custom Integrations", "On-premise Option"],
-                    stripePriceId: "price_placeholder_enterprise"
+                    stripePriceId: "price_enterprise_custom"
                 }
             ]
 

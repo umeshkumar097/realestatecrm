@@ -44,12 +44,12 @@ export default function SuperAdminPage() {
 
       if (platformLeadsRes.ok) {
         const data = await platformLeadsRes.json()
-        setPlatformLeads(data.leads)
+        setPlatformLeads(data)
       }
 
       if (plansRes.ok) {
         const data = await plansRes.json()
-        setPlans(data.plans)
+        setPlans(data)
       }
     } catch (err) {
       console.error("Failed to fetch superadmin data", err)
