@@ -1,31 +1,24 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
+import { baileysManager } from "@/lib/whatsapp/baileys-manager"
+
+/**
+ * Pure Vercel API Route (No VPS Bridge) 🛰️
+ * Directly communicates with the Database-Powered WhatsApp Engine.
+ */
 
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions)
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const userId = (session.user as any).id
-  
-  // High-Fidelity VPS Proxy Sequence (Root Port 80)
-  const BRIDGE_URL = "http://203.57.85.225"
-  const BRIDGE_SECRET = "Umesh_WA_Bridge_2003"
+  const status = await baileysManager.getStatus(userId)
 
-  try {
-      const res = await fetch(`${BRIDGE_URL}/status/${userId}`, {
-          headers: { "x-bridge-secret": BRIDGE_SECRET },
-          next: { revalidate: 0 }
-      })
-      if (res.ok) {
-          const data = await res.json()
-          return NextResponse.json(data)
-      }
-  } catch (e) {
-      console.error("[Vercel] VPS Bridge Status Fetch Failed:", e)
-  }
-
-  return NextResponse.json({ status: "DISCONNECTED", qr: null })
+  return NextResponse.json({ 
+    status: status?.status || "DISCONNECTED", 
+    qr: status?.qrCode || null 
+  })
 }
 
 export async function POST(req: NextRequest) {
@@ -35,32 +28,15 @@ export async function POST(req: NextRequest) {
   const { action, force } = await req.json().catch(() => ({ action: null, force: false }))
   const { id: userId, agencyId } = (session.user as any)
 
-  const BRIDGE_URL = "http://203.57.85.225"
-  const BRIDGE_SECRET = "Umesh_WA_Bridge_2003"
-
   if (action === "connect") {
-    await fetch(`${BRIDGE_URL}/connect`, {
-        method: "POST",
-        headers: { 
-            "Content-Type": "application/json",
-            "x-bridge-secret": BRIDGE_SECRET 
-        },
-        body: JSON.stringify({ agentId: userId, agencyId, force })
-    }).catch(console.error)
-
-    return NextResponse.json({ message: "Connecting initiated on VPS Cluster" })
+    // Initiate connection - Vercel will run this in a fire-and-forget manner
+    // because we have Database-level upserts for the QR.
+    baileysManager.connect(userId, agencyId, force).catch(() => null)
+    return NextResponse.json({ message: "Connecting initiated locally on Vercel" })
   }
 
   if (action === "disconnect") {
-    await fetch(`${BRIDGE_URL}/logout`, {
-        method: "POST",
-        headers: { 
-            "Content-Type": "application/json",
-            "x-bridge-secret": BRIDGE_SECRET 
-        },
-        body: JSON.stringify({ agentId: userId })
-    }).catch(console.error)
-
+    await baileysManager.logout(userId)
     return NextResponse.json({ message: "Disconnected" })
   }
 

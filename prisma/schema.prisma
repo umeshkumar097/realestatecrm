@@ -82,7 +82,7 @@ model WhatsAppSession {
   id          String   @id @default(cuid())
   agentId     String   @unique
   agencyId    String
-  sessionData String
+  sessionData String?
   status      String   @default("DISCONNECTED")
   phoneNumber String?
   qrCode      String?
@@ -90,6 +90,17 @@ model WhatsAppSession {
   updatedAt   DateTime @updatedAt
   agency      Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   agent       User     @relation(fields: [agentId], references: [id])
+}
+
+model BaileysAuth {
+  id        String   @id @default(cuid())
+  userId    String
+  dataType  String   // 'creds', 'request-keys', etc.
+  keyId     String?
+  data      String   @db.Text // Encrypted JSON blob
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, dataType, keyId])
 }
 
 model Lead {
