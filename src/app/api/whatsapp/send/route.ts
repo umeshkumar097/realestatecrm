@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), 15000); // 15s timeout
+    const id = setTimeout(() => controller.abort(), 25000); // 25s timeout
 
     const res = await fetch(`${BRIDGE_URL}/send`, {
         method: "POST",

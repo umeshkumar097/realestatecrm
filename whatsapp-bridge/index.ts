@@ -43,13 +43,27 @@ class BaileysManager {
   private initLocks: Map<string, Promise<any>> = new Map()
   private static cachedVersion: any = null
 
-  async getInstance(agentId: string) {
-    let inst = this.instances.get(agentId)
-    // Auto-rehydrate if not in memory but session exists
-    if (!inst && fs.existsSync(path.join(process.cwd(), `sessions/${agentId}`))) {
-        inst = await this.init(agentId, "", false)
+  async warmupSessions() {
+    const sessions = await prisma.whatsAppSession.findMany({
+      where: { status: "CONNECTED" }
+    });
+    logger.info(`🔥 Warming up ${sessions.length} active sessions...`);
+    for (const session of sessions) {
+      this.init(session.agentId, session.agencyId).catch(err => {
+        logger.error(`❌ Warmup failed for ${session.agentId}: ${err.message}`);
+      });
     }
-    return inst
+  }
+
+  async getInstance(agentId: string) {
+    let instance = this.instances.get(agentId)
+    if (!instance) {
+      // Background init if not in RAM (prevents first-message timeout)
+      const session = await prisma.whatsAppSession.findUnique({ where: { agentId } });
+      if (session) this.init(agentId, session.agencyId).catch(() => null);
+      throw new Error("WhatsApp not connected or warming up. Please try again in 5 seconds.");
+    }
+    return instance
   }
 
   async init(agentId: string, agencyId: string, forceReset: boolean = false): Promise<any> {
@@ -185,4 +199,7 @@ app.post("/send", auth, async (req, res) => {
         res.status(400).json({ error: e.message })
     }
 })
-app.listen(PORT, () => logger.info(`🚀 WhatsApp VPS Bridge running on port ${PORT}`))
+app.listen(PORT, () => {
+    logger.info(`🚀 WhatsApp VPS Bridge running on port ${PORT}`)
+    manager.warmupSessions()
+})
