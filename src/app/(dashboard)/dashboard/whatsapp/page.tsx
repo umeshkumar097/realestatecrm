@@ -23,20 +23,27 @@ export default function WhatsAppWebPage() {
       const data = await res.json()
       const normalizedStatus = data.status?.toLowerCase() as Status
       
-      // Patience logic: Only error if connecting for >60s
+      // UI State Locking: If we are within the 60s grace period, 
+      // do NOT let the UI switch back to 'disconnected' status.
       const gracePeriod = 60000 
       const isWithinGrace = connectingAt && (Date.now() - connectingAt) < gracePeriod
 
-      if (status === "connecting" && normalizedStatus === "disconnected" && !data.qr && !isWithinGrace) {
-          setError("Connection took too long. Please Force Reset.")
-          setConnectingAt(null)
-      } else if (normalizedStatus === "connected") {
-          setError(null)
-          setConnectingAt(null)
+      if (status === "connecting" && normalizedStatus === "disconnected" && !data.qr) {
+          if (!isWithinGrace) {
+            setError("Connection took too long. Please Force Reset.")
+            setStatus("disconnected") // Only now we switch back
+            setConnectingAt(null)
+          }
+          // Else: We keep the status as 'connecting' to hold the UI
+      } else {
+          // If we are connected or have a QR, update freely
+          if (normalizedStatus === "connected") {
+              setError(null)
+              setConnectingAt(null)
+          }
+          setStatus(normalizedStatus || "disconnected")
+          setQr(data.qr ?? null)
       }
-
-      setStatus(normalizedStatus || "disconnected")
-      setQr(data.qr ?? null)
     } catch (err) { console.error("Poll Error", err) }
   }, [status, connectingAt])
 
