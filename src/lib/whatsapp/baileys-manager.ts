@@ -149,7 +149,7 @@ class BaileysManager {
             if (u.connection === "open") {
                 const jid = `${phone.replace(/\D/g, "")}@s.whatsapp.net`
                 await sock.sendMessage(jid, { text: message })
-                sock.end() // Close immediately on Vercel to save memory
+                sock.end(undefined) // Close immediately on Vercel to save memory
                 resolve(true)
             }
             if (u.connection === "close" && (u.lastDisconnect?.error as Boom)?.output?.statusCode === DisconnectReason.loggedOut) {
@@ -157,7 +157,7 @@ class BaileysManager {
             }
         })
         // Timeout safeguard
-        setTimeout(() => { sock.end(); reject(new Error("Timeout")) }, 15000)
+        setTimeout(() => { sock.end(undefined); reject(new Error("Timeout")) }, 15000)
     })
   }
 }
