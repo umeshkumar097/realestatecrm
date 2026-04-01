@@ -55,13 +55,49 @@ class BaileysManager {
     }
   }
 
+  private sendQueue: Array<{ agentId: string, phone: string, message: string }> = []
+  private processingQueue: boolean = false
+
+  async enqueueMessage(agentId: string, phone: string, message: string) {
+    this.sendQueue.push({ agentId, phone, message })
+    logger.info(`📦 Message queued for ${phone} (Queue size: ${this.sendQueue.length})`)
+    this.processQueue() // Trigger background worker
+  }
+
+  async processQueue() {
+    if (this.processingQueue || this.sendQueue.length === 0) return
+    this.processingQueue = true
+    
+    while (this.sendQueue.length > 0) {
+        const item = this.sendQueue[0]
+        try {
+            const instance = await this.getInstance(item.agentId)
+            if (instance.status === "CONNECTED" && instance.socket) {
+                await instance.socket.sendMessage(item.phone + "@s.whatsapp.net", { text: item.message })
+                this.sendQueue.shift() // Remove from queue only on success
+                logger.info(`✅ Message delivered background to ${item.phone}`)
+            } else {
+                // Not connected yet, wait and retry
+                break;
+            }
+        } catch (err) {
+            logger.warn(`⏳ Waiting for session ${item.agentId} to be ready...`)
+            break; // Stop and retry later
+        }
+        await new Promise(r => setTimeout(r, 1000)) // 1s throttle
+    }
+    
+    this.processingQueue = false
+    // Retry in 3 seconds if queue still has items
+    if (this.sendQueue.length > 0) setTimeout(() => this.processQueue(), 3000)
+  }
+
   async getInstance(agentId: string) {
     let instance = this.instances.get(agentId)
     if (!instance) {
-      // Background init if not in RAM (prevents first-message timeout)
       const session = await prisma.whatsAppSession.findUnique({ where: { agentId } });
       if (session) this.init(agentId, session.agencyId).catch(() => null);
-      throw new Error("WhatsApp not connected or warming up. Please try again in 5 seconds.");
+      throw new Error("Initializing connection...");
     }
     return instance
   }
@@ -191,10 +227,12 @@ app.post("/connect", auth, async (req, res) => {
     res.json({ message: "Connecting initiated" })
 })
 app.post("/send", auth, async (req, res) => {
-    const { agentId, phone, message } = req.body
     try {
-        const result = await manager.sendMessage(agentId, phone, message)
-        res.json({ success: true, result })
+        const { agentId, phone, message } = req.body
+        if (!agentId || !phone || !message) throw new Error("Missing parameters")
+        
+        await manager.enqueueMessage(agentId, phone, message)
+        res.json({ status: "queued", message: "Message accepted and queued for delivery" })
     } catch (e: any) {
         res.status(400).json({ error: e.message })
     }
