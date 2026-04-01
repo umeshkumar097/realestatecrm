@@ -23,33 +23,30 @@ export default function WhatsAppWebPage() {
       const data = await res.json()
       const normalizedStatus = data.status?.toLowerCase() as Status
       
-      // UI State Locking: If we are within the 60s grace period, 
+      // UI State Locking: If we are within the 30s grace period, 
       // do NOT let the UI switch back to 'disconnected' status.
-      const gracePeriod = 60000 
+      const gracePeriod = 30000 // Increased from previous to 30s for stability
       const isWithinGrace = connectingAt && (Date.now() - connectingAt) < gracePeriod
 
-      if (status === "connecting" && normalizedStatus === "disconnected" && !data.qr) {
-          if (!isWithinGrace) {
-            setError("Connection took too long. Please Force Reset.")
-            setStatus("disconnected") // Only now we switch back
-            setConnectingAt(null)
-          }
-          // Else: We keep the status as 'connecting' to hold the UI
-      } else {
-          // If we are connected or have a QR, update freely
-          if (normalizedStatus === "connected") {
-              setError(null)
-              setConnectingAt(null)
-          }
-          setStatus(normalizedStatus || "disconnected")
-          setQr(data.qr ?? null)
+      if ((status === "connecting" || isWithinGrace) && normalizedStatus === "disconnected" && !data.qr) {
+          // Keep showing 'connecting' even if server says 'disconnected'
+          setStatus("connecting")
+          return;
       }
+      
+      // Usual update logic
+      if (normalizedStatus === "connected") {
+          setError(null)
+          setConnectingAt(null)
+      }
+      setStatus(normalizedStatus || "disconnected")
+      setQr(data.qr ?? null)
     } catch (err) { console.error("Poll Error", err) }
   }, [status, connectingAt])
 
   useEffect(() => {
     fetchStatus()
-    const interval = setInterval(fetchStatus, 2000)
+    const interval = setInterval(fetchStatus, 3000) // Slightly slower poll (3s)
     return () => clearInterval(interval)
   }, [fetchStatus])
 
@@ -57,11 +54,13 @@ export default function WhatsAppWebPage() {
     setLoading(true)
     setError(null)
     setConnectingAt(Date.now())
+    setStatus("connecting") // Set state IMMEDIATELY
+    
     await fetch("/api/whatsapp", {
       method: "POST",
       body: JSON.stringify({ action: "connect", force }),
     })
-    setStatus("connecting")
+    
     setLoading(false)
   }
 
