@@ -74,18 +74,10 @@ export default function AgenciesPage() {
           return
       }
       
-      const targetAgency = agencies.find(a => a.id === agencyId)
-      const adminEmail = targetAgency?.users?.[0]?.email
-      
-      if (!adminEmail) {
-          alert("Could not find an Administrator email for this agency. Please ensure at least one Admin is registered.")
-          return
-      }
-
       const res = await fetch(`/api/super-admin/agencies/upgrade-manual`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: adminEmail, planId: lifetimePlan.id })
+        body: JSON.stringify({ agencyId: agencyId, planId: lifetimePlan.id })
       })
       if (res.ok) {
           alert("Agency upgraded to Lifetime successfully!")

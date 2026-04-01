@@ -3,20 +3,28 @@ import prisma from "@/lib/prisma"
 
 export async function POST(req: NextRequest) {
     try {
-        const { email, planId, couponCode } = await req.json()
+        const { email, agencyId, planId, couponCode } = await req.json()
 
-        if (!email || !planId) {
-            return NextResponse.json({ error: "Email and Plan ID are required" }, { status: 400 })
+        if (!planId || (!email && !agencyId)) {
+            return NextResponse.json({ error: "Agency ID/Email and Plan ID are required" }, { status: 400 })
         }
 
-        // 1. Find the User & Agency
-        const user = await prisma.user.findUnique({
-            where: { email },
-            include: { agency: true }
-        })
+        // 1. Resolve Target Agency ID
+        let targetAgencyId = agencyId;
 
-        if (!user || !user.agencyId) {
-            return NextResponse.json({ error: "Registration not found. Please complete step 1." }, { status: 404 })
+        if (!targetAgencyId && email) {
+            const user = await prisma.user.findUnique({
+                where: { email },
+                select: { agencyId: true }
+            })
+            if (!user?.agencyId) {
+                return NextResponse.json({ error: "Registration not found for this email." }, { status: 404 })
+            }
+            targetAgencyId = user.agencyId;
+        }
+
+        if (!targetAgencyId) {
+            return NextResponse.json({ error: "Could not resolve Agency ID" }, { status: 400 })
         }
 
         const plan = await prisma.subscriptionPlan.findUnique({
@@ -31,20 +39,20 @@ export async function POST(req: NextRequest) {
         await prisma.$transaction(async (tx: any) => {
             // Update Agency Plan
             await tx.agency.update({
-                where: { id: user.agencyId },
+                where: { id: targetAgencyId },
                 data: { planId: plan.id }
             })
 
             // Update Subscription Record
             await tx.subscription.upsert({
-                where: { agencyId: user.agencyId },
+                where: { agencyId: targetAgencyId },
                 update: {
                     plan: plan.name,
                     status: "ACTIVE",
                     currentPeriodEnd: new Date(Date.now() + 3650 * 24 * 60 * 60 * 1000) // 10 years (Lifetime)
                 },
                 create: {
-                    agencyId: user.agencyId,
+                    agencyId: targetAgencyId,
                     plan: plan.name,
                     status: "ACTIVE",
                     currentPeriodEnd: new Date(Date.now() + 3650 * 24 * 60 * 60 * 1000)
