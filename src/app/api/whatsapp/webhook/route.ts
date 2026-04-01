@@ -16,8 +16,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
   }
 
-  // Normalize phone number (remove @s.whatsapp.net)
-  const phone = contact.split("@")[0];
+  // Normalize phone number (handle @s.whatsapp.net OR @lid)
+  const phone = contact.split("@")[0].replace(/\D/g, "");
 
   try {
     // 1. Find or Create Lead based on phone
