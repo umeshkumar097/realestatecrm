@@ -68,7 +68,21 @@ export async function POST(req: NextRequest) {
             }
         })
 
-        return NextResponse.json({ message: "Plan activated successfully" })
+        // 3. Send Confirmation Email
+        const agencyUser = await prisma.user.findFirst({
+            where: { agencyId: targetAgencyId, role: "AGENCY_OWNER" },
+            select: { email: true, name: true }
+        }) || await prisma.user.findFirst({
+            where: { agencyId: targetAgencyId },
+            select: { email: true, name: true }
+        })
+
+        if (agencyUser?.email) {
+            const { sendMembershipUpgradeEmail } = require("@/lib/mail")
+            await sendMembershipUpgradeEmail(agencyUser.email, plan.name, true)
+        }
+
+        return NextResponse.json({ message: "Plan activated successfully and email dispatched." })
     } catch (error: any) {
         console.error("[Manual Upgrade Error]:", error)
         return NextResponse.json({ error: "Internal server error" }, { status: 500 })

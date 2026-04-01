@@ -149,3 +149,34 @@ export const sendStaffInvitationEmail = async (email: string, name: string, agen
     html: emailWrapper(content, "Staff Invitation"),
   });
 };
+
+/**
+ * Membership Upgrade Confirmation
+ */
+export const sendMembershipUpgradeEmail = async (email: string, planName: string, isLifetime: boolean = false) => {
+  const loginUrl = `${process.env.NEXT_PUBLIC_APP_URL}/login`;
+  
+  const content = `
+    <p>Great news! Your account has been upgraded to the <span class="highlight">${planName}</span> plan Tier.</p>
+    
+    <div style="background-color: #f8fafc; padding: 24px; border-radius: 16px; margin: 24px 0; border: 1px dashed #cbd5e1;">
+        <p style="margin: 0; font-size: 14px; text-align: center;">🛡️ Account Status: <span style="font-weight: 800; color: #10b981;">ACTIVE</span></p>
+        <p style="margin: 8px 0 0 0; text-align: center; font-weight: bold; color: #1e293b;">Plan: ${planName}</p>
+        ${isLifetime ? `<p style="margin: 4px 0 0 0; text-align: center; font-weight: 800; color: #2563eb; letter-spacing: 0.1em;">LIFETIME ACCESS GRANTED 💎</p>` : ""}
+    </div>
+
+    <p>This upgrade unlocks advanced real estate automation, higher agent seat limits, and premium analytics for your agency. You can now access all features associated with this plan.</p>
+
+    <div style="text-align: center; margin: 32px 0;">
+      <a href="${loginUrl}" class="button">Go to Dashboard</a>
+    </div>
+
+    <p style="font-size: 13px; color: #64748b;">If you need a detailed breakdown of your new features, visit the <span class="highlight">Billing</span> section in your agency command center.</p>
+  `;
+
+  return sendEmail({
+    to: email,
+    subject: `💎 Plan Upgraded: Welcome to ${planName} Access!`,
+    html: emailWrapper(content, "Plan Upgrade Successful"),
+  });
+};

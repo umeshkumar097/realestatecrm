@@ -93,6 +93,28 @@ export default function BillingPage() {
       }
   }
 
+  const handleApplyCoupon = async () => {
+      if (!promoCode) return
+      setLoading("coupon")
+      try {
+          const res = await fetch("/api/coupons/validate", {
+              method: "POST",
+              body: JSON.stringify({ code: promoCode })
+          })
+          const data = await res.json()
+          if (res.ok) {
+              alert(`Success! Code ${promoCode} applied: ${data.message || "Discount activated."}`)
+              fetchData() // Refresh to see changes
+          } else {
+              alert(data.error || "Invalid or expired promo code")
+          }
+      } catch (e) {
+          alert("Failed to validate code")
+      } finally {
+          setLoading(null)
+      }
+  }
+
   const handleSubscribe = async (priceId: string) => {
     if (!priceId) {
         alert("This plan is not available for online purchase yet. Contact support.")
@@ -244,7 +266,13 @@ export default function BillingPage() {
                             onChange={(e) => setPromoCode(e.target.value)}
                             className="bg-zinc-50 border border-zinc-200 rounded-xl px-4 py-2 text-xs font-black uppercase outline-none focus:ring-2 focus:ring-primary/20"
                           />
-                          <button className="px-4 py-2 bg-primary text-white rounded-xl text-xs font-black shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all">Apply</button>
+                          <button 
+                            onClick={handleApplyCoupon}
+                            disabled={loading === "coupon"}
+                            className="px-4 py-2 bg-primary text-white rounded-xl text-xs font-black shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all"
+                          >
+                              {loading === "coupon" ? <Loader2 size={12} className="animate-spin"/> : "Apply"}
+                          </button>
                       </div>
                   </div>
 

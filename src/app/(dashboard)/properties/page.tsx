@@ -71,8 +71,11 @@ export default function PropertiesPage() {
         setEditingProperty(null)
         setFormData({ title: "", price: "", location: "", type: "APARTMENT", beds: "", baths: "", area: "" })
         loadProperties()
+      } else {
+        const errorData = await res.json()
+        alert(errorData.error || "Failed to update project")
       }
-    } catch (e) { alert("Failed to update project") }
+    } catch (e) { alert("Network error. Please try again.") }
   }
 
   const handleDelete = async (id: string) => {
