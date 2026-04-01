@@ -85,7 +85,12 @@ export async function GET(req: NextRequest) {
             }
           },
           plan: true,
-          subscription: true
+          subscription: true,
+          users: {
+            where: { role: "ADMIN" },
+            take: 1,
+            select: { email: true }
+          }
         },
         orderBy: { createdAt: "desc" }
       }),
