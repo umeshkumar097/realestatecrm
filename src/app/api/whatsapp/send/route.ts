@@ -17,18 +17,30 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), 15000); // 15s timeout
+
     const res = await fetch(`${BRIDGE_URL}/send`, {
         method: "POST",
         headers: { 
             "Content-Type": "application/json",
             "x-bridge-secret": BRIDGE_SECRET 
         },
-        body: JSON.stringify({ agentId: userId, phone, message })
-    })
-    const data = await res.json()
-    return NextResponse.json(data)
+        body: JSON.stringify({ agentId: userId, phone, message }),
+        signal: controller.signal
+    });
+    
+    clearTimeout(id);
+    const data = await res.json();
+    
+    if (!res.ok) {
+        return NextResponse.json({ error: data.error || "VPS Bridge Error" }, { status: res.status });
+    }
+
+    return NextResponse.json(data);
   } catch (err: any) {
-    console.error("WhatsApp Send Error:", err)
-    return NextResponse.json({ error: "Failed to reach VPS Bridge" }, { status: 500 })
+    console.error("WhatsApp Send Tooling Error:", err);
+    const message = err.name === 'AbortError' ? "VPS Bridge Timeout" : "Failed to reach VPS Bridge";
+    return NextResponse.json({ error: message }, { status: 504 });
   }
 }

@@ -140,20 +140,22 @@ export default function ChatPage() {
         })
       })
 
+      const data = await res.json()
+
       if (res.ok) {
         setNewMessage("")
         // Refresh messages immediately
         const resMsg = await fetch(`/api/whatsapp/messages?leadId=${selectedLead.id}`)
         if (resMsg.ok) {
-          const data = await resMsg.json()
-          setMessages(data)
+          const dataMsg = await resMsg.json()
+          setMessages(dataMsg)
         }
       } else {
-        const error = await res.json()
-        alert(error.error || "Failed to send message")
+        alert(data.error || "Failed to send message")
       }
-    } catch (err) {
-      alert("Error sending message")
+    } catch (err: any) {
+      console.error("Chat Send Error:", err)
+      alert("Network Error: Could not reach chat server.")
     } finally {
       setSending(false)
     }

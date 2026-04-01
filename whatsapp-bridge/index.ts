@@ -82,43 +82,76 @@ class BaileysManager {
             })
             const instance = this.instances.get(agentId)!
             instance.socket = socket
-            socket.ev.on("connection.update", async (update) => {
-              const { connection, lastDisconnect, qr } = update
-              if (qr) {
-                instance.qr = qr
-                instance.status = "CONNECTING"
-                await prisma.whatsAppSession.upsert({
-                  where: { agentId },
-                  update: { qrCode: qr, status: "CONNECTING" },
-                  create: { agentId, agencyId: agencyId || "root", sessionData: "{}", qrCode: qr, status: "CONNECTING" }
-                }).catch(() => null)
-              }
-              if (connection === "close") {
-                const shouldReconnect = (lastDisconnect?.error as Boom)?.output?.statusCode !== DisconnectReason.loggedOut
-                if (!shouldReconnect) {
-                  instance.status = "DISCONNECTED"
-                  this.instances.delete(agentId)
-                  await prisma.whatsAppSession.update({ where: { agentId }, data: { status: "DISCONNECTED", qrCode: null }}).catch(() => null)
-                } else { this.init(agentId, agencyId) }
-              } else if (connection === "open") {
-                instance.status = "CONNECTED"
-                instance.qr = undefined
-                await prisma.whatsAppSession.update({
-                  where: { agentId },
-                  data: { status: "CONNECTED", qrCode: null, phoneNumber: socket.user?.id.split(":")[0] }
-                }).catch(() => null)
-              }
-            })
-            socket.ev.on("creds.update", saveCreds)
-            return instance
-        } catch (e) {
-            this.instances.delete(agentId)
-            throw e
-        } finally { this.initLocks.delete(agentId) }
-    })()
-    this.initLocks.set(agentId, initPromise)
-    return initPromise
-  }
+    const WEBHOOK_URL = process.env.WHATSAPP_WEBHOOK_URL;
+
+    socket.ev.on("messages.upsert", async (m) => {
+        if (m.type !== "notify") return;
+        for (const msg of m.messages) {
+            if (!msg.message || msg.key.fromMe) continue;
+            
+            const contact = msg.key.remoteJid;
+            const content = msg.message.conversation || msg.message.extendedTextMessage?.text || "";
+
+            logger.info(`📩 Incoming message from ${contact}: ${content}`);
+
+            // 1. Save to Database directly (optional, but good for persistence)
+            // 2. Dispatch to Main CRM Webhook for Automation
+            if (WEBHOOK_URL) {
+                fetch(WEBHOOK_URL, {
+                    method: "POST",
+                    headers: { 
+                        "Content-Type": "application/json",
+                        "x-bridge-secret": SECRET
+                    },
+                    body: JSON.stringify({
+                        agentId,
+                        contact,
+                        content,
+                        timestamp: msg.messageTimestamp,
+                        pushName: msg.pushName
+                    })
+                }).catch(err => logger.error(`❌ Webhook failed: ${err.message}`));
+            }
+        }
+    });
+
+    socket.ev.on("connection.update", async (update) => {
+      const { connection, lastDisconnect, qr } = update
+      if (qr) {
+        instance.qr = qr
+        instance.status = "CONNECTING"
+        await prisma.whatsAppSession.upsert({
+          where: { agentId },
+          update: { qrCode: qr, status: "CONNECTING" },
+          create: { agentId, agencyId: agencyId || "root", sessionData: "{}", qrCode: qr, status: "CONNECTING" }
+        }).catch(() => null)
+      }
+      if (connection === "close") {
+        const shouldReconnect = (lastDisconnect?.error as Boom)?.output?.statusCode !== DisconnectReason.loggedOut
+        if (!shouldReconnect) {
+          instance.status = "DISCONNECTED"
+          this.instances.delete(agentId)
+          await prisma.whatsAppSession.update({ where: { agentId }, data: { status: "DISCONNECTED", qrCode: null }}).catch(() => null)
+        } else { this.init(agentId, agencyId) }
+      } else if (connection === "open") {
+        instance.status = "CONNECTED"
+        instance.qr = undefined
+        await prisma.whatsAppSession.update({
+          where: { agentId },
+          data: { status: "CONNECTED", qrCode: null, phoneNumber: socket.user?.id.split(":")[0] }
+        }).catch(() => null)
+      }
+    })
+    socket.ev.on("creds.update", saveCreds)
+    return instance
+  } catch (e) {
+    this.instances.delete(agentId)
+    throw e
+  } finally { this.initLocks.delete(agentId) }
+})()
+this.initLocks.set(agentId, initPromise)
+return initPromise
+}
 
   async sendMessage(agentId: string, phone: string, message: string) {
     const instance = await this.getInstance(agentId)
