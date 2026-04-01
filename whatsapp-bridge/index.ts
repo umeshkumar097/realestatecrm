@@ -18,7 +18,7 @@ dotenv.config()
 const prisma = new PrismaClient({
     datasources: {
         db: {
-            url: "" 
+            url: "postgresql://neondb_owner:npg_djGWaIC7BJ5l@ep-wispy-surf-amfef53a-pooler.c-5.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
         }
     }
 })
@@ -27,7 +27,7 @@ const logger = pino({ level: "info" })
 const app = express()
 app.use(express.json())
 
-const PORT = 5050
+const PORT = 8080 // Shifted to standard web port
 const SECRET = "Umesh_WA_Bridge_2003" 
 
 const auth = (req: any, res: any, next: any) => {
