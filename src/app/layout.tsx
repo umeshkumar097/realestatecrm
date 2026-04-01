@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/providers";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 
 const interFont = Inter({
   variable: "--font-inter",
@@ -24,7 +25,10 @@ export default function RootLayout({
       className={`${interFont.variable} h-full antialiased`}
     >
       <body className={`${interFont.className} min-h-full flex flex-col font-sans`}>
-        <Providers>{children}</Providers>
+        <Providers>
+          <GoogleAnalytics />
+          {children}
+        </Providers>
       </body>
     </html>
   );
