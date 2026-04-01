@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json()
   const { title, description, price, type, location, address, city, state, zip, images, beds, baths, area } = body
 
-  if (!title || !price) {
+  if (!title || (price === undefined || price === null)) {
     return NextResponse.json({ error: "Title and Price are required" }, { status: 400 })
   }
 

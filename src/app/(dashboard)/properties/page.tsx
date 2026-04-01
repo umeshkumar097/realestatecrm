@@ -43,8 +43,11 @@ export default function PropertiesPage() {
         setIsModalOpen(false)
         setFormData({ title: "", price: "", location: "", type: "APARTMENT", beds: "", baths: "", area: "" })
         loadProperties()
+      } else {
+        const errorData = await res.json()
+        alert(errorData.error || "Failed to add project")
       }
-    } catch (e) { alert("Failed to add project") }
+    } catch (e) { alert("Network error. Please try again.") }
   }
 
   const handleEditSubmit = async (e: React.FormEvent) => {

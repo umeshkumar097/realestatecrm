@@ -10,13 +10,28 @@ export async function GET(req: NextRequest) {
   const { agencyId } = session.user as any
   if (!agencyId) return NextResponse.json({ status: "FREE" })
 
-  const subscription = await prisma.subscription.findUnique({
-    where: { agencyId }
+  const agency = await (prisma as any).agency.findUnique({
+    where: { id: agencyId },
+    select: {
+        gstNumber: true,
+        billingAddress: true,
+        billingEmail: true,
+        subscription: true,
+        plan: true,
+        _count: { select: { users: true } }
+    }
   })
 
   return NextResponse.json({
-    status: subscription?.status || "FREE",
-    plan: subscription?.plan || "Starter",
-    currentPeriodEnd: subscription?.currentPeriodEnd
+    status: agency?.subscription?.status || "FREE",
+    plan: agency?.plan?.name || "Free Trial",
+    currentPeriodEnd: agency?.subscription?.currentPeriodEnd,
+    usage: {
+        users: agency?._count?.users || 0,
+        maxUsers: agency?.plan?.maxAgents || 5,
+    },
+    gstNumber: agency?.gstNumber,
+    billingAddress: agency?.billingAddress,
+    billingEmail: agency?.billingEmail
   })
 }

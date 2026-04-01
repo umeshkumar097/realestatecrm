@@ -33,6 +33,9 @@ model Agency {
   users                User[]
   webhookConfigs       WebhookConfig[]
   whatsappSessions     WhatsAppSession[]
+  gstNumber            String?
+  billingAddress       String?
+  billingEmail         String?
 }
 
 model User {
