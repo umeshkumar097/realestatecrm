@@ -50,6 +50,7 @@ export async function POST(req: NextRequest) {
                 data: {
                     content: message,
                     fromMe: true,
+                    status: "SENT",
                     leadId: lead.id,
                     agencyId: lead.agencyId,
                     senderId: userId

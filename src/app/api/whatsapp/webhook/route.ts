@@ -10,8 +10,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { agentId, contact, content, timestamp, pushName } = await req.json();
+  const { type, agentId, whatsappId, contact, content, timestamp, pushName, status } = await req.json();
   
+  if (type === "status") {
+    if (!whatsappId || !status) return NextResponse.json({ error: "Missing status data" }, { status: 400 });
+    
+    await prisma.message.updateMany({
+      where: { whatsappId },
+      data: { status }
+    });
+    return NextResponse.json({ success: true });
+  }
+
+  // Handle incoming chat message
   if (!contact || !content) {
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
   }
@@ -21,13 +32,11 @@ export async function POST(req: NextRequest) {
 
   try {
     // 1. Find or Create Lead based on phone
-    // Note: In a production CRM, you would check for the agencyId as well.
     let lead = await prisma.lead.findFirst({
       where: { phone: { contains: phone } }
     });
 
     if (!lead) {
-      // Create a temporary lead for the incoming unknown contact
       lead = await prisma.lead.create({
         data: {
           name: pushName || `New Client (${phone})`,
@@ -36,17 +45,21 @@ export async function POST(req: NextRequest) {
           source: "WHATSAPP",
           notes: "Auto-created from inbound WhatsApp message.",
           assignedToId: agentId || null,
-          agencyId: "root" // Defaulting to root if unknown
+          agencyId: "root" 
         }
       });
     }
 
-    // 2. Save Message
-    const message = await prisma.message.create({
-      data: {
+    // 2. Save Message (with deduplication)
+    const message = await prisma.message.upsert({
+      where: { whatsappId: whatsappId || "pending" },
+      update: { content, status: "READ" }, // Read by system/notified
+      create: {
+        whatsappId: whatsappId,
         content: content,
         fromMe: false,
-        timestamp: new Date(timestamp * 1000),
+        status: "READ",
+        timestamp: new Date((timestamp || Math.floor(Date.now()/1000)) * 1000),
         leadId: lead.id,
         agencyId: lead.agencyId,
       }
@@ -55,6 +68,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, messageId: message.id });
   } catch (error: any) {
     console.error("Webhook Processing Error:", error);
-    return NextResponse.json({ error: "Internal processing error" }, { status: 500 });
+    return NextResponse.json({ error: "Internal error" }, { status: 500 });
   }
 }

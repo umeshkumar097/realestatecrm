@@ -256,9 +256,22 @@ export default function ChatPage() {
                   <div key={idx} className={`flex ${m.fromMe ? "justify-end" : "justify-start"}`}>
                     <div className={`max-w-[70%] p-3 rounded-2xl text-sm shadow-sm ${m.fromMe ? "bg-primary text-white rounded-tr-none" : "bg-white border border-slate-100 text-slate-700 rounded-tl-none"}`}>
                       <p className="leading-relaxed">{m.content}</p>
-                      <p className={`text-[10px] mt-1 text-right ${m.fromMe ? "text-primary-foreground/70" : "text-slate-400"}`}>
-                        {new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </p>
+                      <div className="flex items-center justify-end gap-1 mt-1">
+                        <p className={`text-[10px] ${m.fromMe ? "text-primary-foreground/70" : "text-slate-400"}`}>
+                          {new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                        {m.fromMe && (
+                          <div className={`flex items-center shrink-0`}>
+                            {m.status === "READ" ? (
+                              <CheckCheck className="h-3 w-3 text-blue-300" />
+                            ) : m.status === "DELIVERED" ? (
+                              <CheckCheck className="h-3 w-3 text-slate-300" />
+                            ) : (
+                              <Send className="h-2 w-2 text-slate-300" />
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))

@@ -169,13 +169,43 @@ class BaileysManager {
                                 "x-bridge-secret": SECRET
                             },
                             body: JSON.stringify({
+                                type: "chat",
                                 agentId,
+                                whatsappId: msg.key.id,
                                 contact,
                                 content,
                                 timestamp: msg.messageTimestamp,
                                 pushName: msg.pushName
                             })
-                        }).catch(err => logger.error(`❌ Webhook err: ${err.message}`));
+                        })
+                        .then(r => logger.info(`✅ Inbound Webhook: ${r.status}`))
+                        .catch(err => logger.error(`❌ Inbound Webhook Error: ${err.message}`));
+                    }
+                }
+            });
+
+            socket.ev.on("messages.update", async (updates) => {
+                for (const update of updates) {
+                    if (update.update.status && WEBHOOK_URL) {
+                        const statusMap: any = { 2: "SENT", 3: "DELIVERED", 4: "READ" };
+                        const status = statusMap[update.update.status];
+                        if (status) {
+                            fetch(WEBHOOK_URL, {
+                                method: "POST",
+                                headers: { 
+                                    "Content-Type": "application/json",
+                                    "x-bridge-secret": SECRET
+                                },
+                                body: JSON.stringify({
+                                    type: "status",
+                                    agentId,
+                                    whatsappId: update.key.id,
+                                    status
+                                })
+                            })
+                            .then(r => logger.info(`✅ Status Webhook (${status}): ${r.status}`))
+                            .catch(err => logger.error(`❌ Status Webhook Error: ${err.message}`));
+                        }
                     }
                 }
             });

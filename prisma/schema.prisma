@@ -223,17 +223,26 @@ model Ticket {
   project      Project? @relation(fields: [projectId], references: [id])
 }
 
+enum MessageStatus {
+  SENT
+  DELIVERED
+  READ
+  FAILED
+}
+
 model Message {
-  id        String   @id @default(cuid())
-  content   String
-  fromMe    Boolean
-  timestamp DateTime @default(now())
-  leadId    String
-  agencyId  String
-  senderId  String?
-  createdAt DateTime @default(now())
-  agency    Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
-  lead      Lead     @relation(fields: [leadId], references: [id])
+  id               String        @id @default(cuid())
+  whatsappId       String?       @unique
+  content          String
+  fromMe           Boolean
+  status           MessageStatus @default(SENT)
+  timestamp        DateTime      @default(now())
+  leadId           String
+  agencyId         String
+  senderId         String?
+  createdAt        DateTime      @default(now())
+  agency           Agency        @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  lead             Lead          @relation(fields: [leadId], references: [id])
 }
 
 model Property {
