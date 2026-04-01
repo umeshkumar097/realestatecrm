@@ -116,6 +116,60 @@ export async function POST(req: NextRequest) {
           return emi
       })
 
+      // --- NEW: Automated WhatsApp Notification ---
+      const BRIDGE_URL = process.env.WHATSAPP_BRIDGE_URL || "http://137.184.114.109"
+      const BRIDGE_SECRET = process.env.WHATSAPP_BRIDGE_SECRET || "Umesh_WA_Bridge_2003"
+      
+      const userId = (session.user as any).id
+
+      // Non-blocking notification trigger
+      (async () => {
+          try {
+              const [lead, project] = await Promise.all([
+                  prisma.lead.findUnique({ where: { id: leadId }, select: { name: true, phone: true } }),
+                  prisma.project.findUnique({ where: { id: projectId }, select: { name: true } })
+              ])
+
+              if (lead && project) {
+                  const cleanPhone = lead.phone.replace(/\D/g, "")
+                  const formattedDate = new Date(startDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+                  
+                  const message = `Hello ${lead.name || 'Ji'},\n` +
+                      `Aapka EMI plan for *${project.name}* (Plot #${plotNumber}) successfully set up ho gaya hai. 🙏\n\n` +
+                      `📊 Plan Details:\n` +
+                      `- Total Price: ₹${parseFloat(totalPrice).toLocaleString('en-IN')}\n` +
+                      `- Installment: ₹${parseFloat(installmentAmount).toLocaleString('en-IN')} (${frequency})\n` +
+                      `- Start Date: ${formattedDate}\n\n` +
+                      `Aapka din shubh ho! ✨`
+
+                  const res = await fetch(`${BRIDGE_URL}/send`, {
+                      method: "POST",
+                      headers: { 
+                          "Content-Type": "application/json",
+                          "x-bridge-secret": BRIDGE_SECRET 
+                      },
+                      body: JSON.stringify({ agentId: userId, phone: cleanPhone, message })
+                  })
+
+                  if (res.ok) {
+                      // Also save this notification to the CRM message history
+                      await prisma.message.create({
+                          data: {
+                              content: message,
+                              fromMe: true,
+                              status: "SENT", // We assume sent once VPS accepts it
+                              leadId: leadId,
+                              agencyId: agencyId,
+                              senderId: userId
+                          }
+                      }).catch(e => console.error("Notification History Save Error:", e))
+                  }
+              }
+          } catch (notificationErr) {
+              console.error("[EMI Notification Trigger Error]:", notificationErr)
+          }
+      })()
+
       return NextResponse.json(result, { status: 201 })
   } catch (error: any) {
       console.error("[EMI Creation Error]:", error)
