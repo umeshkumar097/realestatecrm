@@ -67,10 +67,22 @@ export default function WhatsAppWebPage() {
   const handleDisconnect = async () => {
     if (!confirm("Stop synchronization?")) return
     setLoading(true)
-    await fetch("/api/whatsapp", { method: "POST", body: JSON.stringify({ action: "disconnect" }) })
+    
+    // Immediate state reset to provide instant feedback
     setStatus("disconnected")
     setQr(null)
-    setLoading(false)
+    setConnectingAt(null)
+
+    try {
+      await fetch("/api/whatsapp", { 
+        method: "POST", 
+        body: JSON.stringify({ action: "disconnect" }) 
+      })
+    } catch (err) {
+      console.error("Disconnect error", err)
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (

@@ -209,6 +209,26 @@ return initPromise
     const jid = `${phone.replace(/\D/g, "")}@s.whatsapp.net`
     return instance.socket.sendMessage(jid, { text: message })
   }
+
+  async logout(agentId: string) {
+    const instance = this.instances.get(agentId)
+    if (instance?.socket) {
+        try {
+            await instance.socket.logout() // Tell WA servers we are logging out
+            instance.socket.end() // Close socket
+        } catch (e) {}
+    }
+    this.instances.delete(agentId)
+    const sessionPath = path.join(process.cwd(), `sessions/${agentId}`)
+    if (fs.existsSync(sessionPath)) fs.rmSync(sessionPath, { recursive: true, force: true })
+    
+    await prisma.whatsAppSession.update({
+        where: { agentId },
+        data: { status: "DISCONNECTED", qrCode: null }
+    }).catch(() => null)
+    
+    logger.info(`👋 Session logged out and deleted for ${agentId}`)
+  }
 }
 
 const manager = new BaileysManager()
@@ -216,7 +236,7 @@ const manager = new BaileysManager()
 app.get("/", (req, res) => res.json({ status: "alive" }))
 app.get("/status/:agentId", auth, async (req, res) => {
     const { agentId } = req.params
-    const instance = await manager.getInstance(agentId)
+    const instance = await manager.getInstance(agentId).catch(() => null)
     let qrDataUrl = null
     if (instance?.qr) qrDataUrl = await QRCode.toDataURL(instance.qr)
     res.json({ status: instance?.status || "DISCONNECTED", qr: qrDataUrl })
@@ -225,6 +245,11 @@ app.post("/connect", auth, async (req, res) => {
     const { agentId, agencyId, force } = req.body
     manager.init(agentId, agencyId, force).catch(() => null)
     res.json({ message: "Connecting initiated" })
+})
+app.post("/disconnect", auth, async (req, res) => {
+    const { agentId } = req.body
+    await manager.logout(agentId)
+    res.json({ message: "Disconnected successfully" })
 })
 app.post("/send", auth, async (req, res) => {
     try {
