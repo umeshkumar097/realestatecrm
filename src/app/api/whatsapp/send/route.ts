@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
-import { baileysManager } from "@/lib/whatsapp/baileys-manager"
+
+const BRIDGE_URL = "http://203.57.85.225"
+const BRIDGE_SECRET = "Umesh_WA_Bridge_2003"
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -15,10 +17,18 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const res = await baileysManager.sendMessage(userId, phone, message)
-    return NextResponse.json({ success: true, res })
+    const res = await fetch(`${BRIDGE_URL}/send`, {
+        method: "POST",
+        headers: { 
+            "Content-Type": "application/json",
+            "x-bridge-secret": BRIDGE_SECRET 
+        },
+        body: JSON.stringify({ agentId: userId, phone, message })
+    })
+    const data = await res.json()
+    return NextResponse.json(data)
   } catch (err: any) {
     console.error("WhatsApp Send Error:", err)
-    return NextResponse.json({ error: err.message || "Failed to send message" }, { status: 500 })
+    return NextResponse.json({ error: "Failed to reach VPS Bridge" }, { status: 500 })
   }
 }

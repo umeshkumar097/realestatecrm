@@ -1,56 +1,41 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
-import { baileysManager } from "@/lib/whatsapp/baileys-manager"
 
-/**
- * Endpoint to trigger EMI reminders. 
- * Should be called by a CRON job every day.
- */
+const BRIDGE_URL = "http://203.57.85.225"
+const BRIDGE_SECRET = "Umesh_WA_Bridge_2003"
+
 export async function GET(req: NextRequest) {
-  // In production, add a secret header check for security
-  
   const sevenDaysFromNow = new Date()
   sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7)
-  
-  const today = new Date()
-  today.setHours(0,0,0,0)
-  
   const endOfDay = new Date(sevenDaysFromNow)
   endOfDay.setHours(23,59,59,999)
 
-  // Find EMIs expiring in exactly 7 days
   const upcomingEmis = await prisma.eMI.findMany({
     where: {
-      expiryDate: {
-        gte: sevenDaysFromNow,
-        lte: endOfDay
-      },
+      expiryDate: { gte: sevenDaysFromNow, lte: endOfDay },
       status: "ACTIVE"
     },
-    include: {
-      lead: true,
-      agency: true
-    }
+    include: { lead: true, agency: true }
   })
 
   let count = 0
   for (const emi of upcomingEmis) {
-    // 1. Send WhatsApp Reminder (if bot is connected)
     try {
-      const message = `🔔 *EMI Reminder — ${emi.agency.name}*\n\nHi ${emi.lead.name}, this is a friendly reminder that your EMI for Plot #${emi.plotNumber} is due in 7 days (${emi.expiryDate.toLocaleDateString()}). \n\nAmount: ₹${emi.totalPrice.toLocaleString()}\n\nPlease ensure timely payment to avoid penalties.`
+      const message = `🔔 *EMI Reminder — ${emi.agency.name}*\n\nHi ${emi.lead.name}, this is a friendly reminder for EMI Plot #${emi.plotNumber}.\n\nAmount: ₹${emi.totalPrice.toLocaleString()}\n\nDate: ${emi.expiryDate.toLocaleDateString()}`
       
-      // We need an agentId to send from. We'll use the one the lead is assigned to.
       if (emi.lead.assignedToId) {
-        await baileysManager.sendMessage(emi.lead.assignedToId, emi.lead.phone, message)
-        count++
+        const res = await fetch(`${BRIDGE_URL}/send`, {
+            method: "POST",
+            headers: { 
+                "Content-Type": "application/json",
+                "x-bridge-secret": BRIDGE_SECRET 
+            },
+            body: JSON.stringify({ agentId: emi.lead.assignedToId, phone: emi.lead.phone, message })
+        })
+        if (res.ok) count++
       }
-    } catch (err) {
-      console.error(`Failed to send reminder for EMI ${emi.id}:`, err)
-    }
+    } catch (err) { console.error("Reminder Error:", err) }
   }
 
-  return NextResponse.json({ 
-    message: `Processed ${upcomingEmis.length} upcoming EMIs. Sent ${count} reminders.`,
-    count 
-  })
+  return NextResponse.json({ message: `Processed ${upcomingEmis.length} EMIs. Sent ${count} reminders.`, count })
 }

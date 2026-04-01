@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
-import { baileysManager } from "@/lib/whatsapp/baileys-manager"
+
+const BRIDGE_URL = "http://203.57.85.225"
+const BRIDGE_SECRET = "Umesh_WA_Bridge_2003"
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -15,47 +17,34 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid data format" }, { status: 400 })
   }
 
-  // Fetch leads to get their phone numbers
   const leads = await prisma.lead.findMany({
-    where: {
-      id: { in: ids },
-      agencyId
-    },
+    where: { id: { in: ids }, agencyId },
     select: { id: true, phone: true }
   })
 
   if (leads.length === 0) return NextResponse.json({ error: "No clients found" }, { status: 404 })
 
-  // Check if WhatsApp is connected
-  try {
-     const instance = await baileysManager.getInstance(agentId)
-     if (!instance || instance.status !== "CONNECTED") {
-        return NextResponse.json({ error: "WhatsApp not connected. Please connect from dashboard first." }, { status: 400 })
-     }
-  } catch (e) {
-     return NextResponse.json({ error: "WhatsApp service unavailable" }, { status: 500 })
-  }
-
-  // Perform broadcast in background (though here we await to give summary)
   let successCount = 0
   let failCount = 0
 
   for (const lead of leads) {
     try {
-      // Add defensive delay (800ms) to prevent spam flagging
       await new Promise(resolve => setTimeout(resolve, 800))
       
-      await baileysManager.sendMessage(agentId, lead.phone, message)
-      successCount++
+      const res = await fetch(`${BRIDGE_URL}/send`, {
+          method: "POST",
+          headers: { 
+              "Content-Type": "application/json",
+              "x-bridge-secret": BRIDGE_SECRET 
+          },
+          body: JSON.stringify({ agentId, phone: lead.phone, message })
+      })
+      if (res.ok) successCount++
+      else failCount++
     } catch (err) {
-      console.error(`[Broadcast Error] Failed for ${lead.phone}:`, err)
       failCount++
     }
   }
 
-  return NextResponse.json({ 
-    success: successCount, 
-    failed: failCount,
-    total: leads.length 
-  })
+  return NextResponse.json({ success: successCount, failed: failCount, total: leads.length })
 }
