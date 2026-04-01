@@ -41,6 +41,7 @@ export const metadata: Metadata = {
   }
 };
 
+// Vercel Re-trigger: Force build for business branding
 export default function RootLayout({
   children,
 }: Readonly<{
