@@ -33,7 +33,16 @@ export default function SignupPage() {
   }
 
   const handleStartTrial = async () => {
-    if (!selectedPlan) return
+    if (!selectedPlan) {
+        setError("Please select a plan to continue.")
+        return
+    }
+    if (!formData.email) {
+        setError("Please complete your agency details in the previous step.")
+        setStep(1)
+        return
+    }
+    
     setLoading(true)
     setError("")
 

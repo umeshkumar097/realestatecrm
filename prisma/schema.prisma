@@ -7,52 +7,52 @@ datasource db {
 }
 
 model Agency {
-  id                   String            @id @default(cuid())
+  id                   String              @id @default(cuid())
   name                 String
-  domain               String?           @unique
+  domain               String?             @unique
   logo                 String?
-  createdAt            DateTime          @default(now())
-  updatedAt            DateTime          @updatedAt
-  customDomain         String?           @unique
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+  customDomain         String?             @unique
   planId               String?
-  status               AgencyStatus      @default(ACTIVE)
-  stripeCustomerId     String?           @unique
-  stripeSubscriptionId String?           @unique
+  status               AgencyStatus        @default(ACTIVE)
+  stripeCustomerId     String?             @unique
+  stripeSubscriptionId String?             @unique
   activities           Activity[]
-  plan                 SubscriptionPlan? @relation(fields: [planId], references: [id])
+  plan                 SubscriptionPlan?   @relation(fields: [planId], references: [id])
   emis                 EMI[]
+  googleSheets         GoogleSheetSync?
   leads                Lead[]
   messages             Message[]
+  portalIntegrations   PortalIntegration[]
   projects             Project[]
   properties           Property[]
   subscription         Subscription?
   tasks                Task[]
   tickets              Ticket[]
   users                User[]
-  whatsappSessions     WhatsAppSession[]
-  portalIntegrations   PortalIntegration[]
   webhookConfigs       WebhookConfig[]
-  googleSheets         GoogleSheetSync[]
+  whatsappSessions     WhatsAppSession[]
 }
 
 model User {
   id              String           @id @default(cuid())
   email           String           @unique
-  emailVerified   DateTime?
   name            String?
   password        String?
   role            UserRole         @default(AGENT)
   agencyId        String?
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
+  attendance      Json?
+  commission      Float?
+  emailVerified   DateTime?
   activities      Activity[]
   leads           Lead[]           @relation("AssignedLeads")
   tasks           Task[]
   tickets         Ticket[]
   agency          Agency?          @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   whatsappSession WhatsAppSession?
-  commission      Float?
-  attendance      Json?
 }
 
 model WhatsAppSession {
@@ -297,9 +297,46 @@ model PlatformLead {
   company   String?
   message   String?
   plan      String   @default("Enterprise")
-  status    String   @default("NEW") // NEW, CONTACTED, CLOSED, SPAM
+  status    String   @default("NEW")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model PortalIntegration {
+  id         String   @id @default(cuid())
+  name       String
+  apiKey     String?
+  webhookUrl String?
+  status     String   @default("ACTIVE")
+  agencyId   String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  agency     Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+}
+
+model WebhookConfig {
+  id        String   @id @default(cuid())
+  agencyId  String
+  name      String   @default("Default Webhook")
+  secret    String   @unique @default(cuid())
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  agency    Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+}
+
+model GoogleSheetSync {
+  id            String    @id @default(cuid())
+  agencyId      String    @unique
+  spreadsheetId String?
+  sheetName     String    @default("Leads")
+  accessToken   String?
+  refreshToken  String?
+  isActive      Boolean   @default(true)
+  lastSyncedAt  DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  agency        Agency    @relation(fields: [agencyId], references: [id], onDelete: Cascade)
 }
 
 enum AgencyStatus {
@@ -344,41 +381,4 @@ enum SubscriptionStatus {
   ACTIVE
   CANCELED
   PAST_DUE
-}
-
-model PortalIntegration {
-  id         String   @id @default(cuid())
-  name       String   // Bayut, Property Finder, Dubizzle, Zillow
-  apiKey     String?
-  webhookUrl String?
-  status     String   @default("ACTIVE")
-  agencyId   String
-  agency     Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-}
-
-model WebhookConfig {
-  id        String   @id @default(cuid())
-  agencyId  String
-  name      String   @default("Default Webhook")
-  secret    String   @unique @default(cuid())
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  agency    Agency   @relation(fields: [agencyId], references: [id], onDelete: Cascade)
-}
-
-model GoogleSheetSync {
-  id            String    @id @default(cuid())
-  agencyId      String    @unique
-  spreadsheetId String?
-  sheetName     String    @default("Leads")
-  accessToken   String?
-  refreshToken  String?
-  isActive      Boolean   @default(true)
-  lastSyncedAt  DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  agency        Agency    @relation(fields: [agencyId], references: [id], onDelete: Cascade)
 }
