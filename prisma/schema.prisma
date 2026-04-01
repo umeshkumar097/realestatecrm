@@ -28,6 +28,7 @@ model Agency {
   projects             Project[]
   properties           Property[]
   subscription         Subscription?
+  platformInvoices     PlatformInvoice[]
   tasks                Task[]
   tickets              Ticket[]
   users                User[]
@@ -36,6 +37,30 @@ model Agency {
   gstNumber            String?
   billingAddress       String?
   billingEmail         String?
+}
+
+model PlatformInvoice {
+  id             String         @id @default(cuid())
+  invoiceNumber  String         @unique
+  sequenceNumber Int
+  amount         Float
+  currency       String         @default("INR")
+  status         InvoiceStatus  @default(PAID)
+  planSnapshot   String?
+  generatedAt    DateTime       @default(now())
+  agencyId       String
+  agency         Agency         @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([agencyId])
+}
+
+enum InvoiceStatus {
+  PAID
+  UNPAID
+  VOID
+  ZERO
 }
 
 model User {
