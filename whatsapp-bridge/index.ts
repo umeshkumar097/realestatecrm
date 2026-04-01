@@ -76,8 +76,12 @@ class BaileysManager {
             }
 
             if (instance.status === "CONNECTED" && instance.socket) {
-                // Support both JID and LID formats
-                const jid = item.phone.includes("@") ? item.phone : `${item.phone.replace(/\D/g, "")}@s.whatsapp.net`
+                // Better JID normalization: remove leading 0 and add 91 for India if no country code
+                let cleanPhone = item.phone.replace(/\D/g, "");
+                if (cleanPhone.startsWith("0")) cleanPhone = cleanPhone.substring(1);
+                if (cleanPhone.length === 10) cleanPhone = `91${cleanPhone}`;
+                
+                const jid = item.phone.includes("@") ? item.phone : `${cleanPhone}@s.whatsapp.net`
                 await instance.socket.sendMessage(jid, { text: item.message })
                 this.sendQueue.shift() 
                 logger.info(`✅ Delivered to ${jid}`)
