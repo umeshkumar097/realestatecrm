@@ -158,8 +158,12 @@ model EMI {
   projectId    String
   plotNumber   String
   plotRate     Float
-  totalPrice   Float
-  planDetails  String?
+  totalPrice          Float
+  installmentAmount   Float         @default(0)
+  totalInstallments   Int           @default(1)
+  frequency           String        @default("MONTHLY") // MONTHLY, QUARTERLY, etc.
+  nextDueDate         DateTime?
+  planDetails         String?
   startDate    DateTime
   expiryDate   DateTime
   status       String        @default("ACTIVE")

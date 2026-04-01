@@ -80,6 +80,9 @@ class BaileysManager {
       if (inst?.status === "CONNECTED") return inst
     }
 
+    // Immediately set as connecting to avoid status-glitch during async boot
+    this.instances.set(agentId, { socket: null, status: "CONNECTING" })
+
     const { version, isLatest } = await fetchLatestBaileysVersion()
     logger.info(`using WhatsApp v${version.join(".")}, isLatest: ${isLatest}`)
 
@@ -96,8 +99,8 @@ class BaileysManager {
       browser: ["PropCRM", "Chrome", "1.0.0"],
     })
 
-    const instance: WhatsAppInstance = { socket, status: "CONNECTING" }
-    this.instances.set(agentId, instance)
+    const instance = this.instances.get(agentId)!
+    instance.socket = socket
 
     // Handle connection updates
     socket.ev.on("connection.update", async (update) => {

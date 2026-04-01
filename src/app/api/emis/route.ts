@@ -52,31 +52,73 @@ export async function POST(req: NextRequest) {
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const { agencyId } = session.user as any
-  const { leadId, projectId, plotNumber, plotRate, totalPrice, planDetails, startDate, expiryDate } = await req.json()
+  const { 
+      leadId, projectId, plotNumber, plotRate, totalPrice, planDetails, 
+      startDate, frequency, totalInstallments, installmentAmount 
+  } = await req.json()
 
-  if (!leadId || !projectId || !plotNumber || !plotRate || !totalPrice || !startDate || !expiryDate) {
-    return NextResponse.json({ error: "Missing required fields for EMI creation" }, { status: 400 })
+  if (!leadId || !projectId || !plotNumber || !plotRate || !totalPrice || !startDate || !totalInstallments || !installmentAmount) {
+    return NextResponse.json({ error: "Missing required fields for Automated EMI creation" }, { status: 400 })
   }
 
-  const emi = await prisma.eMI.create({
-    data: {
-      leadId,
-      projectId,
-      plotNumber,
-      plotRate,
-      totalPrice,
-      planDetails,
-      startDate: new Date(startDate),
-      expiryDate: new Date(expiryDate),
-      agencyId
-    }
-  })
+  try {
+      const result = await (prisma as any).$transaction(async (tx: any) => {
+          // 1. Calculate Expiry Date based on frequency and count
+          const start = new Date(startDate)
+          const monthsToAdd = frequency === "QUARTERLY" ? totalInstallments * 3 : totalInstallments
+          const expiryDate = new Date(start)
+          expiryDate.setMonth(expiryDate.getMonth() + monthsToAdd)
 
-  // Update lead status to CONVERTED
-  await prisma.lead.update({
-    where: { id: leadId },
-    data: { status: "CONVERTED" }
-  })
+          // 2. Create the Master EMI Record
+          const emi = await tx.eMI.create({
+              data: {
+                  leadId,
+                  projectId,
+                  plotNumber,
+                  plotRate: parseFloat(plotRate),
+                  totalPrice: parseFloat(totalPrice),
+                  installmentAmount: parseFloat(installmentAmount),
+                  totalInstallments: parseInt(totalInstallments),
+                  frequency,
+                  planDetails,
+                  startDate: start,
+                  expiryDate: expiryDate,
+                  nextDueDate: start, // First payment due on start date
+                  agencyId
+              }
+          })
 
-  return NextResponse.json(emi, { status: 201 })
+          // 3. Generate individual Installment records
+          const installmentsData = []
+          for (let i = 0; i < totalInstallments; i++) {
+              const dueDate = new Date(start)
+              const interval = frequency === "QUARTERLY" ? 3 : 1
+              dueDate.setMonth(dueDate.getMonth() + (i * interval))
+
+              installmentsData.push({
+                  emiId: emi.id,
+                  amount: parseFloat(installmentAmount),
+                  dueDate: dueDate,
+                  status: "PENDING"
+              })
+          }
+
+          await tx.installment.createMany({
+              data: installmentsData
+          })
+
+          // 4. Transform Lead Status
+          await tx.lead.update({
+            where: { id: leadId },
+            data: { status: "CONVERTED" }
+          })
+
+          return emi
+      })
+
+      return NextResponse.json(result, { status: 201 })
+  } catch (error: any) {
+      console.error("[EMI Creation Error]:", error)
+      return NextResponse.json({ error: "Failed to create financial schedule", details: error.message }, { status: 500 })
+  }
 }
