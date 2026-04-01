@@ -454,26 +454,31 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* ── TESTIMONIALS ── */}
-        <section className="py-40 bg-slate-50 overflow-hidden relative">
-           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1600px] h-[1600px] border border-blue-600/5 rounded-full pointer-events-none" />
-           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1200px] h-[1200px] border border-blue-600/5 rounded-full pointer-events-none" />
-           
-           <div className="container mx-auto px-6 lg:px-12 relative">
-             <div className="max-w-4xl mx-auto text-center">
-               <div className="flex justify-center gap-2 mb-10">
-                 {[1,2,3,4,5].map(i => <Star key={i} className="fill-blue-600 text-blue-600" size={24}/>)}
-               </div>
-               <h2 className="text-3xl lg:text-5xl font-black text-slate-900 leading-[1.1] mb-14">"PropGOCrm isn't just software. It's our entire business brain. We closed more in Q1 than all of last year."</h2>
-               <div className="flex items-center justify-center gap-6">
-                  <div className="w-20 h-20 bg-blue-600 rounded-3xl shrink-0" />
-                  <div className="text-left">
-                    <p className="text-2xl font-black text-slate-900">Arjun Deshmukh</p>
-                    <p className="text-lg text-slate-500 font-bold">CEO, Platinum Realty Global</p>
-                  </div>
-               </div>
+        {/* ── TRUST METRIC BOARDER ── */}
+        <section className="py-24 bg-zinc-50/30">
+          <div className="container mx-auto px-6 lg:px-12">
+             <div className="bg-white rounded-[48px] border-4 border-blue-600/10 p-12 lg:p-16 shadow-[0_40px_100px_-20px_rgba(37,99,235,0.05)] relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-40 -mr-20 bg-blue-600/5 rounded-full blur-3xl -z-10 group-hover:scale-110 transition-transform duration-1000" />
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-20 items-center justify-center text-center">
+                   <div className="space-y-3">
+                      <p className="text-4xl lg:text-7xl font-black text-slate-900 tracking-tighter">1,200+</p>
+                      <p className="text-[10px] font-black uppercase text-blue-600 tracking-[0.3em]">Active Agencies</p>
+                   </div>
+                   <div className="space-y-3">
+                      <p className="text-4xl lg:text-7xl font-black text-slate-900 tracking-tighter">12M+</p>
+                      <p className="text-[10px] font-black uppercase text-blue-600 tracking-[0.3em]">Leads Managed</p>
+                   </div>
+                   <div className="space-y-3">
+                      <p className="text-4xl lg:text-7xl font-black text-slate-900 tracking-tighter">4.8/5</p>
+                      <p className="text-[10px] font-black uppercase text-blue-600 tracking-[0.3em]">Avg ROI Increase</p>
+                   </div>
+                   <div className="space-y-3">
+                      <p className="text-4xl lg:text-7xl font-black text-slate-900 tracking-tighter">99.9%</p>
+                      <p className="text-[10px] font-black uppercase text-blue-600 tracking-[0.3em]">Sync Accuracy</p>
+                   </div>
+                </div>
              </div>
-           </div>
+          </div>
         </section>
 
         {/* ── CTA FINAL ── */}
