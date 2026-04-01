@@ -15,19 +15,30 @@ export async function PATCH(
   const body = await req.json()
 
   try {
-    // Only allow updating certain fields to prevent breaking historical payment logic
-    const emi = await prisma.eMI.update({
-      where: { id, agencyId },
-      data: {
-        plotNumber: body.plotNumber,
-        plotRate: body.plotRate ? parseFloat(body.plotRate) : undefined,
-        totalPrice: body.totalPrice ? parseFloat(body.totalPrice) : undefined,
-        planDetails: body.planDetails,
-        status: body.status,
-      }
+    const result = await prisma.$transaction(async (tx) => {
+        const emi = await tx.eMI.update({
+          where: { id, agencyId },
+          data: {
+            plotNumber: body.plotNumber,
+            plotRate: body.plotRate ? parseFloat(body.plotRate) : undefined,
+            totalPrice: body.totalPrice ? parseFloat(body.totalPrice) : undefined,
+            planDetails: body.planDetails,
+            status: body.status,
+          }
+        })
+
+        // If status is updated to FORECLOSED, settle all pending installments
+        if (body.status === "FORECLOSED") {
+            await tx.installment.updateMany({
+                where: { emiId: id, status: "PENDING" },
+                data: { status: "PAID" }
+            })
+        }
+
+        return emi
     })
 
-    return NextResponse.json(emi)
+    return NextResponse.json(result)
   } catch (error: any) {
     return NextResponse.json({ error: "Failed to update EMI plan", details: error.message }, { status: 500 })
   }

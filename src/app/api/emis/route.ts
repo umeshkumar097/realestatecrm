@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { MessageStatus } from "@prisma/client"
 
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -157,7 +158,7 @@ export async function POST(req: NextRequest) {
                           data: {
                               content: message,
                               fromMe: true,
-                              status: "SENT", // We assume sent once VPS accepts it
+                              status: "SENT" as any, // We assume sent once VPS accepts it
                               leadId: leadId,
                               agencyId: agencyId,
                               senderId: userId
@@ -172,7 +173,11 @@ export async function POST(req: NextRequest) {
 
       return NextResponse.json(result, { status: 201 })
   } catch (error: any) {
-      console.error("[EMI Creation Error]:", error)
-      return NextResponse.json({ error: "Failed to create financial schedule", details: error.message }, { status: 500 })
+      console.error("[EMI Creation Error Details]:", error)
+      return NextResponse.json({ 
+          error: "Failed to create financial schedule", 
+          details: error.message,
+          code: error.code 
+      }, { status: 500 })
   }
 }

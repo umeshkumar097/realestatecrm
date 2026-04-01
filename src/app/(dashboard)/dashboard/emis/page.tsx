@@ -4,7 +4,7 @@ import {
   CreditCard, Calendar, User, 
   MapPin, Plus, Loader2, ArrowRight,
   TrendingUp, Clock, AlertTriangle, Building2,
-  Filter, Search, Edit3, Trash2, X
+  Filter, Search, Edit3, Trash2, X, ShieldCheck
 } from "lucide-react"
 
 export default function EMIPage() {
@@ -85,11 +85,30 @@ export default function EMIPage() {
         loadData()
       } else {
         const errData = await res.json().catch(() => ({ error: `Failed to ${isEditing ? 'update' : 'create'} EMI` }))
-        alert(errData.error || "Operation failed")
+        alert(errData.details || errData.error || "Operation failed")
       }
     } catch (err: any) {
       console.error("[EMI Save Error]:", err)
       alert("Network error. Please try again.")
+    }
+  }
+
+  const handleForeclose = async (id: string) => {
+    if (!confirm("Are you sure you want to Foreclose this plan? This will mark all remaining installments as PAID and end the plan schedule.")) return
+    try {
+      const res = await fetch(`/api/emis/${id}`, { 
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: "FORECLOSED" })
+      })
+      if (res.ok) {
+          loadData()
+      } else {
+          const errData = await res.json()
+          alert(errData.error || "Foreclosure failed")
+      }
+    } catch (err) {
+        alert("Foreclosure failed due to network error")
     }
   }
 
@@ -241,6 +260,7 @@ export default function EMIPage() {
                       </td>
                       <td className="px-6 py-4 text-right">
                         <div className="flex items-center justify-end gap-2">
+                            <button onClick={() => handleForeclose(emi.id)} title="Foreclose Plan" className="p-2 hover:bg-emerald-50 rounded-lg transition-colors"><ShieldCheck className="h-4 w-4 text-emerald-400 hover:text-emerald-600" /></button>
                             <button onClick={() => handleEdit(emi)} className="p-2 hover:bg-primary/10 rounded-lg transition-colors"><Edit3 className="h-4 w-4 text-slate-400 hover:text-primary" /></button>
                             <button onClick={() => handleDelete(emi.id)} className="p-2 hover:bg-red-50 rounded-lg transition-colors"><Trash2 className="h-4 w-4 text-slate-400 hover:text-red-500" /></button>
                             <button className="p-2 hover:bg-slate-100 rounded-lg transition-colors group-hover:bg-white border-none"><ArrowRight className="h-4 w-4 text-slate-400" /></button>
@@ -361,6 +381,7 @@ export default function EMIPage() {
                   <select className="w-full px-4 py-3 rounded-xl border border-slate-200 mt-1 bg-white text-sm font-black text-primary" value={formData.status} onChange={e => setFormData({...formData, status: e.target.value})}>
                       <option value="ACTIVE">ACTIVE</option>
                       <option value="CANCELLED">CANCELLED</option>
+                      <option value="FORECLOSED">FORECLOSED</option>
                   </select>
                 </div>
               </div>
