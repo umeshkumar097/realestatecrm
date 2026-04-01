@@ -77,13 +77,30 @@ class BaileysManager {
     return { count: sessions.length }
   }
 
+  // Global cache for Baileys version to avoid dynamic fetching on every request
+  private static cachedVersion: any = null
+
   async init(agentId: string, agencyId: string, forceReset: boolean = false) {
     if (this.instances.has(agentId) && !forceReset) {
       const inst = this.instances.get(agentId)
       if (inst?.status === "CONNECTED") return inst
     }
 
-    // Optional: Clear session directory for a fresh start if requested or if disconnected
+    // Immediately set as connecting to avoid status-glitch during async boot
+    this.instances.set(agentId, { socket: null, status: "CONNECTING" })
+
+    // Use cached version or fetch in background; default to a stable high-perf version
+    if (!BaileysManager.cachedVersion) {
+        try {
+            const { version } = await fetchLatestBaileysVersion()
+            BaileysManager.cachedVersion = version
+        } catch (e) {
+            BaileysManager.cachedVersion = [2, 3000, 1015901307] // Stable Fallback
+        }
+    }
+    const version = BaileysManager.cachedVersion
+
+    // Optional: Clear session directory for a fresh start if requested
     if (forceReset) {
         const sessionPath = path.join(process.cwd(), `sessions/${agentId}`)
         if (fs.existsSync(sessionPath)) {
@@ -91,12 +108,6 @@ class BaileysManager {
             fs.rmSync(sessionPath, { recursive: true, force: true })
         }
     }
-
-    // Immediately set as connecting to avoid status-glitch during async boot
-    this.instances.set(agentId, { socket: null, status: "CONNECTING" })
-
-    const { version, isLatest } = await fetchLatestBaileysVersion()
-    logger.info(`using WhatsApp v${version.join(".")}, isLatest: ${isLatest}`)
 
     // For better scalability, Baileys "AuthState" should be in DB.
     // However, Baileys "useMultiFileAuthState" is simpler for a startup.

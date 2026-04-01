@@ -50,7 +50,7 @@ export default function WhatsAppWebPage() {
 
   useEffect(() => {
     if (status === "connecting") {
-      const interval = setInterval(fetchStatus, 3000)
+      const interval = setInterval(fetchStatus, 1000)
       return () => clearInterval(interval)
     }
   }, [status, fetchStatus])
