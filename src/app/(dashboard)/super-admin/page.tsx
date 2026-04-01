@@ -12,24 +12,28 @@ import {
 import PlanModal from "@/components/super-admin/PlanModal"
 
 export default function SuperAdminPage() {
-  const [activeTab, setActiveTab] = useState<"AGENCIES" | "PLATFORM_LEADS" | "PLANS">("AGENCIES")
+  const [activeTab, setActiveTab] = useState<"AGENCIES" | "PLATFORM_LEADS" | "PLANS" | "COUPONS">("AGENCIES")
   const [agencies, setAgencies] = useState<any[]>([])
   const [platformLeads, setPlatformLeads] = useState<any[]>([])
   const [plans, setPlans] = useState<any[]>([])
+  const [coupons, setCoupons] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState("")
   const [selectedPlan, setSelectedPlan] = useState<any>(null)
+  const [selectedCoupon, setSelectedCoupon] = useState<any>(null)
   const [showPlanModal, setShowPlanModal] = useState(false)
+  const [showCouponModal, setShowCouponModal] = useState(false)
   const [globalStats, setGlobalStats] = useState<any>(null)
 
   const fetchData = async () => {
     try {
       setLoading(true)
-      const [agenciesRes, statsRes, platformLeadsRes, plansRes] = await Promise.all([
+      const [agenciesRes, statsRes, platformLeadsRes, plansRes, couponsRes] = await Promise.all([
         fetch("/api/super-admin/agencies"),
         fetch("/api/super-admin/stats"),
         fetch("/api/super-admin/platform-leads"),
-        fetch("/api/super-admin/plans")
+        fetch("/api/super-admin/plans"),
+        fetch("/api/super-admin/coupons")
       ])
       
       if (agenciesRes.ok) {
@@ -50,6 +54,11 @@ export default function SuperAdminPage() {
       if (plansRes.ok) {
         const data = await plansRes.json()
         setPlans(data)
+      }
+
+      if (couponsRes.ok) {
+          const data = await couponsRes.json()
+          setCoupons(data)
       }
     } catch (err) {
       console.error("Failed to fetch superadmin data", err)
@@ -118,9 +127,7 @@ export default function SuperAdminPage() {
         </div>
       </div>
 
-      {/* Stats row can stay same or add lead count */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-         {/* ...stats same... */}
       </div>
 
       <div className="flex items-center gap-1 bg-zinc-100 p-1.5 rounded-2xl w-fit">
@@ -141,6 +148,12 @@ export default function SuperAdminPage() {
             className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "PLANS" ? "bg-white text-primary shadow-sm" : "text-zinc-500 hover:text-zinc-900"}`}
           >
             Subscription Plans
+          </button>
+          <button 
+            onClick={() => setActiveTab("COUPONS")}
+            className={`px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${activeTab === "COUPONS" ? "bg-white text-primary shadow-sm" : "text-zinc-500 hover:text-zinc-900"}`}
+          >
+            Promos & Coupons
           </button>
       </div>
 
@@ -276,7 +289,7 @@ export default function SuperAdminPage() {
               </tbody>
             </table>
           </div>
-        ) : (
+        ) : activeTab === "PLANS" ? (
           <div className="p-8">
             <div className="flex items-center justify-between mb-8">
                 <div>
@@ -304,7 +317,7 @@ export default function SuperAdminPage() {
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {plans.map(plan => (
+                {(plans || []).map(plan => (
                     <div key={plan.id} className="bg-zinc-50 border border-zinc-100 rounded-[32px] p-8 relative overflow-hidden group">
                         <div className="absolute top-0 right-0 p-6 opacity-0 group-hover:opacity-100 transition-opacity">
                             <button onClick={() => { setSelectedPlan(plan); setShowPlanModal(true); }} className="p-2 bg-white shadow-sm rounded-xl text-zinc-400 hover:text-primary transition-colors"><Settings size={18}/></button>
@@ -329,24 +342,95 @@ export default function SuperAdminPage() {
                                 <span>Agent Limit</span>
                                 <span className="font-black text-zinc-900">{plan.maxAgents} Agents</span>
                             </div>
-                            <div className="flex items-center justify-between text-xs font-bold text-zinc-600">
-                                <span>Lead Limit</span>
-                                <span className="font-black text-zinc-900">{plan.maxLeads} /mo</span>
-                            </div>
-                        </div>
-
-                        <div className="space-y-2">
-                             <p className="text-[10px] font-black uppercase text-zinc-400 tracking-widest mb-3">Included Services</p>
-                             {plan.features?.slice(0, 3).map((f: string, i: number) => (
-                                 <div key={i} className="flex items-center gap-2 text-[10px] font-bold text-zinc-500 uppercase tracking-tight">
-                                     <CheckCircle2 size={12} className="text-emerald-500" />
-                                     {f}
-                                 </div>
-                             ))}
-                             {plan.features?.length > 3 && <p className="text-[10px] font-bold text-primary">+{plan.features.length - 3} more services...</p>}
                         </div>
                     </div>
                 ))}
+            </div>
+          </div>
+        ) : (
+          <div className="p-8">
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                    <h2 className="text-xl font-black tracking-tight">Promotional Campaigns</h2>
+                    <p className="text-xs text-zinc-500 font-bold uppercase tracking-widest mt-0.5">Generate gift codes for bypassing payments</p>
+                </div>
+                <button 
+                    onClick={() => setShowCouponModal(true)}
+                    className="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-2xl font-black tracking-tight shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all"
+                >
+                    <Plus size={18}/> Create Gift Code
+                </button>
+            </div>
+
+            <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                    <thead>
+                        <tr className="bg-zinc-50 border-b border-zinc-100">
+                            <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-zinc-500">Promo Code</th>
+                            <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-zinc-500">Unlocks Plan</th>
+                            <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-zinc-500">Utilization</th>
+                            <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-zinc-500">Expiry</th>
+                            <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-zinc-500">Status</th>
+                            <th className="px-6 py-4"></th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-zinc-50">
+                        {coupons.map((coupon) => (
+                            <tr key={coupon.id} className="hover:bg-zinc-50 transition-colors group">
+                                <td className="px-6 py-4">
+                                    <span className="px-3 py-1.5 bg-zinc-900 text-white rounded-lg font-black text-xs tracking-widest uppercase">
+                                        {coupon.code}
+                                    </span>
+                                </td>
+                                <td className="px-6 py-4">
+                                    <span className="text-sm font-black text-primary">{coupon.plan?.name}</span>
+                                </td>
+                                <td className="px-6 py-4">
+                                    <div className="flex flex-col">
+                                        <span className="text-xs font-black text-zinc-800">{coupon.usedCount} / {coupon.maxUses} used</span>
+                                        <div className="w-24 h-1.5 bg-zinc-100 rounded-full mt-1 overflow-hidden">
+                                            <div 
+                                                className="h-full bg-emerald-500 transition-all" 
+                                                style={{ width: `${(coupon.usedCount / coupon.maxUses) * 100}%` }}
+                                            />
+                                        </div>
+                                    </div>
+                                </td>
+                                <td className="px-6 py-4">
+                                    <span className="text-xs font-bold text-zinc-500">
+                                        {coupon.expiresAt ? new Date(coupon.expiresAt).toLocaleDateString() : "Never Expires"}
+                                    </span>
+                                </td>
+                                <td className="px-6 py-4">
+                                    <span className={`text-[10px] font-black px-2 py-0.5 rounded-full uppercase ${
+                                        coupon.isActive ? "bg-emerald-100 text-emerald-700" : "bg-red-100 text-red-700"
+                                    }`}>
+                                        {coupon.isActive ? "Active" : "Disabled"}
+                                    </span>
+                                </td>
+                                <td className="px-6 py-4 text-right">
+                                    <button 
+                                        onClick={async () => {
+                                            if (!confirm("Delete this promo code?")) return
+                                            await fetch(`/api/super-admin/coupons/${coupon.id}`, { method: "DELETE" })
+                                            fetchData()
+                                        }}
+                                        className="p-2 text-zinc-300 hover:text-red-500 transition-colors"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                        {coupons.length === 0 && (
+                            <tr>
+                                <td colSpan={6} className="px-6 py-12 text-center text-zinc-400 font-bold text-sm">
+                                    No promotional campaigns active.
+                                </td>
+                            </tr>
+                        )}
+                    </tbody>
+                </table>
             </div>
           </div>
         )}
@@ -358,6 +442,91 @@ export default function SuperAdminPage() {
           onSave={() => fetchData()}
           plan={selectedPlan}
         />
+      )}
+
+      {showCouponModal && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] flex items-center justify-center p-6">
+              <div className="bg-white w-full max-w-md rounded-[32px] overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
+                  <div className="p-8 border-b border-zinc-100 flex items-center justify-between bg-zinc-50/50">
+                      <div>
+                          <h2 className="text-xl font-black tracking-tight">New Promo Code</h2>
+                          <p className="text-xs text-zinc-500 font-bold uppercase tracking-widest mt-1">Configure usage & expiry</p>
+                      </div>
+                      <button onClick={() => setShowCouponModal(false)} className="p-2 hover:bg-zinc-200 rounded-xl">
+                          <X size={20} className="text-zinc-400" />
+                      </button>
+                  </div>
+                  
+                  <form className="p-8 space-y-5" onSubmit={async (e) => {
+                      e.preventDefault()
+                      const formData = new FormData(e.currentTarget)
+                      const data = Object.fromEntries(formData.entries())
+                      
+                      const res = await fetch("/api/super-admin/coupons", {
+                          method: "POST",
+                          body: JSON.stringify(data)
+                      })
+                      
+                      if (res.ok) {
+                          setShowCouponModal(false)
+                          fetchData()
+                      } else {
+                          const err = await res.json()
+                          alert(err.error || "Failed to create coupon")
+                      }
+                  }}>
+                      <div className="space-y-1.5">
+                          <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Promo Code</label>
+                          <input 
+                            name="code" 
+                            required 
+                            placeholder="REPURPOSE2026"
+                            className="w-full px-5 py-4 bg-zinc-50 border border-zinc-200 rounded-2xl text-sm font-bold focus:ring-4 focus:ring-primary/10 outline-none transition-all uppercase"
+                          />
+                      </div>
+
+                      <div className="space-y-1.5">
+                          <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Unlocks Package</label>
+                          <select 
+                            name="planId" 
+                            required
+                            className="w-full px-5 py-4 bg-zinc-50 border border-zinc-200 rounded-2xl text-sm font-bold focus:ring-4 focus:ring-primary/10 outline-none transition-all"
+                          >
+                              {plans.filter(p => p.isPublic).map(p => (
+                                  <option key={p.id} value={p.id}>{p.name}</option>
+                              ))}
+                          </select>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Usage Limit</label>
+                            <input 
+                                type="number"
+                                name="maxUses" 
+                                defaultValue={10}
+                                className="w-full px-5 py-4 bg-zinc-50 border border-zinc-200 rounded-2xl text-sm font-bold focus:ring-4 focus:ring-primary/10 outline-none transition-all"
+                            />
+                        </div>
+                        <div className="space-y-1.5">
+                            <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">Expiry Date</label>
+                            <input 
+                                type="date"
+                                name="expiresAt" 
+                                className="w-full px-5 py-4 bg-zinc-50 border border-zinc-200 rounded-2xl text-sm font-bold focus:ring-4 focus:ring-primary/10 outline-none transition-all"
+                            />
+                        </div>
+                      </div>
+
+                      <button 
+                        type="submit"
+                        className="w-full py-5 bg-primary text-white rounded-[24px] font-black flex items-center justify-center gap-3 shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all uppercase tracking-widest text-xs mt-4"
+                      >
+                          Deploy Promo Code <ArrowUpRight className="h-4 w-4" />
+                      </button>
+                  </form>
+              </div>
+          </div>
       )}
     </div>
   )
