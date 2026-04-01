@@ -23,6 +23,8 @@ interface WhatsAppInstance {
 
 class BaileysManager {
   private instances: Map<string, WhatsAppInstance> = new Map()
+  private initLocks: Map<string, Promise<any>> = new Map()
+  private static cachedVersion: any = null
 
   constructor() {}
 
@@ -42,11 +44,21 @@ class BaileysManager {
   }
 
   async getInstance(agentId: string) {
-    const instance = this.instances.get(agentId)
-    if (instance) {
-      logger.info(`[Baileys] Getting instance for ${agentId}: ${instance.status}`)
+    return this.instances.get(agentId)
+  }
+
+  async resetAll() {
+    logger.info("[Baileys] Resetting all global instances")
+    const agentIds = Array.from(this.instances.keys())
+    for (const agentId of agentIds) {
+      await this.logout(agentId).catch(err => logger.error(`[Baileys] Reset logout failed for ${agentId}: ${err}`))
     }
-    return instance
+    
+    const sessions = await prisma.whatsAppSession.findMany({ where: { status: "CONNECTED" } })
+    for (const session of sessions) {
+      this.init(session.agentId, session.agencyId).catch(err => logger.error(`[Baileys] Reset init failed for ${session.agentId}: ${err}`))
+    }
+    return { count: sessions.length }
   }
 
   getAllInstances() {
@@ -56,217 +68,159 @@ class BaileysManager {
     }))
   }
 
-  async resetAll() {
-    logger.info("[Baileys] Resetting all global instances")
-    const agentIds = Array.from(this.instances.keys())
-    for (const agentId of agentIds) {
-      await this.logToSystem(`Reset: Logged out agent ${agentId}`, "WARN")
-      await this.logout(agentId).catch(err => logger.error(`[Baileys] Reset logout failed for ${agentId}: ${err}`))
-    }
-    
-    // Re-initialize all from DB
-    const sessions = await prisma.whatsAppSession.findMany({
-      where: { status: "CONNECTED" }
-    })
-    
-    await this.logToSystem(`Reset: Re-initializing ${sessions.length} sessions`, "INFO")
-    for (const session of sessions) {
-      this.init(session.agentId, session.agencyId).catch(err => logger.error(`[Baileys] Reset init failed for ${session.agentId}: ${err}`))
-    }
-    
-    return { count: sessions.length }
-  }
-
-  // Global cache for Baileys version to avoid dynamic fetching on every request
-  private static cachedVersion: any = null
-
-  async init(agentId: string, agencyId: string, forceReset: boolean = false) {
-    if (this.instances.has(agentId) && !forceReset) {
-      const inst = this.instances.get(agentId)
-      if (inst?.status === "CONNECTED") return inst
+  async init(agentId: string, agencyId: string, forceReset: boolean = false): Promise<any> {
+    if (this.initLocks.has(agentId)) {
+        logger.info(`[Baileys] Already initializing for ${agentId}, waiting for lock...`)
+        return this.initLocks.get(agentId)
     }
 
-    // Immediately set as connecting to avoid status-glitch during async boot
-    this.instances.set(agentId, { socket: null, status: "CONNECTING" })
-
-    // Use cached version or fetch in background; default to a stable high-perf version
-    if (!BaileysManager.cachedVersion) {
+    const initPromise = (async () => {
         try {
-            const { version } = await fetchLatestBaileysVersion()
-            BaileysManager.cachedVersion = version
-        } catch (e) {
-            BaileysManager.cachedVersion = [2, 3000, 1015901307] // Stable Fallback
-        }
-    }
-    const version = BaileysManager.cachedVersion
-
-    // Optional: Clear session directory for a fresh start if requested
-    if (forceReset) {
-        const sessionPath = path.join(process.cwd(), `sessions/${agentId}`)
-        if (fs.existsSync(sessionPath)) {
-            logger.info(`[Baileys] Force-resetting session for ${agentId}`)
-            fs.rmSync(sessionPath, { recursive: true, force: true })
-        }
-    }
-
-    // For better scalability, Baileys "AuthState" should be in DB.
-    // However, Baileys "useMultiFileAuthState" is simpler for a startup.
-    // We'll use a local folder path based on agentId for now, but in prod we'd sync this to S3/DB.
-    const { state, saveCreds } = await useMultiFileAuthState(`sessions/${agentId}`)
-
-    const socket = makeWASocket({
-      version,
-      printQRInTerminal: false,
-      auth: state,
-      logger,
-      browser: ["PropCRM", "Chrome", "1.0.0"],
-    })
-
-    const instance = this.instances.get(agentId)!
-    instance.socket = socket
-
-    // Handle connection updates
-    socket.ev.on("connection.update", async (update) => {
-      const { connection, lastDisconnect, qr } = update
-      
-      if (qr) {
-        instance.qr = qr
-        instance.status = "CONNECTING"
-        await prisma.whatsAppSession.upsert({
-          where: { agentId },
-          update: { qrCode: qr, status: "CONNECTING" },
-          create: { agentId, agencyId, sessionData: "{}", qrCode: qr, status: "CONNECTING" }
-        })
-      }
-
-      if (connection === "close") {
-        const shouldReconnect = (lastDisconnect?.error as Boom)?.output?.statusCode !== DisconnectReason.loggedOut
-        logger.info(`connection closed due to ${lastDisconnect?.error}, reconnecting ${shouldReconnect}`)
-        
-        if (!shouldReconnect) {
-          instance.status = "DISCONNECTED"
-          instance.qr = undefined
-          await this.logToSystem(`Connection Closed: ${agentId}`, "ERROR", { error: lastDisconnect?.error?.message })
-          await prisma.whatsAppSession.update({
-            where: { agentId },
-            data: { status: "DISCONNECTED", qrCode: null }
-          })
-          this.instances.delete(agentId)
-        } else {
-          instance.status = "CONNECTING"
-          await this.logToSystem(`Connection Retrying: ${agentId}`, "WARN")
-          this.init(agentId, agencyId)
-        }
-      } else if (connection === "open") {
-        logger.info("opened connection")
-        instance.status = "CONNECTED"
-        instance.qr = undefined
-        await this.logToSystem(`Connection Opened: ${agentId}`, "INFO")
-        await prisma.whatsAppSession.update({
-          where: { agentId },
-          data: { status: "CONNECTED", qrCode: null, phoneNumber: socket.user?.id.split(":")[0] }
-        })
-      }
-    })
-
-    // Save credentials when updated
-    socket.ev.on("creds.update", saveCreds)
-
-    // Handle historical chat sync
-    socket.ev.on("messaging-history.set", async ({ chats, contacts, messages, isLatest }) => {
-      logger.info(`Received messaging history: ${chats.length} chats, ${messages.length} messages`)
-      
-      for (const chat of chats) {
-        // Only sync personal chats, no groups
-        if (chat.id && chat.id.endsWith("@s.whatsapp.net")) {
-          const phoneNumber = chat.id.split("@")[0]
-          
-          await prisma.lead.upsert({
-            where: { phone_agencyId: { phone: phoneNumber, agencyId } },
-            update: { updatedAt: new Date() },
-            create: {
-              phone: phoneNumber,
-              name: chat.name || "WhatsApp User",
-              agencyId,
-              assignedToId: agentId,
-              source: "WHATSAPP",
-              notes: "Synced from WhatsApp History"
+            if (this.instances.has(agentId) && !forceReset) {
+              const inst = this.instances.get(agentId)
+              if (inst?.status === "CONNECTED") return inst
             }
-          })
-        }
-      }
-    })
 
-    // Handle messages
-    socket.ev.on("messages.upsert", async (m) => {
-      if (m.type === "notify") {
-        for (const msg of m.messages) {
-          if (!msg.key.fromMe && msg.message) {
-            await this.handleIncomingMessage(agentId, agencyId, msg)
-          }
-        }
-      }
-    })
+            this.instances.set(agentId, { socket: null, status: "CONNECTING" })
 
-    return instance
+            // Handshake Timeout Sentinel (15s)
+            const timeout = setTimeout(() => {
+                const inst = this.instances.get(agentId)
+                if (inst && inst.status === "CONNECTING" && !inst.qr) {
+                    logger.error(`[Baileys] Handshake timeout for ${agentId}`)
+                    inst.status = "DISCONNECTED"
+                    this.initLocks.delete(agentId)
+                }
+            }, 15000)
+
+            if (forceReset) {
+                const sessionPath = path.join(process.cwd(), `sessions/${agentId}`)
+                if (fs.existsSync(sessionPath)) {
+                    logger.info(`[Baileys] Force-resetting session for ${agentId}`)
+                    fs.rmSync(sessionPath, { recursive: true, force: true })
+                }
+            }
+
+            if (!BaileysManager.cachedVersion) {
+                try {
+                    const { version } = await fetchLatestBaileysVersion()
+                    BaileysManager.cachedVersion = version
+                } catch (e) {
+                    BaileysManager.cachedVersion = [2, 3000, 1015901307]
+                }
+            }
+            const version = BaileysManager.cachedVersion
+
+            const { state, saveCreds } = await useMultiFileAuthState(`sessions/${agentId}`)
+            const socket = makeWASocket({
+              version,
+              printQRInTerminal: false,
+              auth: state,
+              logger,
+              browser: ["PropCRM", "Chrome", "1.0.0"],
+            })
+
+            const instance = this.instances.get(agentId)!
+            instance.socket = socket
+
+            socket.ev.on("connection.update", async (update) => {
+              const { connection, lastDisconnect, qr } = update
+              if (qr) {
+                instance.qr = qr
+                instance.status = "CONNECTING"
+                await prisma.whatsAppSession.upsert({
+                  where: { agentId },
+                  update: { qrCode: qr, status: "CONNECTING" },
+                  create: { agentId, agencyId, sessionData: "{}", qrCode: qr, status: "CONNECTING" }
+                })
+              }
+
+              if (connection === "close") {
+                const shouldReconnect = (lastDisconnect?.error as Boom)?.output?.statusCode !== DisconnectReason.loggedOut
+                if (!shouldReconnect) {
+                  instance.status = "DISCONNECTED"
+                  instance.qr = undefined
+                  this.instances.delete(agentId)
+                  await prisma.whatsAppSession.update({ where: { agentId }, data: { status: "DISCONNECTED", qrCode: null }})
+                } else {
+                  this.init(agentId, agencyId)
+                }
+              } else if (connection === "open") {
+                instance.status = "CONNECTED"
+                instance.qr = undefined
+                await prisma.whatsAppSession.update({
+                  where: { agentId },
+                  data: { status: "CONNECTED", qrCode: null, phoneNumber: socket.user?.id.split(":")[0] }
+                })
+              }
+            })
+
+            socket.ev.on("creds.update", saveCreds)
+
+            socket.ev.on("messaging-history.set", async ({ chats }) => {
+              for (const chat of chats) {
+                if (chat.id && chat.id.endsWith("@s.whatsapp.net")) {
+                   await prisma.lead.upsert({
+                    where: { phone_agencyId: { phone: chat.id.split("@")[0], agencyId } },
+                    update: { updatedAt: new Date() },
+                    create: {
+                      phone: chat.id.split("@")[0],
+                      name: chat.name || "WhatsApp User",
+                      agencyId,
+                      assignedToId: agentId,
+                      source: "WHATSAPP",
+                      notes: "Synced from WhatsApp History"
+                    }
+                  })
+                }
+              }
+            })
+
+            socket.ev.on("messages.upsert", async (m) => {
+              if (m.type === "notify") {
+                for (const msg of m.messages) {
+                  if (!msg.key.fromMe && msg.message) {
+                    await this.handleIncomingMessage(agentId, agencyId, msg)
+                  }
+                }
+              }
+            })
+
+            return instance
+        } catch (e) {
+            logger.error(`[Baileys] Init error for ${agentId}: ${e}`)
+            this.instances.delete(agentId)
+            throw e
+        } finally {
+            this.initLocks.delete(agentId)
+        }
+    })()
+
+    this.initLocks.set(agentId, initPromise)
+    return initPromise
   }
 
   private async handleIncomingMessage(agentId: string, agencyId: string, msg: proto.IWebMessageInfo) {
-    if (!msg.key) return
-    const remoteJid = msg.key.remoteJid
-    if (!remoteJid || !remoteJid.endsWith("@s.whatsapp.net")) return
-
-    const phoneNumber = remoteJid.split("@")[0]
+    if (!msg.key || !msg.key.remoteJid?.endsWith("@s.whatsapp.net")) return
+    const phoneNumber = msg.key.remoteJid.split("@")[0]
     const content = msg.message?.conversation || msg.message?.extendedTextMessage?.text || ""
-    const senderName = msg.pushName || "WhatsApp User"
-
+    
     try {
-      // 1. Find or create lead
       const lead = await prisma.lead.upsert({
         where: { phone_agencyId: { phone: phoneNumber, agencyId } },
         update: { updatedAt: new Date() },
-        create: {
-          phone: phoneNumber,
-          name: senderName,
-          agencyId,
-          assignedToId: agentId,
-          source: "WHATSAPP",
-          notes: "Auto-created from WhatsApp message"
-        }
+        create: { phone: phoneNumber, name: msg.pushName || "WhatsApp User", agencyId, assignedToId: agentId, source: "WHATSAPP" }
       })
 
-      // 2. Save message
       await prisma.message.create({
-        data: {
-          content,
-          fromMe: false,
-          leadId: lead.id,
-          agencyId,
-          timestamp: new Date(Number(msg.messageTimestamp) * 1000)
-        }
+        data: { content, fromMe: false, leadId: lead.id, agencyId, timestamp: new Date(Number(msg.messageTimestamp) * 1000) }
       })
 
-      // 3. Trigger Webhook API (to notify FE via Socket.io / AI)
-      const { extracted } = await (await fetch(`${process.env.NEXTAUTH_URL}/api/webhook/whatsapp`, {
+      await fetch(`${process.env.NEXTAUTH_URL}/api/webhook/whatsapp`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          agentId,
-          agencyId,
-          leadId: lead.id,
-          message: content,
-          phone: phoneNumber
-        })
-      })).json().catch(() => ({ extracted: {} }))
-
-      // 4. Auto-Reply if it's a first-time message or has high intent
-      if (content.length > 2) {
-        const replyText = `Hi ${senderName}! Thanks for reaching out. We've noted your interest in ${extracted.propertyType || 'our properties'} in ${extracted.location || 'this area'}. An agent will call you shortly.`
-        await this.sendMessage(agentId, remoteJid, replyText).catch(e => logger.error("Auto-reply failed"))
-      }
-
-      await this.logToSystem(`Message Received: ${phoneNumber}`, "INFO", { agentId, content: content.substring(0, 100) })
-      logger.info(`Lead ${lead.id} received message: ${content}`)
+        body: JSON.stringify({ agentId, agencyId, leadId: lead.id, message: content, phone: phoneNumber })
+      }).catch(() => null)
 
     } catch (err) {
       logger.error(`Error handling WhatsApp message: ${err}`)
@@ -275,56 +229,28 @@ class BaileysManager {
 
   async sendMessage(agentId: string, remoteJid: string, text: string) {
     const instance = this.instances.get(agentId)
-    if (!instance || instance.status !== "CONNECTED") {
-      throw new Error("WhatsApp instance not connected")
-    }
-
+    if (!instance || instance.status !== "CONNECTED") throw new Error("WhatsApp instance not connected")
+    
     const jid = remoteJid.includes("@") ? remoteJid : `${remoteJid}@s.whatsapp.net`
     const sentMsg = await instance.socket.sendMessage(jid, { text })
     
-    // Save outbound message to DB
-    const phoneNumber = jid.split("@")[0]
-    const lead = await prisma.lead.findFirst({
-      where: { phone: phoneNumber }
-    })
-
+    const lead = await prisma.lead.findFirst({ where: { phone: jid.split("@")[0], agencyId: (instance.socket.user as any)?.agencyId || "" } })
     if (lead) {
-      await prisma.message.create({
-        data: {
-          content: text,
-          fromMe: true,
-          leadId: lead.id,
-          agencyId: lead.agencyId,
-          timestamp: new Date()
-        }
-      })
+      await prisma.message.create({ data: { content: text, fromMe: true, leadId: lead.id, agencyId: lead.agencyId, timestamp: new Date() }})
     }
-
     return sentMsg
   }
 
   async logout(agentId: string) {
-    logger.info(`[Baileys] Logging out agent: ${agentId}`)
     const instance = this.instances.get(agentId)
     if (instance) {
-      try {
-        await instance.socket.logout()
-      } catch (e) {
-        logger.error(`[Baileys] Logout error for ${agentId}: ${e}`)
-      }
+      await instance.socket.logout().catch(() => null)
       this.instances.delete(agentId)
-      await prisma.whatsAppSession.update({
-        where: { agentId },
-        data: { status: "DISCONNECTED", sessionData: "{}" }
-      })
-      logger.info(`[Baileys] Logout successful for ${agentId}`)
-    } else {
-      logger.warn(`[Baileys] No active instance found to logout for ${agentId}`)
+      await prisma.whatsAppSession.update({ where: { agentId }, data: { status: "DISCONNECTED", sessionData: "{}" }})
     }
   }
 }
 
-// Global singleton
 const globalForBaileys = global as unknown as { baileysManager: BaileysManager }
 export const baileysManager = globalForBaileys.baileysManager || new BaileysManager()
-if (process.env.NODE_ENV !== "production") globalForBaileys.baileysManager = baileysManager
+globalForBaileys.baileysManager = baileysManager

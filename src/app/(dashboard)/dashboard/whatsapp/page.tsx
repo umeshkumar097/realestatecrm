@@ -16,6 +16,7 @@ export default function WhatsAppWebPage() {
   const [status, setStatus] = useState<Status>("disconnected")
   const [qr, setQr] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<"CONNECT" | "WEBHOOK">("CONNECT")
 
   // Webhook States
@@ -38,10 +39,18 @@ export default function WhatsAppWebPage() {
       if (!res.ok) return
       const data = await res.json()
       const normalizedStatus = data.status?.toLowerCase() as Status
+      
+      // If we were connecting but now disconnected and no QR, it's a failure
+      if (status === "connecting" && normalizedStatus === "disconnected" && !data.qr) {
+          setError("Handshake timed out or session was rejected. Please try 'Force Reset'.")
+      } else if (normalizedStatus === "connected") {
+          setError(null)
+      }
+
       setStatus(normalizedStatus || "disconnected")
       setQr(data.qr ?? null)
     } catch (err) { console.error("Status fetch error", err) }
-  }, [])
+  }, [status])
 
   useEffect(() => {
     fetchStatus()
@@ -188,6 +197,15 @@ export default function WhatsAppWebPage() {
                                     <h2 className="text-xl font-black text-slate-800">Booting WhatsApp Cluster</h2>
                                     <p className="text-xs font-black text-zinc-400 uppercase tracking-widest">Generating Digital Handshake...</p>
                                 </div>
+                                
+                                {error && (
+                                    <div className="p-4 bg-red-50 border border-red-100 rounded-2xl animate-in fade-in slide-in-from-top-1">
+                                        <p className="text-[10px] font-black uppercase text-red-500 tracking-widest text-center leading-relaxed">
+                                            {error}
+                                        </p>
+                                    </div>
+                                )}
+
                                 <button 
                                     onClick={() => handleConnect(true)}
                                     className="px-6 py-3 bg-zinc-100 border border-zinc-200 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-white transition-all text-zinc-500"
