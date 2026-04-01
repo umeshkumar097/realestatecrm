@@ -17,7 +17,8 @@ import {
   ShieldCheck,
   Activity,
   Code,
-  Zap
+  Zap,
+  BookOpen
 } from "lucide-react"
 import { signOut, useSession } from "next-auth/react"
 import { cn } from "@/lib/utils"
@@ -148,6 +149,18 @@ export default function DashboardClientLayout({
               >
                 <Zap className={cn("h-4 w-4", pathname === '/dashboard/developer/webhooks' ? "text-white" : "text-zinc-400 group-hover:text-zinc-600")} />
                 Webhooks
+              </Link>
+              <Link
+                href="/dashboard/developer/docs"
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all group",
+                  pathname === '/dashboard/developer/docs' 
+                    ? "bg-zinc-900 text-white shadow-md shadow-zinc-900/10" 
+                    : "text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100"
+                )}
+              >
+                <BookOpen className={cn("h-4 w-4", pathname === '/dashboard/developer/docs' ? "text-white" : "text-zinc-400 group-hover:text-zinc-600")} />
+                API Documentation
               </Link>
             </div>
           </div>

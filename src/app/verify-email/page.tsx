@@ -49,6 +49,45 @@ function VerifyEmailContent() {
     }
   }
 
+  const [resendCooldown, setResendCooldown] = useState(0)
+
+  useEffect(() => {
+    let timer: any
+    if (resendCooldown > 0) {
+      timer = setInterval(() => {
+        setResendCooldown((prev) => prev - 1)
+      }, 1000)
+    }
+    return () => clearInterval(timer)
+  }, [resendCooldown])
+
+  const handleResend = async () => {
+    if (resendCooldown > 0) return
+    setLoading(true)
+    setError("")
+
+    try {
+      const res = await fetch("/api/auth/resend-verification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to resend code")
+      }
+
+      alert("Success: A fresh 6-digit OTP has been dispatched to your inbox.")
+      setResendCooldown(60)
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   if (success) {
     return (
       <div className="text-center space-y-6 animate-in fade-in zoom-in duration-500">
@@ -114,7 +153,14 @@ function VerifyEmailContent() {
 
         <div className="mt-8 text-center">
           <p className="text-sm text-slate-500 font-bold">
-            Didn't get the code? <button className="text-blue-600 hover:underline">Resend Email</button>
+            Didn't get the code?{" "}
+            <button 
+              onClick={handleResend}
+              disabled={loading || resendCooldown > 0}
+              className="text-blue-600 hover:underline disabled:text-slate-400 disabled:no-underline"
+            >
+              {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend Email"}
+            </button>
           </p>
         </div>
       </div>
