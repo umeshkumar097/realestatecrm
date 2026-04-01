@@ -10,6 +10,9 @@ import {
 import { Boom } from "@hapi/boom"
 import pino from "pino"
 import { prisma } from "@/lib/prisma"
+import fs from "fs"
+import path from "path"
+
 const logger = pino({ level: "info" })
 
 interface WhatsAppInstance {
@@ -74,10 +77,19 @@ class BaileysManager {
     return { count: sessions.length }
   }
 
-  async init(agentId: string, agencyId: string) {
-    if (this.instances.has(agentId)) {
+  async init(agentId: string, agencyId: string, forceReset: boolean = false) {
+    if (this.instances.has(agentId) && !forceReset) {
       const inst = this.instances.get(agentId)
       if (inst?.status === "CONNECTED") return inst
+    }
+
+    // Optional: Clear session directory for a fresh start if requested or if disconnected
+    if (forceReset) {
+        const sessionPath = path.join(process.cwd(), `sessions/${agentId}`)
+        if (fs.existsSync(sessionPath)) {
+            logger.info(`[Baileys] Force-resetting session for ${agentId}`)
+            fs.rmSync(sessionPath, { recursive: true, force: true })
+        }
     }
 
     // Immediately set as connecting to avoid status-glitch during async boot

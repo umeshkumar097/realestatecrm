@@ -55,12 +55,12 @@ export default function WhatsAppWebPage() {
     }
   }, [status, fetchStatus])
 
-  const handleConnect = async () => {
+  const handleConnect = async (force: boolean = false) => {
     setLoading(true)
     const res = await fetch("/api/whatsapp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "connect" }),
+      body: JSON.stringify({ action: "connect", force }),
     })
     if (!res.ok) alert("Connection failed")
     setStatus("connecting")
@@ -167,17 +167,33 @@ export default function WhatsAppWebPage() {
                                     <img src={qr} alt="WhatsApp QR" className="w-[320px] h-[320px]" />
                                 </div>
                             </div>
-                            <div className="bg-amber-50 rounded-2xl p-4 flex items-center justify-center gap-3 text-amber-700">
-                                <RefreshCw size={14} className="animate-spin" />
-                                <p className="text-[10px] font-black uppercase tracking-widest">Polling Secure Gateway...</p>
+                            <div className="flex flex-col items-center gap-4">
+                                <div className="bg-amber-50 rounded-2xl p-4 flex items-center justify-center gap-3 text-amber-700">
+                                    <RefreshCw size={14} className="animate-spin" />
+                                    <p className="text-[10px] font-black uppercase tracking-widest">Polling Secure Gateway...</p>
+                                </div>
+                                <button 
+                                    onClick={() => handleConnect(true)}
+                                    className="text-[9px] font-black uppercase text-zinc-400 hover:text-primary transition-colors underline underline-offset-4"
+                                >
+                                    QR Not showing? Force Reset
+                                </button>
                             </div>
                         </div>
                     ) : status === "connecting" ? (
-                        <div className="space-y-6">
+                        <div className="space-y-8">
                             <Loader2 size={64} className="animate-spin text-amber-500 mx-auto" />
-                            <div className="space-y-2">
-                                <h2 className="text-xl font-black text-slate-800">Booting WhatsApp Cluster</h2>
-                                <p className="text-xs font-black text-zinc-400 uppercase tracking-widest">Generating Digital Handshake...</p>
+                            <div className="space-y-4">
+                                <div className="space-y-2">
+                                    <h2 className="text-xl font-black text-slate-800">Booting WhatsApp Cluster</h2>
+                                    <p className="text-xs font-black text-zinc-400 uppercase tracking-widest">Generating Digital Handshake...</p>
+                                </div>
+                                <button 
+                                    onClick={() => handleConnect(true)}
+                                    className="px-6 py-3 bg-zinc-100 border border-zinc-200 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-white transition-all text-zinc-500"
+                                >
+                                    Taking too long? Force New QR
+                                </button>
                             </div>
                         </div>
                     ) : (
@@ -204,13 +220,13 @@ export default function WhatsAppWebPage() {
                             {loading ? <Loader2 className="animate-spin" /> : <><XCircle size={16} /> Disconnect Device</>}
                         </button>
                     ) : (
-                        <button 
-                            onClick={handleConnect}
-                            disabled={loading || status === "connecting"}
-                            className="w-full py-5 bg-emerald-500 text-white rounded-3xl text-sm font-black uppercase tracking-[0.2em] shadow-xl shadow-emerald-500/20 hover:scale-[1.01] active:scale-95 transition-all flex items-center justify-center gap-3 disabled:bg-zinc-200 disabled:text-zinc-400 disabled:shadow-none"
-                        >
-                            {loading ? <Loader2 className="animate-spin" /> : <><MessageSquare size={18} /> Connect Core Handset</>}
-                        </button>
+                                <button 
+                                    onClick={() => handleConnect(false)}
+                                    disabled={loading || status === "connecting"}
+                                    className="w-full py-5 bg-emerald-500 text-white rounded-3xl text-sm font-black uppercase tracking-[0.2em] shadow-xl shadow-emerald-500/20 hover:scale-[1.01] active:scale-95 transition-all flex items-center justify-center gap-3 disabled:bg-zinc-200 disabled:text-zinc-400 disabled:shadow-none"
+                                >
+                                    {loading ? <Loader2 className="animate-spin" /> : <><MessageSquare size={18} /> Connect Core Handset</>}
+                                </button>
                     )}
                 </div>
             </div>

@@ -49,9 +49,10 @@ export async function POST(req: NextRequest) {
   const { id: userId, agencyId } = (session.user as any)
 
   if (action === "connect") {
+    const { force } = await req.json().catch(() => ({ force: false }))
     if (!agencyId) return NextResponse.json({ error: "No agency assigned to your profile" }, { status: 400 })
-    // Fire-and-forget
-    baileysManager.init(userId, agencyId).catch(console.error)
+    // Fire-and-forget with optional force reset
+    baileysManager.init(userId, agencyId, force).catch(console.error)
     return NextResponse.json({ message: "Connecting…" })
   }
 
