@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
-import { MessageStatus } from "@prisma/client"
 
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -52,21 +51,25 @@ export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions)
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const { agencyId } = session.user as any
+  const user = session.user as any
+  const agencyId = user.agencyId
+  const body = await req.json()
+
   const { 
       leadId, projectId, plotNumber, plotRate, totalPrice, planDetails, 
       startDate, frequency, totalInstallments, installmentAmount 
-  } = await req.json()
+  } = body
 
   if (!leadId || !projectId || !plotNumber || !plotRate || !totalPrice || !startDate || !totalInstallments || !installmentAmount) {
     return NextResponse.json({ error: "Missing required fields for Automated EMI creation" }, { status: 400 })
   }
 
   try {
-      const result = await (prisma as any).$transaction(async (tx: any) => {
+      const result = await prisma.$transaction(async (tx) => {
           // 1. Calculate Expiry Date based on frequency and count
           const start = new Date(startDate)
-          const monthsToAdd = frequency === "QUARTERLY" ? totalInstallments * 3 : totalInstallments
+          const count = parseInt(totalInstallments)
+          const monthsToAdd = frequency === "QUARTERLY" ? count * 3 : count
           const expiryDate = new Date(start)
           expiryDate.setMonth(expiryDate.getMonth() + monthsToAdd)
 
@@ -75,11 +78,11 @@ export async function POST(req: NextRequest) {
               data: {
                   leadId,
                   projectId,
-                  plotNumber,
-                  plotRate: parseFloat(plotRate),
-                  totalPrice: parseFloat(totalPrice),
-                  installmentAmount: parseFloat(installmentAmount),
-                  totalInstallments: parseInt(totalInstallments),
+                  plotNumber: String(plotNumber),
+                  plotRate: parseFloat(String(plotRate)),
+                  totalPrice: parseFloat(String(totalPrice)),
+                  installmentAmount: parseFloat(String(installmentAmount)),
+                  totalInstallments: count,
                   frequency,
                   planDetails,
                   startDate: start,
@@ -91,14 +94,14 @@ export async function POST(req: NextRequest) {
 
           // 3. Generate individual Installment records
           const installmentsData = []
-          for (let i = 0; i < totalInstallments; i++) {
+          for (let i = 0; i < count; i++) {
               const dueDate = new Date(start)
               const interval = frequency === "QUARTERLY" ? 3 : 1
               dueDate.setMonth(dueDate.getMonth() + (i * interval))
 
               installmentsData.push({
                   emiId: emi.id,
-                  amount: parseFloat(installmentAmount),
+                  amount: parseFloat(String(installmentAmount)),
                   dueDate: dueDate,
                   status: "PENDING"
               })
@@ -117,53 +120,59 @@ export async function POST(req: NextRequest) {
           return emi
       })
 
-      // --- NEW: Automated WhatsApp Notification ---
+      // --- WhatsApp Notification (Async/Non-blocking) ---
       const BRIDGE_URL = process.env.WHATSAPP_BRIDGE_URL || "http://137.184.114.109"
       const BRIDGE_SECRET = process.env.WHATSAPP_BRIDGE_SECRET || "Umesh_WA_Bridge_2003"
       
-      const userId = (session.user as any).id
+      const userId = user.id
 
-      // Non-blocking notification trigger
-      (async () => {
+      // Trigger notification without awaiting to keeping UI fast
+      ;(async () => {
           try {
-              const [lead, project] = await Promise.all([
+              console.log(`[WA Notification] Proceeding for user: ${userId}, lead: ${leadId}`);
+              const [leadRecord, projectRecord] = await Promise.all([
                   prisma.lead.findUnique({ where: { id: leadId }, select: { name: true, phone: true } }),
                   prisma.project.findUnique({ where: { id: projectId }, select: { name: true } })
               ])
 
-              if (lead && project) {
-                  const cleanPhone = lead.phone.replace(/\D/g, "")
+              if (leadRecord && projectRecord) {
+                  const cleanPhone = leadRecord.phone.replace(/\D/g, "")
                   const formattedDate = new Date(startDate).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
                   
-                  const message = `Hello ${lead.name || 'Ji'},\n` +
-                      `Aapka EMI plan for *${project.name}* (Plot #${plotNumber}) successfully set up ho gaya hai. 🙏\n\n` +
+                  const messageText = `Hello ${leadRecord.name || 'Ji'},\n` +
+                      `Aapka EMI plan for *${projectRecord.name}* (Plot #${plotNumber}) successfully set up ho gaya hai. 🙏\n\n` +
                       `📊 Plan Details:\n` +
-                      `- Total Price: ₹${parseFloat(totalPrice).toLocaleString('en-IN')}\n` +
-                      `- Installment: ₹${parseFloat(installmentAmount).toLocaleString('en-IN')} (${frequency})\n` +
+                      `- Total Price: ₹${parseFloat(String(totalPrice)).toLocaleString('en-IN')}\n` +
+                      `- Installment: ₹${parseFloat(String(installmentAmount)).toLocaleString('en-IN')} (${frequency})\n` +
                       `- Start Date: ${formattedDate}\n\n` +
                       `Aapka din shubh ho! ✨`
 
+                  console.log(`[WA Notification] Sending to ${cleanPhone} via ${BRIDGE_URL}`);
+                  
                   const res = await fetch(`${BRIDGE_URL}/send`, {
                       method: "POST",
                       headers: { 
                           "Content-Type": "application/json",
                           "x-bridge-secret": BRIDGE_SECRET 
                       },
-                      body: JSON.stringify({ agentId: userId, phone: cleanPhone, message })
+                      body: JSON.stringify({ agentId: userId, phone: cleanPhone, message: messageText })
                   })
 
                   if (res.ok) {
-                      // Also save this notification to the CRM message history
                       await prisma.message.create({
                           data: {
-                              content: message,
+                              content: messageText,
                               fromMe: true,
-                              status: "SENT" as any, // We assume sent once VPS accepts it
+                              status: "SENT" as any,
                               leadId: leadId,
                               agencyId: agencyId,
                               senderId: userId
                           }
-                      }).catch(e => console.error("Notification History Save Error:", e))
+                      })
+                      console.log(`[WA Notification] Success for ${cleanPhone}`);
+                  } else {
+                      const errorBody = await res.text();
+                      console.error(`[WA Notification] Failed: ${res.status} - ${errorBody}`);
                   }
               }
           } catch (notificationErr) {
