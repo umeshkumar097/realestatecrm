@@ -17,19 +17,63 @@ export default function SignupPage() {
     email: "",
     password: "",
   })
+  const [token, setToken] = useState("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const router = useRouter()
 
   useEffect(() => {
-    if (step === 2) {
-      fetch("/api/plans").then(res => res.json()).then(setPlans)
+    if (step === 3) {
+      setLoading(true)
+      fetch("/api/plans").then(res => res.json()).then(p => {
+        setPlans(p)
+        setLoading(false)
+      })
     }
   }, [step])
 
-  const handleNextStep = (e: React.FormEvent) => {
+  const handleNextStep = async (e: React.FormEvent) => {
     e.preventDefault()
-    setStep(2)
+    setLoading(true)
+    setError("")
+    
+    try {
+      const res = await fetch("/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || "Registration failed")
+      
+      setStep(2)
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleVerifyToken = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError("")
+    
+    try {
+      const res = await fetch("/api/auth/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: formData.email, token }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || "Verification failed")
+      
+      setStep(3)
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleStartTrial = async () => {
@@ -37,9 +81,9 @@ export default function SignupPage() {
         setError("Please select a plan to continue.")
         return
     }
-    if (!formData.email) {
-        setError("Please complete your agency details in the previous step.")
-        setStep(1)
+    
+    if (selectedPlan.name === "Enterprise") {
+        router.push("/contact?plan=enterprise")
         return
     }
     
@@ -58,7 +102,7 @@ export default function SignupPage() {
       })
 
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || "Failed to start trial")
+      if (!res.ok) throw new Error(data.error || "Failed to create checkout")
 
       window.location.href = data.url
     } catch (err: any) {
@@ -68,117 +112,118 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-50 dark:bg-zinc-950 p-6">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-50 dark:bg-zinc-950 p-6 selection:bg-blue-100 selection:text-blue-900">
       <div className="w-full max-w-4xl">
         <div className="flex items-center justify-center gap-2 mb-10">
-            <div className={cn("w-3 h-3 rounded-full transition-all duration-500", step >= 1 ? "bg-primary" : "bg-zinc-200")} />
+            <div className={cn("w-3 h-3 rounded-full transition-all duration-700", step >= 1 ? "bg-primary" : "bg-zinc-200")} />
             <div className={cn("w-12 h-1 bg-zinc-200 rounded-full", step >= 2 ? "bg-primary" : "bg-zinc-200")} />
-            <div className={cn("w-3 h-3 rounded-full transition-all duration-500", step >= 2 ? "bg-primary" : "bg-zinc-200")} />
+            <div className={cn("w-3 h-3 rounded-full transition-all duration-700", step >= 2 ? "bg-primary" : "bg-zinc-200")} />
+            <div className={cn("w-12 h-1 bg-zinc-200 rounded-full", step >= 3 ? "bg-primary" : "bg-zinc-200")} />
+            <div className={cn("w-3 h-3 rounded-full transition-all duration-700", step >= 3 ? "bg-primary" : "bg-zinc-200")} />
         </div>
 
         {step === 1 ? (
-          <div className="w-full max-w-md mx-auto bg-white dark:bg-zinc-900 rounded-[32px] shadow-2xl border border-zinc-200 dark:border-zinc-800 p-10">
+          <div className="w-full max-w-md mx-auto bg-white dark:bg-zinc-900 rounded-[40px] shadow-2xl border border-zinc-200 dark:border-zinc-800 p-12">
             <div className="flex flex-col items-center mb-8">
-              <div className="w-14 h-14 bg-primary rounded-2xl flex items-center justify-center mb-4 shadow-xl shadow-primary/20">
-                <Building2 className="text-white h-8 w-8" />
+              <div className="w-20 h-20 bg-primary/10 text-primary rounded-3xl flex items-center justify-center mb-4">
+                <Building2 className="h-10 w-10" />
               </div>
-              <h1 className="text-3xl font-black tracking-tighter">Launch Your Agency</h1>
-              <p className="text-zinc-500 text-sm mt-1 text-center font-medium">Set up your workspace in seconds.</p>
+              <h1 className="text-3xl font-black text-slate-900 tracking-tighter">Your Agency OS.</h1>
+              <p className="text-zinc-500 text-sm mt-1 text-center font-medium">Verify your email to unlock packages.</p>
             </div>
+
+            {error && <div className="mb-6 p-4 bg-red-50 text-red-600 rounded-2xl border border-red-100 text-xs font-bold text-center">{error}</div>}
 
             <form onSubmit={handleNextStep} className="space-y-4">
               <div className="space-y-1">
-                <label className="text-[10px] font-black uppercase text-zinc-400 tracking-widest ml-1">Agency Name</label>
-                <input required
-                  className="w-full px-5 py-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 focus:ring-2 focus:ring-primary outline-none transition-all font-bold"
-                  placeholder="Elite Realty"
-                  value={formData.agencyName}
-                  onChange={(e) => setFormData({ ...formData, agencyName: e.target.value })}
-                />
+                <label className="text-[10px] font-black uppercase text-zinc-400 tracking-widest ml-4">Agency Identity</label>
+                <input required className="w-full px-8 py-5 rounded-[24px] border border-zinc-100 bg-zinc-50 focus:ring-2 focus:ring-primary outline-none transition-all font-bold" placeholder="Elite Realty Firm" value={formData.agencyName} onChange={(e) => setFormData({ ...formData, agencyName: e.target.value })} />
               </div>
               <div className="space-y-1">
-                <label className="text-[10px] font-black uppercase text-zinc-400 tracking-widest ml-1">Full Name</label>
-                <input required
-                  className="w-full px-5 py-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 focus:ring-2 focus:ring-primary outline-none transition-all font-bold"
-                  placeholder="John Doe"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                />
+                <label className="text-[10px] font-black uppercase text-zinc-400 tracking-widest ml-4">Full Name</label>
+                <input required className="w-full px-8 py-5 rounded-[24px] border border-zinc-100 bg-zinc-50 focus:ring-2 focus:ring-primary outline-none transition-all font-bold" placeholder="John Doe" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
               </div>
               <div className="space-y-1">
-                <label className="text-[10px] font-black uppercase text-zinc-400 tracking-widest ml-1">Work Email</label>
-                <input type="email" required
-                  className="w-full px-5 py-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 focus:ring-2 focus:ring-primary outline-none transition-all font-bold"
-                  placeholder="john@agency.com"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                />
+                <label className="text-[10px] font-black uppercase text-zinc-400 tracking-widest ml-4">Work Email</label>
+                <input type="email" required className="w-full px-8 py-5 rounded-[24px] border border-zinc-100 bg-zinc-50 focus:ring-2 focus:ring-primary outline-none transition-all font-bold" placeholder="john@agency.com" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
               </div>
               <div className="space-y-1">
-                <label className="text-[10px] font-black uppercase text-zinc-400 tracking-widest ml-1">Secure Password</label>
-                <input type="password" required
-                  className="w-full px-5 py-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-950 focus:ring-2 focus:ring-primary outline-none transition-all font-bold"
-                  placeholder="••••••••"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                />
+                <label className="text-[10px] font-black uppercase text-zinc-400 tracking-widest ml-4">Secure Password</label>
+                <input type="password" required className="w-full px-8 py-5 rounded-[24px] border border-zinc-100 bg-zinc-50 focus:ring-2 focus:ring-primary outline-none transition-all font-bold" placeholder="••••••••" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} />
               </div>
-              <button type="submit" className="w-full py-5 bg-primary text-white rounded-2xl font-black shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2 mt-6 uppercase tracking-widest text-sm">
-                Next: Select Package <ChevronRight className="h-4 w-4" />
+              <button disabled={loading} type="submit" className="w-full py-6 bg-slate-900 text-white rounded-[24px] font-black shadow-xl hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-3 mt-8 uppercase tracking-widest text-xs">
+                {loading ? <Loader2 className="h-5 w-5 animate-spin"/> : <>Send Verification Code <ChevronRight className="h-5 w-5" /></>}
               </button>
             </form>
           </div>
+        ) : step === 2 ? (
+          <div className="w-full max-w-md mx-auto bg-white rounded-[40px] shadow-2xl border border-zinc-200 p-12 text-center animate-in zoom-in-95 duration-500">
+             <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-8 tracking-tighter font-black text-2xl shadow-xl shadow-blue-500/10">
+                OTP
+             </div>
+             <h1 className="text-3xl font-black text-slate-900 tracking-tighter mb-4">Validate Your Email.</h1>
+             <p className="text-slate-500 text-sm font-medium mb-10">We've sent a 6-digit code to <span className="text-blue-600 font-bold">{formData.email}</span>.</p>
+             
+             {error && <div className="mb-8 p-4 bg-red-50 text-red-600 rounded-2xl border border-red-100 text-xs font-bold">{error}</div>}
+
+             <form onSubmit={handleVerifyToken} className="space-y-8">
+               <div className="space-y-2 text-left">
+                 <label className="text-[10px] font-black uppercase text-zinc-400 tracking-widest ml-4">Enter 6-Digit Code</label>
+                 <input required maxLength={6} placeholder="000000" className="w-full px-8 py-5 bg-zinc-50 border-2 border-transparent focus:border-primary focus:bg-white rounded-[24px] text-3xl font-black tracking-[1em] text-center transition-all outline-none" value={token} onChange={(e) => setToken(e.target.value)} />
+               </div>
+               
+               <button disabled={loading || token.length !== 6} type="submit" className="w-full py-6 bg-primary text-white rounded-[24px] font-black shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all text-sm uppercase tracking-widest flex items-center justify-center gap-3">
+                 {loading ? <Loader2 className="h-5 w-5 animate-spin"/> : <>Verify & Review Packages <ChevronRight className="h-5 w-5" /></>}
+               </button>
+             </form>
+             
+             <button onClick={() => setStep(1)} className="mt-8 text-xs font-black text-zinc-400 uppercase tracking-widest hover:text-zinc-600">Incorrect Email? Edit Details</button>
+          </div>
         ) : (
-          <div className="animate-in fade-in slide-in-from-bottom-5 duration-500">
-            <div className="text-center mb-12">
-                <h2 className="text-4xl font-black tracking-tighter mb-2">Choose Your Power Plan</h2>
-                <p className="text-zinc-500 font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-2">
-                    <Sparkles className="h-4 w-4 text-amber-500" /> All plans include a 38-hour priority setup
+          <div className="animate-in fade-in slide-in-from-bottom-5 duration-700">
+            <div className="text-center mb-16">
+                <h2 className="text-4xl lg:text-7xl font-black tracking-tighter text-slate-900 mb-4 leading-none">Choose Your Package.</h2>
+                <p className="text-slate-500 font-bold uppercase tracking-[0.25em] text-xs flex items-center justify-center gap-2">
+                    <Sparkles className="h-4 w-4 text-emerald-500" /> Start with a 3-day full access trial
                 </p>
             </div>
 
-            {error && <div className="mb-8 p-4 bg-red-50 text-red-600 rounded-2xl border border-red-100 text-center font-bold">{error}</div>}
+            {error && <div className="mb-12 p-6 bg-red-50 text-red-600 rounded-[32px] border border-red-100 text-center font-bold shadow-xl shadow-red-500/5">{error}</div>}
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
                 {loading && plans.length === 0 ? (
-                    <div className="col-span-3 text-center py-20 bg-white rounded-[40px] border border-zinc-200">
-                        <Loader2 className="h-10 w-10 animate-spin text-primary mx-auto mb-4" />
-                        <p className="text-zinc-500 font-bold">Gathering available packages...</p>
-                    </div>
-                ) : plans.length === 0 ? (
-                    <div className="col-span-3 text-center py-20 bg-white rounded-[40px] border border-zinc-200">
-                        <XCircle className="h-10 w-10 text-red-500 mx-auto mb-4" />
-                        <p className="text-zinc-500 font-bold">No packages available at the moment. Please contact support.</p>
-                        <button onClick={() => setStep(2)} className="mt-4 text-primary font-black uppercase text-xs tracking-widest">Retry Fetching</button>
+                    <div className="col-span-3 text-center py-40">
+                         <Loader2 className="h-16 w-16 animate-spin text-primary mx-auto mb-6" />
+                         <p className="text-slate-950 font-black text-2xl tracking-tighter italic">Initialising Secure Vault...</p>
                     </div>
                 ) : plans.map((plan) => (
                     <button 
                         key={plan.id}
                         onClick={() => setSelectedPlan(plan)}
                         className={cn(
-                            "bg-white border-2 rounded-[40px] p-8 text-left transition-all relative flex flex-col group",
+                            "bg-white border-2 rounded-[56px] p-10 text-left transition-all relative flex flex-col group",
                             selectedPlan?.id === plan.id 
-                                ? "border-primary shadow-2xl scale-105" 
+                                ? "border-primary shadow-[0_48px_100px_-24px_rgba(37,99,235,0.15)] scale-105" 
                                 : "border-zinc-100 hover:border-zinc-300 shadow-sm"
                         )}
                     >
                         {selectedPlan?.id === plan.id && (
-                            <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-white text-[10px] font-black uppercase tracking-widest px-4 py-1.5 rounded-full shadow-lg">Selected</div>
+                            <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-primary text-white text-[10px] font-black uppercase tracking-[0.3em] px-6 py-2.5 rounded-full shadow-2xl">Selected Package</div>
                         )}
-                        <h3 className="text-2xl font-black mb-1">{plan.name}</h3>
-                        <p className="text-sm font-bold text-zinc-500 mb-6">{plan.description}</p>
+                        <h3 className="text-3xl font-black text-slate-900 mb-2">{plan.name}</h3>
+                        <p className="text-sm font-bold text-slate-500 mb-10 leading-relaxed">{plan.description}</p>
                         
-                        <div className="text-3xl font-black mb-8 flex items-baseline gap-1">
-                            <IndianRupee className="h-5 w-5" /> {plan.monthlyPrice}
-                            <span className="text-xs font-bold text-zinc-400 not-italic">/mo</span>
+                        <div className="text-4xl font-black text-slate-950 mb-10 flex items-baseline gap-1 tracking-tighter">
+                            <span className="text-2xl text-slate-400">₹</span> {plan.monthlyPrice}
+                            <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest ml-2">/ month</span>
                         </div>
 
-                        <div className="space-y-4 flex-1 mb-8">
-                            <div className="flex items-center gap-3 text-sm font-bold text-zinc-600">
-                                <Users className="h-4 w-4 text-zinc-400" /> {plan.maxAgents} Agents Max
+                        <div className="space-y-5 flex-1 mb-10">
+                            <div className="flex items-center gap-4 text-sm font-bold text-slate-700">
+                                <Users className="h-5 w-5 text-blue-500 bg-blue-50 rounded-lg p-1" /> {plan.maxAgents} Agents Max
                             </div>
                             {plan.features?.map((f: string, i: number) => (
-                                <div key={i} className="flex items-start gap-3 text-sm font-bold text-zinc-600">
+                                <div key={i} className="flex items-start gap-4 text-xs font-bold text-slate-600">
                                     <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
                                     {f}
                                 </div>
@@ -186,29 +231,27 @@ export default function SignupPage() {
                         </div>
 
                         <div className={cn(
-                            "w-full py-4 rounded-2xl text-xs font-black uppercase tracking-widest text-center transition-all",
-                            selectedPlan?.id === plan.id ? "bg-primary text-white" : "bg-zinc-50 text-zinc-400 group-hover:bg-zinc-100"
+                            "w-full py-5 rounded-[24px] text-[10px] font-black uppercase tracking-[0.3em] text-center transition-all",
+                            selectedPlan?.id === plan.id ? "bg-slate-900 text-white shadow-xl" : "bg-zinc-50 text-zinc-400 group-hover:bg-zinc-100"
                         )}>
-                            {selectedPlan?.id === plan.id ? "Start 3-Day Trial" : "Select Plan"}
+                            {selectedPlan?.id === plan.id ? (plan.name === "Enterprise" ? "Contact Support" : "Start 3-Day Trial") : "View Details"}
                         </div>
                     </button>
                 ))}
             </div>
 
-            <div className="mt-12 flex flex-col items-center">
+            <div className="mt-20 flex flex-col items-center">
                 <button 
                     disabled={!selectedPlan || loading}
                     onClick={handleStartTrial}
-                    className="px-12 py-5 bg-zinc-950 text-white rounded-[24px] font-black text-lg shadow-2xl hover:scale-105 active:scale-95 disabled:opacity-50 transition-all flex items-center gap-3"
+                    className="px-16 py-8 bg-blue-600 text-white rounded-[40px] font-black text-xl shadow-2xl shadow-blue-600/30 hover:scale-[1.03] active:scale-95 disabled:opacity-30 disabled:scale-100 transition-all flex items-center gap-4 group"
                 >
-                    {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : "Authorize 3-Day Trial Checkout"}
-                    <ChevronRight className="h-6 w-6" />
+                    {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : (selectedPlan?.name === "Enterprise" ? "Request Enterprise Access" : "Authorise 3-Day Trial Checkout")}
+                    <ChevronRight className="h-7 w-7 group-hover:translate-x-1 transition-transform" />
                 </button>
-                <button onClick={() => setStep(1)} className="mt-6 text-sm font-bold text-zinc-400 hover:text-zinc-600 uppercase tracking-widest">← Back to Details</button>
-                <p className="mt-8 text-center text-xs text-zinc-400 max-w-md font-medium leading-relaxed">
-                    By starting the trial, you authorize billing on your selected plan after 3 days. 
-                    <span className="text-zinc-800 font-bold px-1">You can cancel at any time via your dashboard</span> 
-                    before the trial ends to avoid any charges.
+                
+                <p className="mt-10 text-center text-[10px] font-black text-zinc-400 uppercase tracking-[0.4em] max-w-lg leading-relaxed">
+                   Secure Deployment: AES-256 Protected Connection
                 </p>
             </div>
           </div>
