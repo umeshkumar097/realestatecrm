@@ -17,6 +17,7 @@ export default function WhatsAppWebPage() {
   const [qr, setQr] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [connectingAt, setConnectingAt] = useState<number | null>(null)
   const [activeTab, setActiveTab] = useState<"CONNECT" | "WEBHOOK">("CONNECT")
 
   // Webhook States
@@ -40,17 +41,21 @@ export default function WhatsAppWebPage() {
       const data = await res.json()
       const normalizedStatus = data.status?.toLowerCase() as Status
       
-      // If we were connecting but now disconnected and no QR, it's a failure
-      if (status === "connecting" && normalizedStatus === "disconnected" && !data.qr) {
-          setError("Handshake timed out or session was rejected. Please try 'Force Reset'.")
+      // Extended Patience: Only show error if we've been connecting for > 60s
+      const isStillStarting = connectingAt && (Date.now() - connectingAt) < 60000
+
+      if (status === "connecting" && normalizedStatus === "disconnected" && !data.qr && !isStillStarting) {
+          setError("Handshake timed out. The cluster took too long to respond. Please try again.")
+          setConnectingAt(null)
       } else if (normalizedStatus === "connected") {
           setError(null)
+          setConnectingAt(null)
       }
 
       setStatus(normalizedStatus || "disconnected")
       setQr(data.qr ?? null)
     } catch (err) { console.error("Status fetch error", err) }
-  }, [status])
+  }, [status, connectingAt])
 
   useEffect(() => {
     fetchStatus()
@@ -59,13 +64,15 @@ export default function WhatsAppWebPage() {
 
   useEffect(() => {
     if (status === "connecting") {
-      const interval = setInterval(fetchStatus, 1000)
+      const interval = setInterval(fetchStatus, 2000) // Poll every 2s instead of 1s to reduce noise
       return () => clearInterval(interval)
     }
   }, [status, fetchStatus])
 
   const handleConnect = async (force: boolean = false) => {
     setLoading(true)
+    setError(null)
+    setConnectingAt(Date.now())
     const res = await fetch("/api/whatsapp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
