@@ -117,3 +117,35 @@ export const sendPasswordResetEmail = async (email: string, token: string) => {
     html,
   });
 };
+
+/**
+ * Staff Invitation Email
+ */
+export const sendStaffInvitationEmail = async (email: string, name: string, agencyName: string, password?: string) => {
+  const loginUrl = `${process.env.NEXT_PUBLIC_APP_URL}/login`;
+  const verifyUrl = `${process.env.NEXT_PUBLIC_APP_URL}/verify-email?email=${encodeURIComponent(email)}`;
+  
+  const content = `
+    <p>Hello <span class="highlight">${name}</span>,</p>
+    <p>You have been invited to join <span class="highlight">${agencyName}</span> as an Agent on the PropGoCRM platform.</p>
+    
+    <div style="background-color: #f8fafc; padding: 24px; border-radius: 16px; margin: 24px 0; border: 1px dashed #cbd5e1;">
+      <p style="margin: 0; font-size: 14px; color: #64748b;">Temporary Credentials:</p>
+      <p style="margin: 8px 0 0 0; font-weight: bold; color: #1e293b;">Email: ${email}</p>
+      ${password ? `<p style="margin: 4px 0 0 0; font-weight: bold; color: #1e293b;">Password: ${password}</p>` : ""}
+    </div>
+
+    <p>Please click the button below to verify your email and activate your access:</p>
+    <div style="text-align: center; margin: 32px 0;">
+      <a href="${verifyUrl}" class="button">Verify Email & Activate</a>
+    </div>
+
+    <p style="font-size: 13px; color: #64748b;">If you already have a PropGoCRM account, you can simply <a href="${loginUrl}" class="highlight">Login here</a>. After verification, we recommend changing your password immediately.</p>
+  `;
+
+  return sendEmail({
+    to: email,
+    subject: `🚀 Invitation: Join ${agencyName} on PropGoCRM`,
+    html: emailWrapper(content, "Staff Invitation"),
+  });
+};
