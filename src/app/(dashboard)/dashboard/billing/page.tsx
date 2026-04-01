@@ -30,43 +30,6 @@ export default function BillingPage() {
       billingEmail: ""
   })
 
-  // GST Verification States
-  const [isGstModalOpen, setIsGstModalOpen] = useState(false)
-  const [gstSearch, setGstSearch] = useState("")
-  const [gstStep, setGstStep] = useState(1) // 1: Input, 2: Captcha, 3: Result
-  const [mockCaptcha, setMockCaptcha] = useState("")
-  const [captchaInput, setCaptchaInput] = useState("")
-
-  const startGstVerify = () => {
-      if (!gstSearch || gstSearch.length < 15) return alert("Enter valid 15-digit GSTIN")
-      setMockCaptcha(Math.random().toString(36).substring(7).toUpperCase())
-      setGstStep(2)
-  }
-
-  const verifyCaptcha = () => {
-      if (captchaInput !== mockCaptcha) return alert("Invalid Captcha")
-      setLoading("gst")
-      setTimeout(() => {
-          // Intelligent Mocking: Recognizes the real Aiclex GSTIN
-          const isAiclex = gstSearch === "09JAMPK1070B1ZS"
-          const mockData = isAiclex ? {
-              company: "Aiclex Technologies",
-              address: "8125 8th Floor, Gaur City Mall Office Space, Sector 4, Greater Noida 201318"
-          } : {
-              company: `${gstSearch.slice(2, 7)} Enterprises Private Ltd`,
-              address: `Tower ${gstSearch.slice(0, 2)}, Sector 15, Industrial Hub, Northern Corporate Zone`
-          }
-          
-          setBillingForm({
-              ...billingForm,
-              gstNumber: gstSearch,
-              billingAddress: mockData.address
-          })
-          setLoading(null)
-          setGstStep(3)
-      }, 1500)
-  }
-
   const handleSubAction = async (action: string, pId?: string) => {
     setLoading(action)
     try {
@@ -456,26 +419,6 @@ export default function BillingPage() {
                   <p className="text-sm text-zinc-500 font-medium">Verify your GST identification for compliant B2B invoicing.</p>
               </div>
 
-              {/* GST Search Trigger */}
-              <div className="mb-10 p-6 bg-zinc-50 rounded-3xl border border-zinc-200 border-dashed">
-                  <div className="flex flex-col md:flex-row items-center gap-4">
-                      <div className="flex-1 space-y-1">
-                          <label className="text-[9px] font-black uppercase text-zinc-400 tracking-widest">Instant GST Lookup</label>
-                          <input 
-                              placeholder="07AAAAA0000A1Z5"
-                              value={gstSearch}
-                              onChange={(e) => setGstSearch(e.target.value)}
-                              className="w-full bg-white px-5 py-3 border border-zinc-200 rounded-xl text-sm font-bold uppercase outline-none focus:ring-4 focus:ring-primary/10 transition-all"
-                          />
-                      </div>
-                      <button 
-                        onClick={() => setIsGstModalOpen(true)}
-                        className="w-full md:w-auto px-8 py-3 bg-slate-900 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all mt-4"
-                      >
-                          Verify & Load Data
-                      </button>
-                  </div>
-              </div>
               
               <form onSubmit={handleUpdateSettings} className="space-y-6">
                   <div className="space-y-2">
@@ -521,87 +464,6 @@ export default function BillingPage() {
           </div>
       )}
 
-      {/* GST Verification Modal */}
-      {isGstModalOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-md p-6">
-              <div className="bg-white rounded-[40px] p-10 w-full max-w-lg shadow-2xl animate-in zoom-in-95 duration-300">
-                  <div className="flex items-center justify-between mb-8">
-                      <h2 className="text-xl font-black tracking-tight">GST Identity Verification</h2>
-                      <button onClick={() => { setIsGstModalOpen(false); setGstStep(1); }} className="text-zinc-400 hover:text-zinc-600">✕</button>
-                  </div>
-
-                  {gstStep === 1 && (
-                      <div className="space-y-6">
-                          <p className="text-sm font-medium text-slate-600">Enter the 15-digit GSTIN mentioned on your registration certificate to begin automated data retrieval.</p>
-                          <div className="space-y-2">
-                              <label className="text-[9px] font-black uppercase tracking-widest text-zinc-400">GST Registration Number</label>
-                              <input 
-                                placeholder="07AAAAA0000A1Z5"
-                                value={gstSearch}
-                                onChange={(e) => setGstSearch(e.target.value.toUpperCase())}
-                                className="w-full px-6 py-5 bg-zinc-50 border border-zinc-200 rounded-2xl text-lg font-black tracking-widest outline-none focus:ring-4 focus:ring-primary/10"
-                              />
-                          </div>
-                          <button onClick={startGstVerify} className="w-full py-5 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:scale-[1.02] transition-all">Start Verification</button>
-                      </div>
-                  )}
-
-                  {gstStep === 2 && (
-                      <div className="space-y-8">
-                          <div className="text-center space-y-2">
-                             <h3 className="font-black text-slate-800 tracking-tight">Security Check</h3>
-                             <p className="text-xs text-zinc-500 font-medium tracking-tight">Please enter the mnemonic code displayed below to authorize session retrieval from the platform's GST gateway.</p>
-                          </div>
-                          <div className="flex flex-col items-center gap-6">
-                              <div className="bg-zinc-100 p-8 rounded-3xl border border-zinc-200 border-dashed relative group">
-                                  <div className="absolute inset-0 bg-white/20 backdrop-blur-[1px] rounded-3xl" />
-                                  <span className="text-4xl font-black text-primary tracking-[0.5em] italic skew-x-12 select-none">{mockCaptcha}</span>
-                              </div>
-                              <input 
-                                placeholder="Type the code above"
-                                value={captchaInput}
-                                onChange={(e) => setCaptchaInput(e.target.value.toUpperCase())}
-                                className="w-full px-6 py-5 bg-zinc-50 border border-zinc-200 rounded-2xl text-center text-xl font-black uppercase outline-none focus:ring-4 focus:ring-primary/10"
-                              />
-                          </div>
-                          <button onClick={verifyCaptcha} disabled={loading === "gst"} className="w-full py-5 bg-primary text-white rounded-2xl font-black uppercase tracking-widest text-xs shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all flex items-center justify-center gap-2">
-                              {loading === "gst" ? <Loader2 size={16} className="animate-spin"/> : "Validate Identity"}
-                          </button>
-                      </div>
-                  )}
-
-                  {gstStep === 3 && (
-                      <div className="space-y-8 animate-in slide-in-from-bottom-4">
-                          <div className="flex items-center gap-4 p-5 bg-emerald-50 rounded-3xl border border-emerald-100">
-                             <div className="p-3 bg-emerald-500 text-white rounded-2xl"><Check size={24}/></div>
-                             <div>
-                                 <h3 className="font-black text-emerald-900 tracking-tight">Verification Success</h3>
-                                 <p className="text-xs text-emerald-700 font-medium">Platform-level data extraction complete.</p>
-                             </div>
-                          </div>
-                          <div className="space-y-4">
-                              <div className="p-6 bg-zinc-50 rounded-3xl border border-zinc-100">
-                                  <p className="text-[9px] font-black uppercase text-zinc-400 tracking-widest mb-1">Extracted Legal Name</p>
-                                  <p className="text-sm font-black text-slate-800">{gstSearch === "09JAMPK1070B1ZS" ? "Aiclex Technologies" : `${gstSearch.slice(2, 7)} Enterprises Private Ltd`}</p>
-                              </div>
-                              <div className="p-6 bg-zinc-50 rounded-3xl border border-zinc-100">
-                                  <p className="text-[9px] font-black uppercase text-zinc-400 tracking-widest mb-1">Registered Commercial Address</p>
-                                  <p className="text-sm font-black text-slate-800 leading-relaxed">
-                                      {gstSearch === "09JAMPK1070B1ZS" 
-                                          ? "8125 8th Floor, Gaur City Mall Office Space, Sector 4, Greater Noida 201318" 
-                                          : `Tower ${gstSearch.slice(0, 2)}, Sector 15, Industrial Hub, Northern Corporate Zone`}
-                                  </p>
-                              </div>
-                          </div>
-                          <div className="grid grid-cols-2 gap-4">
-                              <button onClick={() => setGstStep(1)} className="py-4 border border-zinc-100 text-zinc-400 rounded-2xl font-black uppercase tracking-widest text-[10px]">Retry</button>
-                              <button onClick={() => { setIsGstModalOpen(false); setGstStep(1); }} className="py-4 bg-primary text-white rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-xl shadow-primary/20">Apply & Close</button>
-                          </div>
-                      </div>
-                  )}
-              </div>
-          </div>
-      )}
 
       {activeTab === "CLIENT_BILLING" && (
           <div className="animate-in fade-in duration-700 space-y-8">
