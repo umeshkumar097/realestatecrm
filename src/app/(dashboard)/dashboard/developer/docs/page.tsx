@@ -6,6 +6,7 @@ import {
   Copy, Check, ChevronRight,
   Info, AlertTriangle, ShieldCheck
 } from "lucide-react"
+import Link from "next/link"
 
 const languages = [
   { id: "curl", name: "cURL", icon: Terminal },
