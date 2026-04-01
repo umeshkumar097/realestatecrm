@@ -160,6 +160,27 @@ export default function BillingPage() {
     </div>
   )
 
+  if (session?.user?.role === "AGENT") {
+    return (
+      <div className="flex flex-col items-center justify-center h-[60vh] p-20 gap-4 text-center">
+          <div className="bg-red-50 p-6 rounded-[32px] mb-4">
+            <Shield className="h-16 w-16 text-red-500" />
+          </div>
+          <h2 className="text-3xl font-black text-slate-900 tracking-tight">Financial Command Locked</h2>
+          <p className="text-slate-500 font-medium max-w-md leading-relaxed">
+              Your security clearance does not allow access to the billing and subscription management sector. 
+              Please contact your Agency Administrator for billing inquiries.
+          </p>
+          <button 
+            onClick={() => window.location.href = "/dashboard"}
+            className="mt-6 px-10 py-4 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/20"
+          >
+              Return to Dashboard
+          </button>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-8 max-w-6xl mx-auto pb-20">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">

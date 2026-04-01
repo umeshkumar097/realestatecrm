@@ -77,17 +77,19 @@ export default function DashboardPage() {
           <p className="text-slate-500 text-sm mt-0.5">Welcome back, {session?.user?.name}.</p>
         </div>
         <div className="flex items-center gap-3">
-          <Link href="/dashboard/whatsapp" className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all shadow-sm ${
-            waStatus === "CONNECTED" 
-              ? "bg-white border border-emerald-100 text-emerald-600 hover:bg-emerald-50" 
-              : "bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-500/30"
-          }`}>
-            <div className="relative">
-              <MessageSquare className="h-4 w-4" />
-              {waStatus === "CONNECTED" && <span className="absolute -top-1 -right-1 w-2 h-2 bg-emerald-500 rounded-full border-2 border-white animate-pulse" />}
-            </div>
-            {waStatus === "CONNECTED" ? "WhatsApp Connected" : "WhatsApp Connect"}
-          </Link>
+          {session?.user?.role !== "AGENT" && (
+            <Link href="/dashboard/whatsapp" className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all shadow-sm ${
+              waStatus === "CONNECTED" 
+                ? "bg-white border border-emerald-100 text-emerald-600 hover:bg-emerald-50" 
+                : "bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-500/30"
+            }`}>
+              <div className="relative">
+                <MessageSquare className="h-4 w-4" />
+                {waStatus === "CONNECTED" && <span className="absolute -top-1 -right-1 w-2 h-2 bg-emerald-500 rounded-full border-2 border-white animate-pulse" />}
+              </div>
+              {waStatus === "CONNECTED" ? "WhatsApp Connected" : "WhatsApp Connect"}
+            </Link>
+          )}
           <div className="flex items-center gap-2 bg-white border border-slate-200 px-4 py-2 rounded-xl text-sm text-slate-500">
             <Clock className="h-4 w-4" />
             {new Date().toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
@@ -158,14 +160,16 @@ export default function DashboardPage() {
             <p className="mt-6 text-[11px] text-slate-400 font-bold leading-tight">* Based on the last 30 days of incoming traffic.</p>
           </div>
 
-          <div className="bg-primary p-6 rounded-3xl shadow-xl shadow-primary/20 text-white relative overflow-hidden group">
-             <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:scale-110 transition-transform"></div>
-             <h3 className="text-lg font-black mb-2 flex items-center gap-2">Upgrade to Pro <ChevronRight className="h-4 w-4" /></h3>
-             <p className="text-white/80 text-[11px] mb-6 leading-relaxed">Connect multiple WhatsApp numbers and unlock AI-powered intent extraction & auto-replies.</p>
-             <Link href="/dashboard/billing" className="block text-center w-full py-3 bg-white text-primary rounded-xl font-black text-xs hover:bg-slate-50 active:scale-95 transition-all shadow-lg">
-                 View Pricing Plans
-             </Link>
-          </div>
+          {session?.user?.role !== "AGENT" && (
+            <div className="bg-primary p-6 rounded-3xl shadow-xl shadow-primary/20 text-white relative overflow-hidden group">
+              <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-white/10 rounded-full blur-2xl group-hover:scale-110 transition-transform"></div>
+              <h3 className="text-lg font-black mb-2 flex items-center gap-2">Upgrade to Pro <ChevronRight className="h-4 w-4" /></h3>
+              <p className="text-white/80 text-[11px] mb-6 leading-relaxed">Connect multiple WhatsApp numbers and unlock AI-powered intent extraction & auto-replies.</p>
+              <Link href="/dashboard/billing" className="block text-center w-full py-3 bg-white text-primary rounded-xl font-black text-xs hover:bg-slate-50 active:scale-95 transition-all shadow-lg">
+                  View Pricing Plans
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </div>

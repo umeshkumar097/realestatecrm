@@ -66,6 +66,12 @@ export const authOptions: NextAuthOptions = {
           throw new Error("User not found")
         }
 
+        // --- NEW: Suspension Check ---
+        if ((user as any).status === "SUSPENDED") {
+            throw new Error("ACCOUNT_SUSPENDED")
+        }
+        // -----------------------------
+
         const isPasswordValid = await compare(credentials.password, user.password)
 
         if (!isPasswordValid) {

@@ -35,6 +35,8 @@ export default function LoginForm({ agency }: LoginFormProps) {
       if (res?.error) {
         if (res.error === "VERIFY_EMAIL") {
           router.push(`/verify-email?email=${encodeURIComponent(email)}`)
+        } else if (res.error === "ACCOUNT_SUSPENDED") {
+          setError(`Your account has been suspended by ${agency?.name || "your company"}. Please contact support.`)
         } else {
           setError("Invalid email or password")
         }

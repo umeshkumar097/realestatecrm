@@ -48,14 +48,22 @@ export async function GET(req: NextRequest) {
       take: 5,
       include: { assignedTo: { select: { name: true } } }
     }),
-    prisma.message.count({ where: globalWhere }),
+    prisma.message.count({ 
+      where: { 
+        ...globalWhere,
+        ...(role === "AGENT" ? { lead: { assignedToId: userId } } : {})
+      } 
+    }),
     prisma.lead.groupBy({
       by: ['source'],
       where: filter,
       _count: { source: true }
     }),
     prisma.eMI.aggregate({
-      where: globalWhere,
+      where: { 
+        ...globalWhere,
+        ...(role === "AGENT" ? { lead: { assignedToId: userId } } : {})
+      },
       _sum: { totalPrice: true }
     })
   ])
