@@ -183,7 +183,12 @@ export default function AgenciesPage() {
                                 {agency.subscription?.status || "OPEN"}
                             </span>
                         </div>
-                        <p className="text-[10px] text-zinc-400 font-bold">Renewal: {new Date(agency.createdAt).toLocaleDateString()}</p>
+                        <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-tighter">
+                            {agency.plan?.name === "Lifetime Member" 
+                                ? "LIFETIME ACCESS" 
+                                : `Renewal: ${agency.subscription?.currentPeriodEnd ? new Date(agency.subscription.currentPeriodEnd).toLocaleDateString() : "Pending"}`
+                            }
+                        </p>
                     </div>
                   </td>
                   <td className="px-6 py-6">
