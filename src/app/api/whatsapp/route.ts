@@ -12,32 +12,27 @@ export async function GET(req: NextRequest) {
   const userId = (session.user as any).id
   const agencyId = (session.user as any).agencyId
   
-  let instance = await baileysManager.getInstance(userId)
-  let qrDataUrl: string | null = null
-  let status = instance?.status || "DISCONNECTED"
+  // High-Fidelity VPS Proxy Sequence
+  const BRIDGE_URL = "http://203.57.85.225:5050"
+  const BRIDGE_SECRET = "उमेश_वॉटसएप_ब्रिज_२००३"
 
-  // 1. Check in-memory instance first
-  if (instance?.qr) {
-    qrDataUrl = await QRCode.toDataURL(instance.qr, { width: 300, margin: 2 })
-  } 
-  
-  // 2. Fallback to Database if in-memory is missing or has no QR
-  if (!qrDataUrl) {
-    const dbSession = await prisma.whatsAppSession.findUnique({
-      where: { agentId: userId }
-    })
-    
-    if (dbSession?.status === "CONNECTING" && dbSession.qrCode) {
-        status = "CONNECTING"
-        qrDataUrl = await QRCode.toDataURL(dbSession.qrCode, { width: 300, margin: 2 })
-    } else if (dbSession?.status === "CONNECTED") {
-        status = "CONNECTED"
-    }
+  try {
+      const res = await fetch(`${BRIDGE_URL}/status/${userId}`, {
+          headers: { "x-bridge-secret": BRIDGE_SECRET }
+      })
+      if (res.ok) {
+          const data = await res.json()
+          return NextResponse.json(data)
+      }
+  } catch (e) {
+      console.error("[Vercel] VPS Bridge Status Fetch Failed:", e)
   }
 
+  // Local Fallback (Standard Metadata) if Bridge is Offline
+  const dbSession = await prisma.whatsAppSession.findUnique({ where: { agentId: userId } })
   return NextResponse.json({ 
-    status, 
-    qr: qrDataUrl 
+    status: dbSession?.status || "DISCONNECTED", 
+    qr: null 
   })
 }
 
@@ -45,19 +40,37 @@ export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions)
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const { action } = await req.json()
+  const { action } = await req.json().catch(() => ({ action: null }))
   const { id: userId, agencyId } = (session.user as any)
+
+  const BRIDGE_URL = "http://203.57.85.225:5050"
+  const BRIDGE_SECRET = "उमेश_वॉटसएप_ब्रिज_२००३"
 
   if (action === "connect") {
     const { force } = await req.json().catch(() => ({ force: false }))
-    if (!agencyId) return NextResponse.json({ error: "No agency assigned to your profile" }, { status: 400 })
-    // Fire-and-forget with optional force reset
-    baileysManager.init(userId, agencyId, force).catch(console.error)
-    return NextResponse.json({ message: "Connecting…" })
+    
+    await fetch(`${BRIDGE_URL}/connect`, {
+        method: "POST",
+        headers: { 
+            "Content-Type": "application/json",
+            "x-bridge-secret": BRIDGE_SECRET 
+        },
+        body: JSON.stringify({ agentId: userId, agencyId, force })
+    }).catch(console.error)
+
+    return NextResponse.json({ message: "Connecting initiated on VPS Cluster" })
   }
 
   if (action === "disconnect") {
-    await baileysManager.logout(userId)
+    await fetch(`${BRIDGE_URL}/logout`, {
+        method: "POST",
+        headers: { 
+            "Content-Type": "application/json",
+            "x-bridge-secret": BRIDGE_SECRET 
+        },
+        body: JSON.stringify({ agentId: userId })
+    }).catch(console.error)
+
     return NextResponse.json({ message: "Disconnected" })
   }
 

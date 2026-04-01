@@ -18,51 +18,44 @@ model Agency {
   status               AgencyStatus        @default(ACTIVE)
   stripeCustomerId     String?             @unique
   stripeSubscriptionId String?             @unique
+  billingAddress       String?
+  billingEmail         String?
+  gstNumber            String?
+  apiKey               String?             @unique
+  apiUsageCount        Int                 @default(0)
   activities           Activity[]
   plan                 SubscriptionPlan?   @relation(fields: [planId], references: [id])
   emis                 EMI[]
   googleSheets         GoogleSheetSync?
   leads                Lead[]
   messages             Message[]
+  platformInvoices     PlatformInvoice[]
   portalIntegrations   PortalIntegration[]
   projects             Project[]
   properties           Property[]
   subscription         Subscription?
-  platformInvoices     PlatformInvoice[]
   tasks                Task[]
   tickets              Ticket[]
   users                User[]
   webhookConfigs       WebhookConfig[]
   whatsappSessions     WhatsAppSession[]
-  gstNumber            String?
-  billingAddress       String?
-  billingEmail         String?
-  apiKey               String?             @unique
-  apiUsageCount        Int                 @default(0)
 }
 
 model PlatformInvoice {
-  id             String         @id @default(cuid())
-  invoiceNumber  String         @unique
+  id             String        @id @default(cuid())
+  invoiceNumber  String        @unique
   sequenceNumber Int
   amount         Float
-  currency       String         @default("INR")
-  status         InvoiceStatus  @default(PAID)
+  currency       String        @default("INR")
+  status         InvoiceStatus @default(PAID)
   planSnapshot   String?
-  generatedAt    DateTime       @default(now())
+  generatedAt    DateTime      @default(now())
   agencyId       String
-  agency         Agency         @relation(fields: [agencyId], references: [id], onDelete: Cascade)
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  agency         Agency        @relation(fields: [agencyId], references: [id], onDelete: Cascade)
 
   @@index([agencyId])
-}
-
-enum InvoiceStatus {
-  PAID
-  UNPAID
-  VOID
-  ZERO
 }
 
 model User {
@@ -153,27 +146,27 @@ model Project {
 }
 
 model EMI {
-  id           String        @id @default(cuid())
-  leadId       String
-  projectId    String
-  plotNumber   String
-  plotRate     Float
-  totalPrice          Float
-  installmentAmount   Float         @default(0)
-  totalInstallments   Int           @default(1)
-  frequency           String        @default("MONTHLY") // MONTHLY, QUARTERLY, etc.
-  nextDueDate         DateTime?
-  planDetails         String?
-  startDate    DateTime
-  expiryDate   DateTime
-  status       String        @default("ACTIVE")
-  agencyId     String
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  agency       Agency        @relation(fields: [agencyId], references: [id], onDelete: Cascade)
-  lead         Lead          @relation(fields: [leadId], references: [id])
-  project      Project       @relation(fields: [projectId], references: [id])
-  installments Installment[]
+  id                String        @id @default(cuid())
+  leadId            String
+  projectId         String
+  plotNumber        String
+  plotRate          Float
+  totalPrice        Float
+  planDetails       String?
+  startDate         DateTime
+  expiryDate        DateTime
+  status            String        @default("ACTIVE")
+  agencyId          String
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  frequency         String        @default("MONTHLY")
+  installmentAmount Float         @default(0)
+  nextDueDate       DateTime?
+  totalInstallments Int           @default(1)
+  agency            Agency        @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+  lead              Lead          @relation(fields: [leadId], references: [id])
+  project           Project       @relation(fields: [projectId], references: [id])
+  installments      Installment[]
 }
 
 model Installment {
@@ -304,16 +297,16 @@ model SubscriptionPlan {
 }
 
 model Coupon {
-  id              String           @id @default(cuid())
-  code            String           @unique
-  planId          String
-  plan            SubscriptionPlan @relation(fields: [planId], references: [id])
-  isActive        Boolean          @default(true)
-  maxUses         Int              @default(1)
-  usedCount       Int              @default(0)
-  expiresAt       DateTime?
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
+  id        String           @id @default(cuid())
+  code      String           @unique
+  planId    String
+  isActive  Boolean          @default(true)
+  maxUses   Int              @default(1)
+  usedCount Int              @default(0)
+  expiresAt DateTime?
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+  plan      SubscriptionPlan @relation(fields: [planId], references: [id])
 }
 
 model SystemLog {
@@ -386,6 +379,13 @@ model GoogleSheetSync {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   agency        Agency    @relation(fields: [agencyId], references: [id], onDelete: Cascade)
+}
+
+enum InvoiceStatus {
+  PAID
+  UNPAID
+  VOID
+  ZERO
 }
 
 enum AgencyStatus {
