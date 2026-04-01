@@ -28,7 +28,7 @@ const navigation = [
   { name: 'Tasks', href: '/dashboard/tasks', icon: ListTodo },
   { name: 'Support', href: '/dashboard/tickets', icon: ShieldAlert },
   { name: 'Staff', href: '/dashboard/staff', icon: ShieldCheck, adminOnly: true },
-  { name: 'Properties', href: '/properties', icon: Building2 },
+  { name: 'Projects', href: '/properties', icon: Building2 },
   { name: 'Billing', href: '/dashboard/billing', icon: CreditCard, adminOnly: true },
   { name: 'Reports', href: '/dashboard/reports', icon: BarChart3, adminOnly: true },
   { name: 'Master Overview', href: '/super-admin', icon: ShieldCheck, superAdminOnly: true },
