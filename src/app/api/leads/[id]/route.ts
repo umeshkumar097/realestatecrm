@@ -10,14 +10,18 @@ export async function PATCH(
   const session = await getServerSession(authOptions)
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const { id } = await params
+  const { id: leadId } = await params
+  const { agencyId, role, id: userId } = session.user as any
   const { status, notes, name, phone, email, budget, location } = await req.json()
 
-  console.log(`[PATCH Lead] ID: ${id}, Status: ${status}, Agency: ${session.user.agencyId}`)
-
   try {
+    const where: any = { id: leadId, agencyId }
+    if (role === "AGENT") {
+      where.assignedToId = userId
+    }
+
     const lead = await prisma.lead.update({
-      where: { id },
+      where,
       data: { 
         ...(status && { status }),
         ...(notes && { notes }),
@@ -28,11 +32,11 @@ export async function PATCH(
         ...(location && { location })
       }
     })
-    console.log(`[PATCH Lead] Success for ${id}`)
+
     return NextResponse.json(lead)
   } catch (error: any) {
     console.error(`[PATCH Lead] Error: ${error.message}`)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ error: "Lead not found or access denied" }, { status: 500 })
   }
 }
 
@@ -43,11 +47,20 @@ export async function DELETE(
   const session = await getServerSession(authOptions)
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const { id } = await params
+  const { id: leadId } = await params
+  const { agencyId, role, id: userId } = session.user as any
+
   try {
-    await prisma.lead.delete({ where: { id } })
+    const where: any = { id: leadId, agencyId }
+    
+    // Only Admin/Owner or the Assigned Agent can delete
+    if (role === "AGENT") {
+      where.assignedToId = userId
+    }
+
+    await prisma.lead.delete({ where })
     return NextResponse.json({ success: true })
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ error: "Failed to delete lead or access denied" }, { status: 500 })
   }
 }

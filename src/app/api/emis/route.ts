@@ -7,26 +7,34 @@ export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions)
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const { agencyId } = session.user as any
+  const { agencyId, role, id: userId } = session.user as any
   const { searchParams } = new URL(req.url)
   const leadId = searchParams.get("leadId")
 
   try {
+    const where: any = { agencyId }
+    
+    // RBAC: Agents only see EMIs for their assigned leads
+    if (role === "AGENT") {
+      where.lead = { assignedToId: userId }
+    }
+
+    if (leadId) {
+      where.leadId = leadId
+    }
+
     const [emis, dueSoon] = await Promise.all([
       prisma.eMI.findMany({
-        where: { 
-          agencyId,
-          ...(leadId ? { leadId } : {})
-        },
+        where,
         include: {
-          lead: { select: { name: true, phone: true } },
+          lead: { select: { name: true, phone: true, assignedToId: true } },
           project: { select: { name: true } }
         },
         orderBy: { startDate: "desc" }
       }),
       prisma.installment.count({
         where: {
-          emi: { agencyId },
+          emi: where, // Use the same filtered where clause for due soon counts
           status: "PENDING",
           dueDate: {
             lte: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)

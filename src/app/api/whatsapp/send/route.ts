@@ -38,28 +38,42 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: data.error || "VPS Bridge Error" }, { status: res.status });
     }
 
-    // --- NEW: Save to Local DB ---
+    // --- NEW: Verify Lead Ownership & Save ---
     try {
-        const { agencyId } = session.user as any
+        const { agencyId, role, id: userId } = session.user as any
+        const cleanPhone = phone.replace(/\D/g, "")
+        
         const lead = await prisma.lead.findFirst({
-            where: { phone: { contains: phone.replace(/\D/g, "") }, agencyId }
+            where: { 
+                phone: { contains: cleanPhone }, 
+                agencyId 
+            }
         });
 
-        if (lead) {
-            await prisma.message.create({
-                data: {
-                    content: message,
-                    fromMe: true,
-                    status: "SENT",
-                    leadId: lead.id,
-                    agencyId: lead.agencyId,
-                    senderId: userId
-                }
-            });
+        if (!lead) {
+            return NextResponse.json({ error: "Lead not found in your agency" }, { status: 404 });
         }
-    } catch (saveErr) {
-        console.error("Local Save Error:", saveErr);
-        // We still return success because the VPS accepted it.
+
+        // AGENT isolation: Must be assigned to them
+        if (role === "AGENT" && lead.assignedToId !== userId) {
+            return NextResponse.json({ error: "Forbidden: You are not assigned to this lead" }, { status: 403 });
+        }
+
+        await prisma.message.create({
+            data: {
+                content: message,
+                fromMe: true,
+                status: "SENT" as any,
+                leadId: lead.id,
+                agencyId: lead.agencyId,
+                senderId: userId
+            }
+        });
+    } catch (saveErr: any) {
+        console.error("Local Save/Check Error:", saveErr);
+        if (saveErr.message.includes("Forbidden") || saveErr.message.includes("not found")) {
+            return NextResponse.json({ error: saveErr.message }, { status: 403 });
+        }
     }
 
     return NextResponse.json(data);

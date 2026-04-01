@@ -55,11 +55,22 @@ export async function PATCH(req: NextRequest) {
   const session = await getServerSession(authOptions)
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
+  const { agencyId, role, id: userId } = session.user as any
   const { id, status } = await req.json()
-  const task = await prisma.task.update({
-    where: { id },
-    data: { status }
-  })
 
-  return NextResponse.json(task)
+  try {
+    const where: any = { id, agencyId }
+    if (role === "AGENT") {
+      where.assignedToId = userId
+    }
+
+    const task = await prisma.task.update({
+      where,
+      data: { status }
+    })
+
+    return NextResponse.json(task)
+  } catch (error: any) {
+    return NextResponse.json({ error: "Task not found or access denied" }, { status: 500 })
+  }
 }

@@ -9,10 +9,24 @@ export async function GET(req: NextRequest) {
 
   const { searchParams } = new URL(req.url)
   const leadId = searchParams.get("leadId")
-  const { agencyId } = session.user as any
+  const { agencyId, role, id: userId } = session.user as any
 
   if (!leadId) {
     return NextResponse.json({ error: "Missing leadId" }, { status: 400 })
+  }
+
+  // Verify lead ownership/access
+  const lead = await prisma.lead.findUnique({
+    where: { id: leadId, agencyId },
+    select: { assignedToId: true }
+  })
+
+  if (!lead) {
+    return NextResponse.json({ error: "Lead not found" }, { status: 404 })
+  }
+
+  if (role === "AGENT" && lead.assignedToId !== userId) {
+    return NextResponse.json({ error: "Forbidden: You do not have access to this chat" }, { status: 403 })
   }
 
   const messages = await prisma.message.findMany({
