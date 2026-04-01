@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
   
   // High-Fidelity VPS Proxy Sequence
   const BRIDGE_URL = "http://203.57.85.225:5050"
-  const BRIDGE_SECRET = "उमेश_वॉटसएप_ब्रिज_२००३"
+  const BRIDGE_SECRET = "Umesh_WA_Bridge_2003"
 
   try {
       const res = await fetch(`${BRIDGE_URL}/status/${userId}`, {
@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
   const { id: userId, agencyId } = (session.user as any)
 
   const BRIDGE_URL = "http://203.57.85.225:5050"
-  const BRIDGE_SECRET = "उमेश_वॉटसएप_ब्रिज_२००३"
+  const BRIDGE_SECRET = "Umesh_WA_Bridge_2003"
 
   if (action === "connect") {
     const { force } = await req.json().catch(() => ({ force: false }))
