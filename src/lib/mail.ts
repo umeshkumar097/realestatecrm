@@ -11,6 +11,8 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+const APP_URL = process.env.NEXTAUTH_URL || process.env.NEXT_PUBLIC_APP_URL || "https://propgocrm.com";
+
 interface SendEmailOptions {
   to: string;
   subject: string;
@@ -100,7 +102,7 @@ export const sendVerificationEmail = async (email: string, name: string, token: 
  * Password Reset Email
  */
 export const sendPasswordResetEmail = async (email: string, token: string) => {
-  const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${token}`;
+  const resetUrl = `${APP_URL}/reset-password?token=${token}`;
   const html = emailWrapper(`
     <p>A password reset was requested for your PropGoCRM account.</p>
     <p>Please click the button below to reset your password:</p>
@@ -122,8 +124,8 @@ export const sendPasswordResetEmail = async (email: string, token: string) => {
  * Staff Invitation Email
  */
 export const sendStaffInvitationEmail = async (email: string, name: string, agencyName: string, password?: string) => {
-  const loginUrl = `${process.env.NEXT_PUBLIC_APP_URL}/login`;
-  const verifyUrl = `${process.env.NEXT_PUBLIC_APP_URL}/verify-email?email=${encodeURIComponent(email)}`;
+  const loginUrl = `${APP_URL}/login`;
+  const verifyUrl = `${APP_URL}/verify-email?email=${encodeURIComponent(email)}`;
   
   const content = `
     <p>Hello <span class="highlight">${name}</span>,</p>
@@ -154,7 +156,7 @@ export const sendStaffInvitationEmail = async (email: string, name: string, agen
  * Membership Upgrade Confirmation
  */
 export const sendMembershipUpgradeEmail = async (email: string, planName: string, isLifetime: boolean = false) => {
-  const loginUrl = `${process.env.NEXT_PUBLIC_APP_URL}/login`;
+  const loginUrl = `${APP_URL}/login`;
   
   const content = `
     <p>Great news! Your account has been upgraded to the <span class="highlight">${planName}</span> plan Tier.</p>
@@ -178,5 +180,53 @@ export const sendMembershipUpgradeEmail = async (email: string, planName: string
     to: email,
     subject: `💎 Plan Upgraded: Welcome to ${planName} Access!`,
     html: emailWrapper(content, "Plan Upgrade Successful"),
+  });
+};
+
+/**
+ * Member Lifecycle Notification (To Admin)
+ */
+export const sendMemberUpdateNotification = async (adminEmail: string, memberData: { name: string, email: string }, action: 'ADDED' | 'DELETED', agencyName: string) => {
+  const isAdded = action === 'ADDED';
+  const color = isAdded ? "#10b981" : "#ef4444";
+  
+  const content = `
+    <p>A member lifecycle event has been recorded for <span class="highlight">${agencyName}</span>.</p>
+    
+    <div style="background-color: #f8fafc; padding: 24px; border-radius: 16px; margin: 24px 0; border: 1px solid #e2e8f0;">
+        <p style="margin: 0; font-size: 10px; font-weight: 800; uppercase; tracking: 0.1em; color: ${color};">${action} MEMBER REPORT</p>
+        <p style="margin: 12px 0 0 0; font-weight: bold; color: #1e293b;">Name: ${memberData.name}</p>
+        <p style="margin: 4px 0 0 0; font-weight: bold; color: #1e293b;">Email: ${memberData.email}</p>
+    </div>
+
+    <p>${isAdded ? "The agent has been successfully invited and will appear in your fleet once they verify their identity." : "The member's access has been purged and they can no longer access your agency dashboard."}</p>
+  `;
+
+  return sendEmail({
+    to: adminEmail,
+    subject: `🛡️ Security Alert: Member ${isAdded ? 'Added' : 'Removed'} from ${agencyName}`,
+    html: emailWrapper(content, `Member ${isAdded ? 'Onboarded' : 'Offboarded'}`),
+  });
+};
+
+/**
+ * Password Reset Success Notification
+ */
+export const sendPasswordResetSuccessEmail = async (email: string, name: string) => {
+  const content = `
+    <p>Hello <span class="highlight">${name}</span>,</p>
+    <p>This is a security confirmation that the password for your PropGoCRM account has been **successfully updated**.</p>
+    
+    <div style="background-color: #ecfdf5; padding: 24px; border-radius: 16px; margin: 24px 0; border: 1px solid #10b981;">
+        <p style="margin: 0; font-weight: bold; color: #065f46; text-align: center;">Shield Verified: Credentials Updated</p>
+    </div>
+
+    <p>If you did not perform this change, please contact our security team immediately at <span class="highlight">security@propgocrm.com</span> to lock your account.</p>
+  `;
+
+  return sendEmail({
+    to: email,
+    subject: "🛡️ Security Alert: Password Updated Successfully",
+    html: emailWrapper(content, "Password Changed Successfully"),
   });
 };

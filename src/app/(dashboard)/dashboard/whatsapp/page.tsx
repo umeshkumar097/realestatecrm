@@ -1,10 +1,11 @@
 "use client"
 import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
+import { authOptions } from "@/lib/auth"
 import {
   MessageSquare, CheckCircle2, XCircle, RefreshCw,
-  Smartphone, Wifi, WifiOff, Bell, Shield, ArrowLeft,
-  Info, Zap
+  Smartphone, WifiOff, Shield, ArrowLeft,
+  Zap, Globe, Key, Trash2, Loader2, Plus
 } from "lucide-react"
 import { useSession } from "next-auth/react"
 
@@ -15,276 +16,286 @@ export default function WhatsAppWebPage() {
   const [status, setStatus] = useState<Status>("disconnected")
   const [qr, setQr] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
-  const [polling, setPolling] = useState(false)
-  const [lastLead, setLastLead] = useState<{ name: string; time: string } | null>(null)
+  const [activeTab, setActiveTab] = useState<"CONNECT" | "WEBHOOK">("CONNECT")
+
+  // Webhook States
+  const [webhooks, setWebhooks] = useState<any[]>([])
+  const [whLoading, setWhLoading] = useState(false)
+
+  const fetchWebhooks = useCallback(async () => {
+    setWhLoading(true)
+    try {
+        const res = await fetch("/api/webhooks/config")
+        const data = await res.json()
+        setWebhooks(data.webhooks || [])
+    } catch (e) { console.error("Webhook fetch failed") }
+    finally { setWhLoading(false) }
+  }, [])
 
   const fetchStatus = useCallback(async () => {
     try {
       const res = await fetch("/api/whatsapp")
       if (!res.ok) return
       const data = await res.json()
-      // Normalize status to lowercase to match our Status type
       const normalizedStatus = data.status?.toLowerCase() as Status
       setStatus(normalizedStatus || "disconnected")
       setQr(data.qr ?? null)
-    } catch (err) {
-      console.error("Failed to fetch WhatsApp status", err)
-    }
+    } catch (err) { console.error("Status fetch error", err) }
   }, [])
 
-  // Fetch status on mount
   useEffect(() => {
     fetchStatus()
-  }, [fetchStatus])
+    fetchWebhooks()
+  }, [fetchStatus, fetchWebhooks])
 
-  // Poll every 3s while connecting
   useEffect(() => {
     if (status === "connecting") {
-      const interval = setInterval(fetchStatus, 2000)
+      const interval = setInterval(fetchStatus, 3000)
       return () => clearInterval(interval)
     }
   }, [status, fetchStatus])
 
-  // Auto-redirect on success
-  useEffect(() => {
-    if (status === "connected") {
-      const timer = setTimeout(() => {
-        // window.location.href = "/dashboard" // Or use router.push if available
-      }, 5000)
-      return () => clearTimeout(timer)
-    }
-  }, [status])
-
   const handleConnect = async () => {
-    if (!session?.user?.agencyId) return alert("No agency assigned to your profile.")
-    
     setLoading(true)
     const res = await fetch("/api/whatsapp", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ 
-        action: "connect"
-      }),
+      body: JSON.stringify({ action: "connect" }),
     })
-    
-    if (!res.ok) {
-      const errorData = await res.json().catch(() => ({}))
-      alert(errorData.error || "Failed to initiate WhatsApp connection.")
-      setLoading(false)
-      return
-    }
+    if (!res.ok) alert("Connection failed")
     setStatus("connecting")
     setLoading(false)
-    // Start polling immediately
     fetchStatus()
   }
 
   const handleDisconnect = async () => {
-    if (!confirm("Are you sure you want to disconnect? This will stop all lead alerts.")) return
-    
+    if (!confirm("Are you sure? This will stop all lead alerts.")) return
     setLoading(true)
-    try {
-      const res = await fetch("/api/whatsapp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "disconnect" }),
-      })
-      
-      if (res.ok) {
-        setStatus("disconnected")
-        setQr(null)
-      } else {
-        const error = await res.json().catch(() => ({}))
-        alert(error.error || "Failed to disconnect")
-      }
-    } catch (err) {
-      console.error("Disconnect error", err)
-      alert("An unexpected error occurred while disconnecting.")
-    } finally {
-      setLoading(false)
-    }
+    await fetch("/api/whatsapp", {
+      method: "POST",
+      body: JSON.stringify({ action: "disconnect" }),
+    })
+    setStatus("disconnected")
+    setQr(null)
+    setLoading(false)
   }
 
-  // Simulate a test lead (demo)
-  const simulateLead = () => {
-    setLastLead({ name: "Amit Kapoor", time: new Date().toLocaleTimeString("en-IN") })
+  const handleCreateWebhook = async () => {
+      setWhLoading(true)
+      await fetch("/api/webhooks/config", { method: "POST" })
+      fetchWebhooks()
+  }
+
+  const handleDeleteWebhook = async (id: string) => {
+      if (!confirm("Delete this webhook secret?")) return
+      await fetch(`/api/webhooks/config?id=${id}`, { method: "DELETE" })
+      fetchWebhooks()
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-4">
-        <Link href="/dashboard" className="flex items-center gap-1.5 text-sm font-semibold text-slate-500 hover:text-blue-600 transition-colors">
-          <ArrowLeft className="h-4 w-4" /> Dashboard
-        </Link>
-        <span className="text-slate-300">/</span>
-        <h1 className="text-xl font-black text-slate-800">WhatsApp Web Connect</h1>
+    <div className="max-w-4xl mx-auto space-y-10 pb-20">
+      {/* Premium Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="space-y-1">
+            <Link href="/dashboard" className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-primary transition-colors mb-2">
+                <ArrowLeft size={12} /> Dashboard
+            </Link>
+            <h1 className="text-4xl font-black text-slate-900 tracking-tighter">WhatsApp Integration</h1>
+            <p className="text-zinc-500 font-medium tracking-tight">Sync your real-time lead ingestion with global WhatsApp connectivity.</p>
+        </div>
+
+        <div className="flex items-center gap-1 bg-zinc-100 p-1 rounded-2xl w-fit border border-zinc-200">
+            <button 
+                onClick={() => setActiveTab("CONNECT")}
+                className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === "CONNECT" ? "bg-white text-primary shadow-sm" : "text-zinc-500"}`}
+            >
+                Connect Device
+            </button>
+            <button 
+                onClick={() => setActiveTab("WEBHOOK")}
+                className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === "WEBHOOK" ? "bg-white text-primary shadow-sm" : "text-zinc-500"}`}
+            >
+                Webhook Config
+            </button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* QR Panel */}
-        <div className="lg:col-span-1">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-            {/* Status bar */}
-            <div className={`px-6 py-4 flex items-center justify-between border-b border-slate-100 ${
-              status === "connected" ? "bg-emerald-50/50" :
-              status === "connecting" ? "bg-amber-50/50" : "bg-slate-50/50"
-            }`}>
-              <div className="flex items-center gap-3">
-                {status === "connected" ? (
-                  <><div className="relative"><Wifi className="h-5 w-5 text-emerald-500" /><span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-white animate-pulse" /></div><div><p className="font-black text-emerald-700 text-sm">Connected</p><p className="text-[10px] text-emerald-600">Active & Syncing</p></div></>
-                ) : status === "connecting" ? (
-                  <><RefreshCw className="h-5 w-5 text-amber-500 animate-spin" /><div><p className="font-black text-amber-700 text-sm">Waiting for scan…</p><p className="text-[10px] text-amber-600">Scan QR with your phone</p></div></>
-                ) : (
-                  <><WifiOff className="h-5 w-5 text-slate-400" /><div><p className="font-black text-slate-600 text-sm">Not Connected</p><p className="text-[10px] text-slate-400">Click connect to start</p></div></>
-                )}
-              </div>
-              {status === "connected" && (
-                <Link href="/dashboard" className="text-[10px] font-black text-emerald-700 bg-emerald-100 px-3 py-1.5 rounded-lg hover:bg-emerald-200 transition-all uppercase tracking-tighter">
-                  Done, Go Back
-                </Link>
-              )}
-            </div>
+      {activeTab === "CONNECT" ? (
+          <div className="animate-in fade-in zoom-in-95 duration-500">
+            <div className="bg-white border border-slate-200 rounded-[48px] shadow-sm overflow-hidden min-h-[600px] flex flex-col">
+                {/* Connection Status Bar */}
+                <div className={`p-8 flex items-center justify-between border-b border-zinc-100 ${status === "connected" ? "bg-emerald-50/30" : status === "connecting" ? "bg-amber-50/30" : "bg-white"}`}>
+                    <div className="flex items-center gap-4">
+                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${status === "connected" ? "bg-emerald-500 text-white" : status === "connecting" ? "bg-amber-500 text-white" : "bg-zinc-100 text-zinc-400"}`}>
+                            {status === "connected" ? <Globe className="animate-spin-slow" /> : status === "connecting" ? <RefreshCw className="animate-spin" /> : <WifiOff />}
+                        </div>
+                        <div>
+                            <p className="font-black text-slate-800 uppercase tracking-widest text-[10px]">Current Status</p>
+                            <p className={`text-lg font-black uppercase tracking-tighter ${status === "connected" ? "text-emerald-600" : status === "connecting" ? "text-amber-600" : "text-zinc-400"}`}>
+                                {status === "connected" ? "LIVE & SYNCED" : status === "connecting" ? "WAITING FOR SCAN" : "DISCONNECTED"}
+                            </p>
+                        </div>
+                    </div>
+                </div>
 
-            {/* QR code area */}
-            <div className="p-8 flex flex-col items-center justify-center min-h-[300px]">
-              {status === "connected" ? (
-                <div className="flex flex-col items-center gap-4 text-center">
-                  <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center">
-                    <CheckCircle2 className="h-10 w-10 text-emerald-500" />
-                  </div>
-                  <div>
-                    <p className="font-black text-slate-800 text-lg">WhatsApp Live! 🎉</p>
-                    <p className="text-slate-500 text-sm mt-1">Leads will be sent to your<br />WhatsApp automatically.</p>
-                  </div>
-                  <button
-                    onClick={simulateLead}
-                    className="mt-2 px-5 py-2.5 bg-emerald-500 text-white rounded-xl text-sm font-bold hover:bg-emerald-600 transition-colors"
-                  >
-                    <span className="flex items-center gap-1.5"><Zap className="h-4 w-4" />Send Test Client</span>
-                  </button>
+                {/* Primary QR Focus Area */}
+                <div className="flex-1 flex flex-col items-center justify-center p-12 text-center">
+                    {status === "connected" ? (
+                        <div className="space-y-8">
+                            <div className="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mx-auto ring-8 ring-emerald-50 overflow-hidden relative group">
+                                <div className="absolute inset-0 bg-emerald-500/10 group-hover:bg-emerald-500/20 transition-all duration-700" />
+                                <CheckCircle2 size={48} className="text-emerald-500 relative z-10" />
+                            </div>
+                            <div className="space-y-2">
+                                <h2 className="text-3xl font-black text-slate-900 tracking-tight">Active Connectivity! 🚀</h2>
+                                <p className="text-zinc-500 font-medium max-w-sm mx-auto">Your agency is now synchronized. New leads will be dispatched to your WhatsApp immediately.</p>
+                            </div>
+                            <div className="bg-zinc-50 border border-zinc-100 rounded-3xl p-6 flex items-center gap-4 text-left">
+                                <Shield className="text-emerald-500 shrink-0" size={24} />
+                                <p className="text-xs font-semibold text-slate-600 leading-relaxed"><strong>Security Verified:</strong> Your session is protected via local authentication. No private data is ever shared with external handlers.</p>
+                            </div>
+                        </div>
+                    ) : status === "connecting" && qr ? (
+                        <div className="space-y-10">
+                            <div className="space-y-2">
+                                <h2 className="text-3xl font-black text-slate-900 tracking-tighter">Scan to Authorize</h2>
+                                <p className="text-sm font-medium text-zinc-400 uppercase tracking-widest">Open WhatsApp → Linked Devices → Scan</p>
+                            </div>
+                            <div className="relative group">
+                                <div className="absolute -inset-4 bg-gradient-to-r from-emerald-500 to-blue-500 rounded-[44px] blur-xl opacity-20 group-hover:opacity-40 transition-all duration-1000" />
+                                <div className="bg-white p-6 rounded-[40px] border-4 border-slate-900 shadow-2xl relative">
+                                    <img src={qr} alt="WhatsApp QR" className="w-[320px] h-[320px]" />
+                                </div>
+                            </div>
+                            <div className="bg-amber-50 rounded-2xl p-4 flex items-center justify-center gap-3 text-amber-700">
+                                <RefreshCw size={14} className="animate-spin" />
+                                <p className="text-[10px] font-black uppercase tracking-widest">Polling Secure Gateway...</p>
+                            </div>
+                        </div>
+                    ) : status === "connecting" ? (
+                        <div className="space-y-6">
+                            <Loader2 size={64} className="animate-spin text-amber-500 mx-auto" />
+                            <div className="space-y-2">
+                                <h2 className="text-xl font-black text-slate-800">Booting WhatsApp Cluster</h2>
+                                <p className="text-xs font-black text-zinc-400 uppercase tracking-widest">Generating Digital Handshake...</p>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="space-y-8">
+                            <div className="w-24 h-24 bg-zinc-100 rounded-[32px] flex items-center justify-center mx-auto">
+                                <Smartphone size={40} className="text-zinc-300" />
+                            </div>
+                            <div className="space-y-2">
+                                <h2 className="text-3xl font-black text-slate-900 tracking-tight">Offline</h2>
+                                <p className="text-zinc-500 font-medium max-w-sm mx-auto">Connect your flagship WhatsApp account to enable professional lead alerts 24/7.</p>
+                            </div>
+                        </div>
+                    )}
                 </div>
-              ) : status === "connecting" && qr ? (
-                <div className="flex flex-col items-center gap-4">
-                  <div className="bg-white p-3 rounded-2xl border-2 border-emerald-500 shadow-lg">
-                    <img src={qr} alt="WhatsApp QR Code" className="w-56 h-56" />
-                  </div>
-                  <p className="text-xs text-slate-500 text-center max-w-[200px]">
-                    Open WhatsApp → tap ⋮ → <strong>Linked Devices</strong> → scan this QR
-                  </p>
-                </div>
-              ) : status === "connecting" ? (
-                <div className="flex flex-col items-center gap-4 text-center">
-                  <RefreshCw className="h-12 w-12 text-amber-400 animate-spin" />
-                  <div>
-                    <p className="font-black text-slate-700">Generating QR Code…</p>
-                    <p className="text-slate-400 text-sm mt-1">This may take 10–20 seconds</p>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex flex-col items-center gap-4 text-center">
-                  <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center">
-                    <Smartphone className="h-10 w-10 text-slate-400" />
-                  </div>
-                  <div>
-                    <p className="font-black text-slate-700">Not Connected</p>
-                    <p className="text-slate-400 text-sm mt-1">Connect your WhatsApp to<br />receive client alerts instantly</p>
-                  </div>
-                </div>
-              )}
-            </div>
 
-            {/* Action button */}
-            <div className="px-6 pb-6">
-              {status === "connected" ? (
-                <button
-                  onClick={handleDisconnect}
-                  disabled={loading}
-                  className="w-full py-3 border-2 border-red-200 text-red-600 rounded-xl font-bold text-sm hover:bg-red-50 transition-colors flex items-center justify-center gap-2"
-                >
-                  <XCircle className="h-4 w-4" /> Disconnect WhatsApp
-                </button>
-              ) : (
-                <button
-                  onClick={status === "connecting" ? undefined : handleConnect}
-                  disabled={loading || status === "connecting"}
-                  className={`w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
-                    status === "connecting"
-                      ? "bg-amber-100 text-amber-600 cursor-default"
-                      : "bg-emerald-500 text-white hover:bg-emerald-600 shadow-lg shadow-emerald-500/30"
-                  }`}
-                >
-                  {status === "connecting" ? (
-                    <><RefreshCw className="h-4 w-4 animate-spin" />Waiting for QR…</>
+                {/* Footer Action */}
+                <div className="p-8 bg-zinc-50 border-t border-zinc-100">
+                    {status === "connected" ? (
+                        <button 
+                            onClick={handleDisconnect}
+                            disabled={loading}
+                            className="w-full py-5 bg-white border border-red-200 text-red-600 rounded-3xl text-xs font-black uppercase tracking-widest hover:bg-red-50 transition-all flex items-center justify-center gap-2"
+                        >
+                            {loading ? <Loader2 className="animate-spin" /> : <><XCircle size={16} /> Disconnect Device</>}
+                        </button>
+                    ) : (
+                        <button 
+                            onClick={handleConnect}
+                            disabled={loading || status === "connecting"}
+                            className="w-full py-5 bg-emerald-500 text-white rounded-3xl text-sm font-black uppercase tracking-[0.2em] shadow-xl shadow-emerald-500/20 hover:scale-[1.01] active:scale-95 transition-all flex items-center justify-center gap-3 disabled:bg-zinc-200 disabled:text-zinc-400 disabled:shadow-none"
+                        >
+                            {loading ? <Loader2 className="animate-spin" /> : <><MessageSquare size={18} /> Connect Core Handset</>}
+                        </button>
+                    )}
+                </div>
+            </div>
+          </div>
+      ) : (
+          /* Webhook Configuration Section */
+          <div className="animate-in fade-in slide-in-from-right-4 duration-500 space-y-8">
+              <div className="bg-white border border-slate-200 rounded-[48px] p-12 overflow-hidden relative">
+                  <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-12">
+                      <div className="space-y-2">
+                          <h2 className="text-2xl font-black text-slate-800 tracking-tight">Agency Webhooks</h2>
+                          <p className="text-sm text-zinc-500 font-medium">Inject leads directly into PropGoCRM via your website or third-party forms.</p>
+                      </div>
+                      <button 
+                        onClick={handleCreateWebhook}
+                        disabled={whLoading}
+                        className="px-8 py-4 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.1em] hover:scale-105 active:scale-95 transition-all shadow-xl shadow-slate-900/10 flex items-center gap-2"
+                      >
+                          {whLoading ? <Loader2 className="animate-spin"/> : <><Plus size={14}/> Generate Webhook</>}
+                      </button>
+                  </div>
+
+                  {whLoading ? (
+                      <div className="flex flex-col items-center justify-center py-20 gap-4">
+                          <Loader2 className="animate-spin text-primary" size={40} />
+                          <p className="text-[10px] font-black uppercase text-zinc-400">Updating Webhook Registry...</p>
+                      </div>
+                  ) : webhooks.length > 0 ? (
+                      <div className="space-y-6">
+                        {webhooks.map((wh) => (
+                            <div key={wh.id} className="bg-zinc-50 border border-zinc-100 rounded-3xl p-8 space-y-6">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-3 bg-white border border-zinc-200 rounded-xl"><Globe size={18} className="text-primary"/></div>
+                                        <div>
+                                            <p className="text-sm font-black text-slate-800">{wh.name}</p>
+                                            <p className="text-[10px] font-black text-emerald-500 uppercase">ACTIVE & READY</p>
+                                        </div>
+                                    </div>
+                                    <button 
+                                        onClick={() => handleDeleteWebhook(wh.id)}
+                                        className="p-3 bg-white border border-red-100 text-red-500 rounded-xl hover:bg-red-50 transition-all"
+                                    >
+                                        <Trash2 size={16}/>
+                                    </button>
+                                </div>
+                                
+                                <div className="space-y-4 pt-4 border-t border-zinc-200/50">
+                                    <div className="space-y-1.5">
+                                        <label className="text-[9px] font-black uppercase text-zinc-400 tracking-widest flex items-center gap-1.5"><Globe size={10}/> Endpoint URL</label>
+                                        <div className="flex items-center gap-2">
+                                            <code className="flex-1 bg-white px-5 py-3 border border-zinc-200 rounded-xl text-xs font-bold text-slate-600 truncate">
+                                                {process.env.NEXT_PUBLIC_APP_URL}/api/webhooks/incoming/{wh.agencyId}
+                                            </code>
+                                            <button onClick={() => { navigator.clipboard.writeText(`${process.env.NEXT_PUBLIC_APP_URL}/api/webhooks/incoming/${wh.agencyId}`); alert("URL Copied!"); }} className="p-3 bg-white border border-zinc-200 rounded-xl hover:bg-zinc-50 transition-all font-black text-[10px] uppercase">Copy</button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div className="space-y-1.5">
+                                        <label className="text-[9px] font-black uppercase text-zinc-400 tracking-widest flex items-center gap-1.5"><Key size={10}/> Webhook Secret</label>
+                                        <div className="flex items-center gap-2">
+                                            <code className="flex-1 bg-white px-5 py-3 border border-zinc-200 rounded-xl text-xs font-bold text-slate-600 truncate">
+                                                {wh.secret}
+                                            </code>
+                                            <button onClick={() => { navigator.clipboard.writeText(wh.secret); alert("Secret Copied!"); }} className="p-3 bg-white border border-zinc-200 rounded-xl hover:bg-zinc-50 transition-all font-black text-[10px] uppercase">Copy</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                      </div>
                   ) : (
-                    <><MessageSquare className="h-4 w-4" />Connect WhatsApp</>
+                    <div className="flex flex-col items-center justify-center py-20 text-center gap-6">
+                        <div className="w-20 h-20 bg-zinc-50 border-2 border-dashed border-zinc-200 rounded-[32px] flex items-center justify-center">
+                            <Zap size={32} className="text-zinc-300" />
+                        </div>
+                        <div className="space-y-2">
+                            <h3 className="text-xl font-black text-slate-800">No Webhooks Established</h3>
+                            <p className="text-sm text-zinc-500 font-medium max-w-xs">Generate your first webhook to begin ingestion from your external platforms.</p>
+                        </div>
+                    </div>
                   )}
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Right: Info + Lead log */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* How it works */}
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6">
-            <h2 className="font-black text-slate-800 mb-5">How It Works</h2>
-            <div className="space-y-4">
-              {[
-                { step: "1", title: "Connect Your WhatsApp", desc: "Click 'Connect WhatsApp' and scan the QR code with your phone's WhatsApp (Linked Devices).", icon: Smartphone, color: "bg-blue-600" },
-                { step: "2", title: "Stay Logged In", desc: "Your WhatsApp session stays active in the background. No need to keep the page open.", icon: Wifi, color: "bg-emerald-600" },
-                { step: "3", title: "Receive Client Alerts", desc: "When a new client is assigned to you, PropCRM auto-sends the full details to your WhatsApp instantly.", icon: Bell, color: "bg-amber-500" },
-                { step: "4", title: "Take Immediate Action", desc: "You'll see the client's name, phone, property interest, budget, and source — all in one WhatsApp message.", icon: MessageSquare, color: "bg-purple-600" },
-              ].map(s => (
-                <div key={s.step} className="flex gap-4">
-                  <div className={`${s.color} w-9 h-9 rounded-xl flex items-center justify-center text-white text-sm font-black shrink-0`}>{s.step}</div>
-                  <div>
-                    <p className="font-black text-slate-800 text-sm">{s.title}</p>
-                    <p className="text-slate-500 text-xs mt-0.5 leading-relaxed">{s.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Sample message preview */}
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-6">
-            <h2 className="font-black text-slate-800 mb-4">Sample WhatsApp Message</h2>
-            <div className="bg-[#DCF8C6] rounded-2xl rounded-br-none p-4 max-w-xs shadow-sm font-sans text-sm text-slate-900 space-y-1 ml-auto">
-              <p>🏠 <strong>New Client Alert — PropCRM</strong></p>
-              <p></p>
-              <p>👤 <strong>Name:</strong> Amit Kapoor</p>
-              <p>📱 <strong>Phone:</strong> +91 98765 43210</p>
-              <p>🏡 <strong>Interest:</strong> 3BHK Bandra West</p>
-              <p>💰 <strong>Budget:</strong> ₹1.8 Cr</p>
-              <p>📌 <strong>Source:</strong> Website Form</p>
-              <p></p>
-              <p className="text-[10px] text-slate-400">Log in to PropCRM to take action</p>
-              <p className="text-[9px] text-slate-400 text-right">17:34 ✓✓</p>
-            </div>
-          </div>
-
-          {/* Last lead sent */}
-          {lastLead && (
-            <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 flex items-center gap-4">
-              <CheckCircle2 className="h-8 w-8 text-emerald-500 shrink-0" />
-              <div>
-                <p className="font-black text-emerald-800">Test client sent!</p>
-                <p className="text-emerald-600 text-sm">Client "{lastLead?.name}" was sent to your WhatsApp at {lastLead?.time}</p>
               </div>
-            </div>
-          )}
-
-          {/* Security note */}
-          <div className="flex gap-3 p-4 bg-blue-50 border border-blue-100 rounded-2xl">
-            <Shield className="h-5 w-5 text-blue-500 shrink-0 mt-0.5" />
-            <p className="text-xs text-blue-700 leading-relaxed">
-              <strong>Privacy:</strong> Your WhatsApp session is stored securely on our servers using local auth (no password required). Only PropCRM can send messages through this session. You can disconnect at any time.
-            </p>
           </div>
-        </div>
-      </div>
+      )}
     </div>
   )
 }

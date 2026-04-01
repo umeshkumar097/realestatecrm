@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
-import { sendStaffInvitationEmail } from "@/lib/mail"
+import { sendStaffInvitationEmail, sendMemberUpdateNotification } from "@/lib/mail"
 
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -19,7 +19,6 @@ export async function GET(req: NextRequest) {
       name: true,
       email: true,
       role: true,
-      emailVerified: true,
       createdAt: true
     },
     orderBy: { createdAt: "desc" }
@@ -86,6 +85,11 @@ export async function POST(req: NextRequest) {
 
     // 4. Send Invitation Email
     await sendStaffInvitationEmail(email, name, agency.name, password)
+
+    // 5. Notify Admin (The one who performed the action)
+    if (session.user.email) {
+      await sendMemberUpdateNotification(session.user.email, { name, email }, "ADDED", agency.name)
+    }
 
     return NextResponse.json({ 
       id: user.id, 

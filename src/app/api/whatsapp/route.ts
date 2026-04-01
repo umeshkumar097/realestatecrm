@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { baileysManager } from "@/lib/whatsapp/baileys-manager"
+import { prisma } from "@/lib/prisma"
 import QRCode from "qrcode"
 
 export async function GET(req: NextRequest) {
@@ -9,23 +10,33 @@ export async function GET(req: NextRequest) {
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const userId = (session.user as any).id
-  const instance = await baileysManager.getInstance(userId)
-
-  if (!instance) {
-    return NextResponse.json({ status: "DISCONNECTED", qr: null })
-  }
-
+  const agencyId = (session.user as any).agencyId
+  
+  let instance = await baileysManager.getInstance(userId)
   let qrDataUrl: string | null = null
-  if (instance.qr) {
-    try {
-      qrDataUrl = await QRCode.toDataURL(instance.qr, { width: 300, margin: 2 })
-    } catch (err) {
-      console.error("QR Generation Error:", err)
+  let status = instance?.status || "DISCONNECTED"
+
+  // 1. Check in-memory instance first
+  if (instance?.qr) {
+    qrDataUrl = await QRCode.toDataURL(instance.qr, { width: 300, margin: 2 })
+  } 
+  
+  // 2. Fallback to Database if in-memory is missing or has no QR
+  if (!qrDataUrl) {
+    const dbSession = await prisma.whatsAppSession.findUnique({
+      where: { agentId: userId }
+    })
+    
+    if (dbSession?.status === "CONNECTING" && dbSession.qrCode) {
+        status = "CONNECTING"
+        qrDataUrl = await QRCode.toDataURL(dbSession.qrCode, { width: 300, margin: 2 })
+    } else if (dbSession?.status === "CONNECTED") {
+        status = "CONNECTED"
     }
   }
 
   return NextResponse.json({ 
-    status: instance.status, 
+    status, 
     qr: qrDataUrl 
   })
 }

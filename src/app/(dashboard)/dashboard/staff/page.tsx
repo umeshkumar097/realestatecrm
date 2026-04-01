@@ -91,6 +91,24 @@ export default function StaffPage() {
     }
   }
 
+  const handleDeleteMember = async (id: string) => {
+    if (!confirm("Are you sure? This will permanently remove this agent and their assignments.")) return
+    setLoading(true)
+    try {
+        const res = await fetch(`/api/staff/${id}`, { method: "DELETE" })
+        if (res.ok) {
+            loadStaff()
+        } else {
+            const err = await res.json()
+            alert(err.error || "Failed to delete")
+        }
+    } catch (e) {
+        alert("Deletion failed")
+    } finally {
+        setLoading(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -144,7 +162,12 @@ export default function StaffPage() {
             <div className="mt-8 pt-6 border-t border-slate-50 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <button className="p-2 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-xl transition-all"><Edit3 className="h-4 w-4" /></button>
-                  <button className="p-2 text-slate-400 hover:text-amber-500 hover:bg-amber-50 rounded-xl transition-all"><Lock className="h-4 w-4" /></button>
+                  <button 
+                    onClick={() => handleDeleteMember(member.id)}
+                    className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
                 </div>
                 {member.emailVerified ? (
                     <div className="flex items-center gap-1 text-[9px] font-black text-emerald-500 uppercase tracking-widest">

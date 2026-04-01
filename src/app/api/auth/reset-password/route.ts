@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { hash } from "bcrypt"
+import { sendPasswordResetSuccessEmail } from "@/lib/mail"
 
 export async function POST(req: NextRequest) {
   try {
@@ -41,6 +42,11 @@ export async function POST(req: NextRequest) {
         where: { id: resetToken.id }
       })
     ])
+
+    // 5. Notify user of success
+    if (user.email) {
+        await sendPasswordResetSuccessEmail(user.email, user.name || "PropGoCRM User");
+    }
 
     return NextResponse.json({ message: "Password updated successfully" })
   } catch (error: any) {
