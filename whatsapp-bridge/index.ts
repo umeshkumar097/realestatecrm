@@ -155,19 +155,13 @@ class BaileysManager {
                 if (m.type !== "notify") return;
                 for (const msg of m.messages) {
                     if (!msg.message || msg.key.fromMe) continue;
-                    
                     const contact = msg.key.remoteJid;
                     const content = msg.message.conversation || msg.message.extendedTextMessage?.text || "";
-
                     logger.info(`📩 Incoming from ${contact}: ${content}`);
-
                     if (WEBHOOK_URL) {
                         fetch(WEBHOOK_URL, {
                             method: "POST",
-                            headers: { 
-                                "Content-Type": "application/json",
-                                "x-bridge-secret": SECRET
-                            },
+                            headers: { "Content-Type": "application/json", "x-bridge-secret": SECRET },
                             body: JSON.stringify({
                                 type: "chat",
                                 agentId,
@@ -184,6 +178,43 @@ class BaileysManager {
                 }
             });
 
+            socket.ev.on("messaging-history.set", async ({ messages }) => {
+                logger.info(`📜 History received: ${messages.length} messages. Filtering for last 48h...`);
+                const now = Math.floor(Date.now() / 1000);
+                const twoDaysAgo = now - (2 * 24 * 60 * 60);
+                const filtered = messages.filter(m => {
+                    const ts = Number(m.messageTimestamp);
+                    const jid = m.key.remoteJid || "";
+                    return ts > twoDaysAgo && (jid.endsWith("@s.whatsapp.net") || jid.endsWith("@lid"));
+                });
+                logger.info(`🎯 Found ${filtered.length} relevant historical messages. Syncing to CRM in batches...`);
+                const batchSize = 50;
+                for (let i = 0; i < filtered.length; i += batchSize) {
+                    const batch = filtered.slice(i, i + batchSize).map(m => ({
+                        whatsappId: m.key.id,
+                        contact: m.key.remoteJid,
+                        content: m.message?.conversation || m.message?.extendedTextMessage?.text || "",
+                        fromMe: m.key.fromMe || false,
+                        timestamp: m.messageTimestamp,
+                        pushName: m.pushName || null,
+                        status: m.status === 4 ? "READ" : m.status === 3 ? "DELIVERED" : "SENT"
+                    }));
+                    if (WEBHOOK_URL) {
+                        try {
+                            await fetch(WEBHOOK_URL, {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json", "x-bridge-secret": SECRET },
+                                body: JSON.stringify({ type: "batch_history", agentId, messages: batch })
+                            });
+                            logger.info(`✅ Synced batch ${Math.floor(i/batchSize) + 1} of ${Math.ceil(filtered.length/batchSize)}`);
+                        } catch (err: any) {
+                            logger.error(`❌ Batch Sync Error: ${err.message}`);
+                        }
+                    }
+                    await new Promise(r => setTimeout(r, 1000));
+                }
+            });
+
             socket.ev.on("messages.update", async (updates) => {
                 for (const update of updates) {
                     if (update.update.status && WEBHOOK_URL) {
@@ -192,16 +223,8 @@ class BaileysManager {
                         if (status) {
                             fetch(WEBHOOK_URL, {
                                 method: "POST",
-                                headers: { 
-                                    "Content-Type": "application/json",
-                                    "x-bridge-secret": SECRET
-                                },
-                                body: JSON.stringify({
-                                    type: "status",
-                                    agentId,
-                                    whatsappId: update.key.id,
-                                    status
-                                })
+                                headers: { "Content-Type": "application/json", "x-bridge-secret": SECRET },
+                                body: JSON.stringify({ type: "status", agentId, whatsappId: update.key.id, status })
                             })
                             .then(r => logger.info(`✅ Status Webhook (${status}): ${r.status}`))
                             .catch(err => logger.error(`❌ Status Webhook Error: ${err.message}`));
