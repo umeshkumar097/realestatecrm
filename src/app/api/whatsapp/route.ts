@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { baileysManager } from "@/lib/whatsapp/baileys-manager"
+import QRCode from "qrcode"
 
 /**
  * Pure Vercel API Route (No VPS Bridge) 🛰️
@@ -15,9 +16,14 @@ export async function GET(req: NextRequest) {
   const userId = (session.user as any).id
   const status = await baileysManager.getStatus(userId)
 
+  let qrDataUrl = null
+  if (status?.qrCode) {
+    qrDataUrl = await QRCode.toDataURL(status.qrCode)
+  }
+
   return NextResponse.json({ 
     status: status?.status || "DISCONNECTED", 
-    qr: status?.qrCode || null 
+    qr: qrDataUrl 
   })
 }
 
