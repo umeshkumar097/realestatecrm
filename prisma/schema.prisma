@@ -37,6 +37,8 @@ model Agency {
   gstNumber            String?
   billingAddress       String?
   billingEmail         String?
+  apiKey               String?             @unique
+  apiUsageCount        Int                 @default(0)
 }
 
 model PlatformInvoice {

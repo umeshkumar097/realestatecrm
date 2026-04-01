@@ -47,11 +47,16 @@ export default function BillingPage() {
       if (captchaInput !== mockCaptcha) return alert("Invalid Captcha")
       setLoading("gst")
       setTimeout(() => {
-          // Simulated Data extraction for high-fidelity UX
-          const mockData = {
+          // Intelligent Mocking: Recognizes the real Aiclex GSTIN
+          const isAiclex = gstSearch === "09JAMPK1070B1ZS"
+          const mockData = isAiclex ? {
+              company: "Aiclex Technologies",
+              address: "8125 8th Floor, Gaur City Mall Office Space, Sector 4, Greater Noida 201318"
+          } : {
               company: `${gstSearch.slice(2, 7)} Enterprises Private Ltd`,
               address: `Tower ${gstSearch.slice(0, 2)}, Sector 15, Industrial Hub, Northern Corporate Zone`
           }
+          
           setBillingForm({
               ...billingForm,
               gstNumber: gstSearch,
@@ -577,11 +582,15 @@ export default function BillingPage() {
                           <div className="space-y-4">
                               <div className="p-6 bg-zinc-50 rounded-3xl border border-zinc-100">
                                   <p className="text-[9px] font-black uppercase text-zinc-400 tracking-widest mb-1">Extracted Legal Name</p>
-                                  <p className="text-sm font-black text-slate-800">{gstSearch.slice(2, 7)} Enterprises Private Ltd</p>
+                                  <p className="text-sm font-black text-slate-800">{gstSearch === "09JAMPK1070B1ZS" ? "Aiclex Technologies" : `${gstSearch.slice(2, 7)} Enterprises Private Ltd`}</p>
                               </div>
                               <div className="p-6 bg-zinc-50 rounded-3xl border border-zinc-100">
                                   <p className="text-[9px] font-black uppercase text-zinc-400 tracking-widest mb-1">Registered Commercial Address</p>
-                                  <p className="text-sm font-black text-slate-800 leading-relaxed">Tower {gstSearch.slice(0, 2)}, Sector 15, Industrial Hub, Northern Corporate Zone</p>
+                                  <p className="text-sm font-black text-slate-800 leading-relaxed">
+                                      {gstSearch === "09JAMPK1070B1ZS" 
+                                          ? "8125 8th Floor, Gaur City Mall Office Space, Sector 4, Greater Noida 201318" 
+                                          : `Tower ${gstSearch.slice(0, 2)}, Sector 15, Industrial Hub, Northern Corporate Zone`}
+                                  </p>
                               </div>
                           </div>
                           <div className="grid grid-cols-2 gap-4">

@@ -15,7 +15,9 @@ import {
   ListTodo,
   ShieldAlert,
   ShieldCheck,
-  Activity
+  Activity,
+  Code,
+  Zap
 } from "lucide-react"
 import { signOut, useSession } from "next-auth/react"
 import { cn } from "@/lib/utils"
@@ -117,6 +119,39 @@ export default function DashboardClientLayout({
             )
           })}
         </div>
+
+        {/* Developer Section */}
+        {((session?.user as any)?.role === 'ADMIN' || (session?.user as any)?.role === 'AGENCY_OWNER') && (
+          <div className="px-4 py-2 mt-auto">
+            <p className="px-3 mb-2 text-[10px] font-black uppercase tracking-widest text-zinc-400">Developer Suite</p>
+            <div className="space-y-1">
+              <Link
+                href="/dashboard/developer/api"
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all group",
+                  pathname === '/dashboard/developer/api' 
+                    ? "bg-zinc-900 text-white shadow-md shadow-zinc-900/10" 
+                    : "text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100"
+                )}
+              >
+                <Code className={cn("h-4 w-4", pathname === '/dashboard/developer/api' ? "text-white" : "text-zinc-400 group-hover:text-zinc-600")} />
+                API Settings
+              </Link>
+              <Link
+                href="/dashboard/developer/webhooks"
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all group",
+                  pathname === '/dashboard/developer/webhooks' 
+                    ? "bg-zinc-900 text-white shadow-md shadow-zinc-900/10" 
+                    : "text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100"
+                )}
+              >
+                <Zap className={cn("h-4 w-4", pathname === '/dashboard/developer/webhooks' ? "text-white" : "text-zinc-400 group-hover:text-zinc-600")} />
+                Webhooks
+              </Link>
+            </div>
+          </div>
+        )}
 
         <div className="p-4 border-t border-zinc-100 dark:border-zinc-800">
           <button
