@@ -4,9 +4,9 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sendMemberUpdateNotification } from "@/lib/mail";
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     const session = await getServerSession(authOptions);
-    const { id } = params;
+    const { id } = await params;
 
     if (!session?.user || (session.user as any).role !== "ADMIN") {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
