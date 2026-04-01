@@ -18,6 +18,8 @@ export default function SignupPage() {
     password: "",
   })
   const [token, setToken] = useState("")
+  const [couponCode, setCouponCode] = useState("")
+  const [couponPlan, setCouponPlan] = useState<any>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const router = useRouter()
@@ -31,6 +33,28 @@ export default function SignupPage() {
       })
     }
   }, [step])
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode) return
+    setLoading(true)
+    setError("")
+    try {
+      const res = await fetch("/api/coupons/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: couponCode }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || "Invalid coupon")
+      
+      setCouponPlan(data.plan)
+      setSelectedPlan(data.plan)
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleNextStep = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -82,15 +106,32 @@ export default function SignupPage() {
         return
     }
     
-    if (selectedPlan.name === "Enterprise") {
+    if (selectedPlan.name === "Enterprise" && !couponPlan) {
         router.push("/contact?plan=enterprise")
         return
     }
-    
+
     setLoading(true)
     setError("")
 
     try {
+      if (couponPlan?.id === selectedPlan.id || selectedPlan.monthlyPrice === 0) {
+        console.log("[Bypass]: Activating plan via Coupon/Lifetime logic...")
+        const res = await fetch("/api/super-admin/agencies/upgrade-manual", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+                email: formData.email, 
+                planId: selectedPlan.id,
+                couponCode: couponPlan?.code 
+            }),
+        })
+        const data = await res.json()
+        if (!res.ok) throw new Error(data.error || "Failed to activate plan")
+        router.push("/signup/success?plan=" + selectedPlan.name)
+        return
+      }
+
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -112,7 +153,7 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-50 dark:bg-zinc-950 p-6 selection:bg-blue-100 selection:text-blue-900">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-zinc-50 dark:bg-zinc-950 p-6 selection:bg-blue-100 selection:text-blue-900 font-inter">
       <div className="w-full max-w-4xl">
         <div className="flex items-center justify-center gap-2 mb-10">
             <div className={cn("w-3 h-3 rounded-full transition-all duration-700", step >= 1 ? "bg-primary" : "bg-zinc-200")} />
@@ -181,22 +222,41 @@ export default function SignupPage() {
           </div>
         ) : (
           <div className="animate-in fade-in slide-in-from-bottom-5 duration-700">
-            <div className="text-center mb-16">
-                <h2 className="text-4xl lg:text-7xl font-black tracking-tighter text-slate-900 mb-4 leading-none">Choose Your Package.</h2>
-                <p className="text-slate-500 font-bold uppercase tracking-[0.25em] text-xs flex items-center justify-center gap-2">
-                    <Sparkles className="h-4 w-4 text-emerald-500" /> Start with a 3-day full access trial
-                </p>
+            <div className="text-center mb-8">
+                <h2 className="text-4xl lg:text-7xl font-black tracking-tighter text-slate-900 mb-2 leading-none uppercase italic">Choose Your Package.</h2>
+                <div className="flex flex-col items-center gap-4">
+                    <p className="text-slate-500 font-bold uppercase tracking-[0.25em] text-xs flex items-center justify-center gap-2">
+                        <Sparkles className="h-4 w-4 text-emerald-500" /> Start with a 3-day full access trial
+                    </p>
+                    
+                    <div className="flex items-center gap-2 mt-4 bg-white border border-zinc-200 rounded-full pl-6 pr-2 py-2 shadow-sm focus-within:ring-2 focus-within:ring-primary transition-all">
+                         <span className="text-[10px] font-black uppercase text-zinc-400 tracking-widest">Gift Code:</span>
+                         <input 
+                            className="bg-transparent border-none outline-none font-bold text-sm w-32 placeholder:text-zinc-300"
+                            placeholder="PROMO2026"
+                            value={couponCode}
+                            onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                         />
+                         <button 
+                            onClick={handleApplyCoupon}
+                            disabled={loading || !couponCode}
+                            className="px-6 py-2 bg-slate-900 text-white rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-slate-800 transition-colors disabled:opacity-30"
+                         >
+                            Apply
+                         </button>
+                    </div>
+                    {couponPlan && (
+                        <div className="bg-emerald-50 text-emerald-600 px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-2 border border-emerald-100 animate-in slide-in-from-top-2">
+                            <CheckCircle2 className="h-3 w-3" /> Activated: {couponPlan.name} (Bypassing Stripe)
+                        </div>
+                    )}
+                </div>
             </div>
 
             {error && <div className="mb-12 p-6 bg-red-50 text-red-600 rounded-[32px] border border-red-100 text-center font-bold shadow-xl shadow-red-500/5">{error}</div>}
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-                {loading && plans.length === 0 ? (
-                    <div className="col-span-3 text-center py-40">
-                         <Loader2 className="h-16 w-16 animate-spin text-primary mx-auto mb-6" />
-                         <p className="text-slate-950 font-black text-2xl tracking-tighter italic">Initialising Secure Vault...</p>
-                    </div>
-                ) : plans.map((plan) => (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mt-12">
+                {plans.filter(p => p.isPublic || (couponPlan && p.id === couponPlan.id)).map((plan) => (
                     <button 
                         key={plan.id}
                         onClick={() => setSelectedPlan(plan)}
@@ -208,22 +268,22 @@ export default function SignupPage() {
                         )}
                     >
                         {selectedPlan?.id === plan.id && (
-                            <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-primary text-white text-[10px] font-black uppercase tracking-[0.3em] px-6 py-2.5 rounded-full shadow-2xl">Selected Package</div>
+                            <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-primary text-white text-[10px] font-black uppercase tracking-[0.3em] px-6 py-2.5 rounded-full shadow-2xl">Targeted Plan</div>
                         )}
-                        <h3 className="text-3xl font-black text-slate-900 mb-2">{plan.name}</h3>
-                        <p className="text-sm font-bold text-slate-500 mb-10 leading-relaxed">{plan.description}</p>
+                        <h3 className="text-3xl font-black text-slate-900 mb-2 uppercase italic">{plan.name}</h3>
+                        <p className="text-sm font-bold text-slate-500 mb-10 leading-relaxed font-inter">{plan.description}</p>
                         
-                        <div className="text-4xl font-black text-slate-950 mb-10 flex items-baseline gap-1 tracking-tighter">
-                            <span className="text-2xl text-slate-400">₹</span> {plan.monthlyPrice}
-                            <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest ml-2">/ month</span>
+                        <div className="text-4xl font-black text-slate-950 mb-10 flex items-baseline gap-1 tracking-tighter uppercase italic">
+                            <span className="text-2xl text-slate-400 not-italic">₹</span> {plan.monthlyPrice}
+                            <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest ml-2 not-italic font-inter">/ month</span>
                         </div>
 
                         <div className="space-y-5 flex-1 mb-10">
-                            <div className="flex items-center gap-4 text-sm font-bold text-slate-700">
+                            <div className="flex items-center gap-4 text-sm font-bold text-slate-700 font-inter">
                                 <Users className="h-5 w-5 text-blue-500 bg-blue-50 rounded-lg p-1" /> {plan.maxAgents} Agents Max
                             </div>
                             {plan.features?.map((f: string, i: number) => (
-                                <div key={i} className="flex items-start gap-4 text-xs font-bold text-slate-600">
+                                <div key={i} className="flex items-start gap-4 text-xs font-bold text-slate-600 font-inter">
                                     <CheckCircle2 className="h-4 w-4 text-emerald-500 shrink-0 mt-0.5" />
                                     {f}
                                 </div>
@@ -234,7 +294,7 @@ export default function SignupPage() {
                             "w-full py-5 rounded-[24px] text-[10px] font-black uppercase tracking-[0.3em] text-center transition-all",
                             selectedPlan?.id === plan.id ? "bg-slate-900 text-white shadow-xl" : "bg-zinc-50 text-zinc-400 group-hover:bg-zinc-100"
                         )}>
-                            {selectedPlan?.id === plan.id ? (plan.name === "Enterprise" ? "Contact Support" : "Start 3-Day Trial") : "View Details"}
+                            {selectedPlan?.id === plan.id ? (plan.name === "Enterprise" ? "Contact Support" : (couponPlan ? "Activate Account" : "Authorize 3-Day Trial")) : "View Details"}
                         </div>
                     </button>
                 ))}
@@ -244,13 +304,13 @@ export default function SignupPage() {
                 <button 
                     disabled={!selectedPlan || loading}
                     onClick={handleStartTrial}
-                    className="px-16 py-8 bg-blue-600 text-white rounded-[40px] font-black text-xl shadow-2xl shadow-blue-600/30 hover:scale-[1.03] active:scale-95 disabled:opacity-30 disabled:scale-100 transition-all flex items-center gap-4 group"
+                    className="px-16 py-8 bg-blue-600 text-white rounded-[40px] font-black text-xl shadow-2xl shadow-blue-600/30 hover:scale-[1.03] active:scale-95 disabled:opacity-30 disabled:scale-100 transition-all flex items-center gap-4 group uppercase italic"
                 >
-                    {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : (selectedPlan?.name === "Enterprise" ? "Request Enterprise Access" : "Authorise 3-Day Trial Checkout")}
+                    {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : (selectedPlan?.name === "Enterprise" && !couponPlan ? "Request Enterprise Access" : "Authorise Activation")}
                     <ChevronRight className="h-7 w-7 group-hover:translate-x-1 transition-transform" />
                 </button>
                 
-                <p className="mt-10 text-center text-[10px] font-black text-zinc-400 uppercase tracking-[0.4em] max-w-lg leading-relaxed">
+                <p className="mt-10 text-center text-[10px] font-black text-zinc-400 uppercase tracking-[0.4em] max-w-lg leading-relaxed font-inter">
                    Secure Deployment: AES-256 Protected Connection
                 </p>
             </div>

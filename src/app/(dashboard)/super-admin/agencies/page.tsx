@@ -4,7 +4,7 @@ import {
   Building2, Users, Search, 
   ShieldCheck, ShieldAlert, MoreVertical,
   Calendar, Activity, Filter, Plus,
-  CheckCircle2, XCircle, AlertTriangle
+  CheckCircle2, XCircle, AlertTriangle, ShieldPlus
 } from "lucide-react"
 
 export default function AgenciesPage() {
@@ -62,6 +62,32 @@ export default function AgenciesPage() {
       if (res.ok) fetchAgencies()
     } catch (err) {
       alert("Failed to delete agency")
+    }
+  }
+
+  const handleUpgradeToLifetime = async (agencyId: string) => {
+    if (!confirm("Upgrade this agency to a Permanent Lifetime Membership?")) return
+    try {
+      const lifetimePlan = plans.find(p => p.name === "Lifetime Member")
+      if (!lifetimePlan) {
+          alert("Lifetime plan not seeded. Please contact Dev.")
+          return
+      }
+      
+      const res = await fetch(`/api/super-admin/agencies/upgrade-manual`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: agencies.find(a => a.id === agencyId).users[0]?.email, planId: lifetimePlan.id })
+      })
+      if (res.ok) {
+          alert("Agency upgraded to Lifetime successfully!")
+          fetchAgencies()
+      } else {
+          const data = await res.json()
+          alert(data.error || "Upgrade failed")
+      }
+    } catch (err) {
+      alert("Error upgrading agency")
     }
   }
 
@@ -204,6 +230,13 @@ export default function AgenciesPage() {
                                 <CheckCircle2 className="h-4 w-4" />
                             </button>
                         )}
+                        <button 
+                            onClick={() => handleUpgradeToLifetime(agency.id)}
+                            className="p-2 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-colors"
+                            title="Upgrade to Lifetime Member"
+                        >
+                            <ShieldPlus className="h-4 w-4" />
+                        </button>
                         <div className="relative group/menu">
                             <button className="p-2 bg-zinc-50 text-zinc-400 rounded-xl hover:bg-zinc-100 transition-colors">
                                 <MoreVertical className="h-4 w-4" />
