@@ -27,7 +27,7 @@ const logger = pino({ level: "info" })
 const app = express()
 app.use(express.json())
 
-const PORT = 8080 // Shifted to standard web port
+const PORT = 3000 // Reusing the standard Passfit port
 const SECRET = "Umesh_WA_Bridge_2003" 
 
 const auth = (req: any, res: any, next: any) => {
