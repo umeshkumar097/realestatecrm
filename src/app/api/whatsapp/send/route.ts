@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 
-const BRIDGE_URL = "http://203.57.85.225"
-const BRIDGE_SECRET = "Umesh_WA_Bridge_2003"
+const BRIDGE_URL = process.env.WHATSAPP_BRIDGE_URL || "http://137.184.114.109";
+const BRIDGE_SECRET = process.env.WHATSAPP_BRIDGE_SECRET || "Umesh_WA_Bridge_2003";
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions)
