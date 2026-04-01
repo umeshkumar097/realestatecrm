@@ -4,8 +4,8 @@
  */
 export const baileysManager = {
   sendMessage: async (userId: string, phone: string, message: string) => {
-    const BRIDGE_URL = "http://203.57.85.225"
-    const BRIDGE_SECRET = "Umesh_WA_Bridge_2003"
+    const BRIDGE_URL = process.env.WHATSAPP_BRIDGE_URL || "http://137.184.114.109";
+    const BRIDGE_SECRET = process.env.WHATSAPP_BRIDGE_SECRET || "Umesh_WA_Bridge_2003";
     const res = await fetch(`${BRIDGE_URL}/send`, {
       method: "POST",
       headers: { 
