@@ -18,7 +18,8 @@ import {
   Activity,
   Code,
   Zap,
-  BookOpen
+  BookOpen,
+  Home
 } from "lucide-react"
 import { signOut, useSession } from "next-auth/react"
 import { cn } from "@/lib/utils"
@@ -31,7 +32,8 @@ const navigation = [
   { name: 'Tasks', href: '/dashboard/tasks', icon: ListTodo },
   { name: 'Support', href: '/dashboard/tickets', icon: ShieldAlert },
   { name: 'Staff', href: '/dashboard/staff', icon: ShieldCheck, adminOnly: true },
-  { name: 'Projects', href: '/properties', icon: Building2 },
+  { name: 'Projects', href: '/dashboard/projects', icon: Building2 },
+  { name: 'Inventory Units', href: '/properties', icon: Home },
   { name: 'Billing', href: '/dashboard/billing', icon: CreditCard, adminOnly: true },
   { name: 'Reports', href: '/dashboard/reports', icon: BarChart3, adminOnly: true },
   { name: 'Master Overview', href: '/super-admin', icon: ShieldCheck, superAdminOnly: true },

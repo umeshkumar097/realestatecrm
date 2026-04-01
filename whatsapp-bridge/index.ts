@@ -144,6 +144,7 @@ class BaileysManager {
               logger,
               browser: ["PropCRM", "Chrome", "1.0.0"],
               connectTimeoutMs: 60000,
+              syncFullHistory: true,
             })
 
             const instance = this.instances.get(agentId)!
