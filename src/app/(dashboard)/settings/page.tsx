@@ -72,129 +72,152 @@ export default function SettingsPage() {
   )
 
   return (
-    <div className="max-w-4xl mx-auto space-y-10 pb-20">
-      <div className="flex justify-between items-end">
-        <div>
-            <h1 className="text-2xl font-black text-slate-800 tracking-tight">System Settings</h1>
-            <p className="text-slate-500 text-sm mt-0.5">Configure your agency preferences and Enterprise white-labeling.</p>
+    <div className="max-w-5xl mx-auto space-y-12 animate-in fade-in duration-1000 pb-20 mt-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-slate-50 pb-8">
+        <div className="space-y-1">
+            <h1 className="text-4xl font-black text-slate-900 tracking-tighter italic flex items-center gap-4">
+                <div className="p-3 bg-slate-900 text-white rounded-[20px] shadow-2xl shadow-slate-900/20">
+                    <Settings className="h-8 w-8" />
+                </div>
+                Architectural Governance
+            </h1>
+            <p className="text-slate-400 text-[11px] font-black uppercase tracking-[0.3em] mt-2 italic ml-1">Configuring {formData.name || "Master"} Agency Node within the Global Real Estate Registry</p>
         </div>
         {success && (
-            <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-600 rounded-xl text-sm font-bold border border-emerald-100 animate-in fade-in slide-in-from-top-4">
+            <div className="flex items-center gap-3 px-8 py-4 bg-emerald-50 text-emerald-600 rounded-full text-[10px] font-black border border-emerald-100 uppercase tracking-[0.2em] italic shadow-lg shadow-emerald-500/10 animate-in slide-in-from-right-8 duration-500">
                 <CheckCircle2 className="h-4 w-4" />
-                Changes saved successfully!
+                Governance Protocol Updated Successfully
             </div>
         )}
       </div>
 
-      <div className="space-y-6">
-        <section className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
-          <div className="p-6 border-b border-slate-50 flex items-center gap-3">
-             <div className="p-2 bg-blue-50 text-blue-600 rounded-lg"><Building2 className="h-5 w-5" /></div>
-             <h2 className="font-black text-slate-800">Agency White-labeling</h2>
+      <div className="space-y-12">
+        <section className="bg-white rounded-[60px] border border-slate-100 shadow-sm overflow-hidden hover:shadow-2xl transition-all duration-700">
+          <div className="p-10 border-b border-slate-50 flex items-center gap-6 bg-slate-50/30">
+             <div className="p-4 bg-indigo-600/10 text-indigo-600 rounded-[20px] shadow-sm"><Building2 className="h-8 w-8" /></div>
+             <div>
+                <h2 className="text-2xl font-black text-slate-900 tracking-tighter italic">Global Brand Identity</h2>
+                <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.3em] mt-1 italic">Internal Agency Designation & Visual Realization</p>
+             </div>
           </div>
-          <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="space-y-2">
-              <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Agency Display Name</label>
+          <div className="p-12 grid grid-cols-1 md:grid-cols-2 gap-10">
+            <div className="space-y-3">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] italic ml-1">Agency Designation (Display Name)</label>
               <input 
                 type="text" 
                 value={formData.name}
                 onChange={(e) => setFormData({...formData, name: e.target.value})}
-                placeholder="Real Estate Pro" 
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-bold focus:ring-2 focus:ring-primary outline-none" 
+                placeholder="Real Estate Pro Matrix" 
+                className="w-full px-8 py-5 rounded-[32px] border border-slate-50 bg-slate-50/50 text-sm font-black italic outline-none focus:bg-white focus:ring-4 focus:ring-indigo-600/5 transition-all" 
               />
             </div>
-            <div className="space-y-2">
-              <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Internal CRM Subdomain</label>
+            <div className="space-y-3">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] italic ml-1">CRM Internal Ingress (Subdomain)</label>
               <input 
                 type="text" 
                 value={formData.domain}
                 onChange={(e) => setFormData({...formData, domain: e.target.value})}
-                placeholder="crm-agency (lowercase only)" 
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-bold focus:ring-2 focus:ring-primary outline-none" 
+                placeholder="crm-agency-node" 
+                className="w-full px-8 py-5 rounded-[32px] border border-slate-50 bg-slate-50/50 text-sm font-black italic outline-none focus:bg-white focus:ring-4 focus:ring-indigo-600/5 transition-all" 
               />
             </div>
-            <div className="space-y-2 col-span-1 md:col-span-2">
-              <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Logo Image URL</label>
+            <div className="space-y-3 col-span-1 md:col-span-2">
+              <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] italic ml-1">Symbolic Realization (Logo Image URL)</label>
               <input 
                 type="text" 
                 value={formData.logo}
                 onChange={(e) => setFormData({...formData, logo: e.target.value})}
-                placeholder="https://example.com/logo.png" 
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-bold focus:ring-2 focus:ring-primary outline-none" 
+                placeholder="https://cloud.matrix.com/logo.png" 
+                className="w-full px-8 py-5 rounded-[32px] border border-slate-50 bg-slate-50/50 text-sm font-black italic outline-none focus:bg-white focus:ring-4 focus:ring-indigo-600/5 transition-all" 
               />
             </div>
           </div>
         </section>
 
-        <section className={`bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden transition-all ${(!isEnterprise || !isActive) ? 'opacity-90' : ''}`}>
-          <div className="p-6 border-b border-slate-50 flex items-center justify-between">
-             <div className="flex items-center gap-3">
-                <div className="p-2 bg-purple-50 text-purple-600 rounded-lg"><Globe className="h-5 w-5" /></div>
-                <h2 className="font-black text-slate-800">Enterprise Custom Domain</h2>
+        <section className={`bg-white rounded-[60px] border border-slate-100 shadow-sm overflow-hidden transition-all duration-700 hover:shadow-2xl ${(!isEnterprise || !isActive) ? 'opacity-90 grayscale-[0.5]' : ''}`}>
+          <div className="p-10 border-b border-slate-50 flex items-center justify-between bg-slate-50/30">
+             <div className="flex items-center gap-6">
+                <div className="p-4 bg-purple-600/10 text-purple-600 rounded-[20px] shadow-sm"><Globe className="h-8 w-8" /></div>
+                <div>
+                    <h2 className="text-2xl font-black text-slate-900 tracking-tighter italic">Domain Isolation Registry</h2>
+                    <p className="text-[10px] text-slate-400 font-black uppercase tracking-[0.3em] mt-1 italic">Enterprise Architectural Identity Locking</p>
+                </div>
              </div>
              {(!isEnterprise || !isActive) && (
-                <span className="px-3 py-1 bg-amber-50 text-amber-600 text-[10px] font-black rounded-full uppercase tracking-tighter flex items-center gap-1 border border-amber-100">
-                    <Lock className="h-3 w-3" /> Enterprise Feature
+                <span className="px-6 py-3 bg-amber-50 text-amber-600 text-[10px] font-black rounded-full uppercase tracking-[0.2em] italic flex items-center gap-2 border border-amber-100 shadow-sm">
+                    <Lock className="h-4 w-4" /> Enterprise Restricted
                 </span>
              )}
           </div>
-          <div className="p-8 space-y-6">
-             <p className="text-sm text-slate-500 font-medium leading-relaxed">
-                Connect your own top-level domain (e.g., <code className="text-primary bg-primary/5 px-2 py-0.5 rounded">portal.myagency.com</code>) to the CRM.
-                All billing, client portals, and staff dashboards will be accessible through this domain.
+          <div className="p-12 space-y-8">
+             <p className="text-sm text-slate-500 font-black italic leading-relaxed max-w-2xl border-l-4 border-indigo-500/20 pl-8 ml-2">
+                Establish high-authority architectural isolation by connecting your master top-level domain. 
+                All fiscal operations, client portals, and governance matrices will be isolated under this secure ingress.
              </p>
              
-             <div className="space-y-2">
-                <label className="text-xs font-black text-slate-400 uppercase tracking-widest">Primary Custom Domain</label>
-                <div className="relative">
+             <div className="space-y-3">
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] italic ml-1">Primary Isolation Ingress (Custom Domain)</label>
+                <div className="relative group">
                     <input 
                         type="text" 
                         value={formData.customDomain}
                         disabled={!isEnterprise || !isActive}
                         onChange={(e) => setFormData({...formData, customDomain: e.target.value})}
-                        placeholder="e.g. dash.youragency.com" 
-                        className={`w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-bold focus:ring-2 focus:ring-primary outline-none ${(!isEnterprise || !isActive) ? 'bg-slate-50 cursor-not-allowed opacity-50' : ''}`} 
+                        placeholder="dash.youragency.matrix" 
+                        className={`w-full px-8 py-5 rounded-[32px] border border-slate-50 bg-slate-50/50 text-sm font-black italic outline-none focus:bg-white focus:ring-4 focus:ring-indigo-600/5 transition-all ${(!isEnterprise || !isActive) ? 'cursor-not-allowed' : ''}`} 
                     />
                     {(!isEnterprise || !isActive) && (
-                        <div className="absolute inset-0 flex items-center justify-end pr-4 pointer-events-none">
-                            <Lock className="h-4 w-4 text-slate-300" />
+                        <div className="absolute inset-0 flex items-center justify-end pr-8 pointer-events-none text-slate-200">
+                            <Lock className="h-6 w-6" />
                         </div>
                     )}
                 </div>
              </div>
 
              {(!isEnterprise || !isActive) ? (
-                 <Link href="/dashboard/billing" className="inline-flex items-center gap-2 text-sm font-black text-primary hover:underline group">
-                     Upgrade to Enterprise to activate custom domains
-                     <ExternalLink className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                 <Link href="/dashboard/billing" className="inline-flex items-center gap-3 px-8 py-4 bg-amber-50 text-amber-600 rounded-full text-[10px] font-black uppercase tracking-[0.2em] italic border border-amber-100 hover:bg-amber-600 hover:text-white transition-all group shadow-sm">
+                     Upgrade to Enterprise Tier to Activate Domain Isolation
+                     <ExternalLink className="h-4 w-4 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1" />
                  </Link>
              ) : (
-                <div className="p-4 bg-blue-50/50 rounded-2xl border border-blue-100 flex gap-4">
-                    <div className="p-2 bg-blue-100 text-blue-600 rounded-xl h-fit">
-                        <Settings className="h-4 w-4" />
+                <div className="p-8 bg-blue-50/40 rounded-[40px] border border-blue-50 flex gap-6 items-center shadow-inner">
+                    <div className="p-4 bg-white text-blue-600 rounded-[24px] shadow-sm animate-pulse">
+                        <Settings className="h-7 w-7" />
                     </div>
                     <div>
-                        <p className="text-sm font-bold text-blue-900">Next Step: DNS Configuration</p>
-                        <p className="text-xs text-blue-700 mt-1">Point your domain&apos;s CNAME record to our server hostname. SSL will be automatically provisioned.</p>
+                        <p className="text-[11px] font-black uppercase text-blue-900 tracking-[0.2em] italic mb-1">Pending Ingress Strategy: DNS Resolution</p>
+                        <p className="text-[10px] text-blue-700/80 font-black italic uppercase tracking-[0.1em]">Map your CNAME registry to the master cluster endpoint. SSL Genesis will initialize upon discovery.</p>
                     </div>
                 </div>
              )}
           </div>
         </section>
 
-        <div className="flex justify-end gap-4">
+        <div className="flex justify-end gap-6 pt-4">
             <button 
                 onClick={handleSave}
                 disabled={saving}
-                className="px-10 py-4 bg-primary text-white rounded-2xl text-base font-black hover:opacity-90 transition-all flex items-center justify-center gap-3 shadow-xl shadow-primary/20 disabled:opacity-50"
+                className="px-12 py-6 bg-slate-900 text-white rounded-[32px] text-[11px] font-black uppercase tracking-[0.4em] italic hover:bg-indigo-600 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-4 shadow-2xl shadow-slate-900/20 disabled:opacity-50"
             >
-                {saving ? <Loader2 className="h-5 w-5 animate-spin" /> : <><CheckCircle2 className="h-5 w-5" /> Save All Settings</>}
+                {saving ? <Loader2 className="h-6 w-6 animate-spin" /> : <><CheckCircle2 className="h-6 w-6 text-emerald-400" /> Commit Architectural Changes ⚡</>}
             </button>
         </div>
 
-        <div className="flex justify-center py-10 opacity-30 gap-6">
-           <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest"><ShieldCheck className="h-4 w-4" /> SSL Provisioning Active</div>
-           <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest"><Globe className="h-4 w-4" /> Enterprise Isolation</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-10">
+           <div className="flex items-center gap-4 p-8 bg-slate-50/50 rounded-[40px] border border-slate-100/50">
+                <div className="p-3 bg-white rounded-2xl shadow-sm"><ShieldCheck className="h-6 w-6 text-emerald-500" /></div>
+                <div>
+                     <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-800 italic">SSL Genesis Active</p>
+                     <p className="text-[9px] font-black uppercase tracking-[0.1em] text-slate-400 mt-1 italic">Automated Layer 7 Security</p>
+                </div>
+           </div>
+           <div className="flex items-center gap-4 p-8 bg-slate-50/50 rounded-[40px] border border-slate-100/50">
+                <div className="p-3 bg-white rounded-2xl shadow-sm"><Globe className="h-6 w-6 text-indigo-500" /></div>
+                <div>
+                     <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-800 italic">Enterprise Isolation</p>
+                     <p className="text-[9px] font-black uppercase tracking-[0.1em] text-slate-400 mt-1 italic">Independent Cluster Architecture</p>
+                </div>
+           </div>
         </div>
       </div>
     </div>

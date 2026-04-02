@@ -16,16 +16,16 @@ export default function Logo({ className = "", light = false }: { className?: st
             </div>
             
             <div className="flex flex-col justify-center">
-                <div className="flex items-baseline">
-                    <span className={`text-3xl font-black tracking-tighter leading-none ${light ? 'text-white' : 'text-slate-900'}`}>
-                        PropGo
+                <div className="flex items-baseline italic uppercase">
+                    <span className={`text-2xl font-black tracking-tighter leading-none ${light ? 'text-white' : 'text-slate-900'}`}>
+                        Master
                     </span>
-                    <span className="text-3xl font-black tracking-tighter leading-none text-emerald-500 ml-0.5">
-                        CRM
+                    <span className="text-2xl font-black tracking-tighter leading-none text-blue-600 ml-1">
+                        Matrix
                     </span>
                 </div>
-                <span className={`text-[8px] font-black uppercase tracking-[0.4em] mt-2 opacity-90 whitespace-nowrap ${light ? 'text-white/60' : 'text-slate-400'}`}>
-                    BY AICLEX <span className={light ? 'text-white' : 'text-blue-600'}>TECHNOLOGIES</span>
+                <span className={`text-[8.5px] font-black uppercase tracking-[0.45em] mt-2 opacity-90 whitespace-nowrap italic ${light ? 'text-white/60' : 'text-slate-400'}`}>
+                    BY AICLEX <span className={light ? 'text-white' : 'text-blue-600'}>LABS</span>
                 </span>
             </div>
         </div>

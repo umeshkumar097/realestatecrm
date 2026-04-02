@@ -44,8 +44,8 @@ export async function POST(req: NextRequest) {
 
                 // 1. Create Product
                 const product = await stripe.products.create({
-                    name: `PropGoCRM: ${plan.name}`,
-                    description: plan.description || `PropGoCRM ${plan.name} Plan`,
+                    name: `Master Real Estate Matrix: ${plan.name}`,
+                    description: plan.description || `Master Real Estate Matrix ${plan.name} Plan`,
                 })
 
                 // 2. Create Price

@@ -55,21 +55,21 @@ export default function Landing() {
       href: "/signup" 
     },
     { 
-      plan: "Professional", 
+      plan: "Professional Node", 
       price: "1,099", 
       period: "/month", 
-      desc: "For growing agencies managing 20+ deals.", 
-      features: ["Up to 20 Agents", "Unlimited Leads", "AI Lead Scoring", "Priority Support", "Custom Reports", "Dedicated WhatsApp CRM"], 
+      desc: "For growing clusters managing 20+ operational nodes.", 
+      features: ["Up to 20 Agents", "Unlimited Leads", "AI-Resolve Scoring", "Priority Support", "Governance Reports", "Dedicated WhatsApp Bridge"], 
       cta: "Most Popular", 
       highlight: true, 
       href: "/signup" 
     },
     { 
-      plan: "Enterprise", 
+      plan: "Governance Cluster", 
       price: "Custom", 
       period: "", 
-      desc: "For large property companies with multiple branches.", 
-      features: ["Unlimited Agents", "Multi-Branch Dashboard", "Portal Sync Integration", "API Access", "Custom Integrations", "On-premise Option"], 
+      desc: "For large enterprise companies with multi-node branches.", 
+      features: ["Global Node Access", "Multi-Branch Governance", "Universal Portal Sync", "API Ingress", "Custom Architectural Overhaul", "On-premise Isolation"], 
       cta: "Contact Sales", 
       highlight: false, 
       onClick: () => setIsLeadModalOpen(true) 
@@ -102,38 +102,38 @@ export default function Landing() {
   const features = [
     { 
       icon: Users, 
-      title: "Automated Lead Pipeline", 
-      desc: "Every inquiry from WhatsApp, Portals, and Ads is auto-captured, scored by AI, and assigned to the right agent instantly.", 
+      title: "Intelligence Ingress Matrix", 
+      desc: "Every inquiry from WhatsApp, Portals, and Ads is auto-captured, scored by AI-Resolve, and assigned to the right operational node instantly.", 
       color: "from-blue-600 to-indigo-700" 
     },
     { 
       icon: Building2, 
-      title: "Smart Property Catalog", 
-      desc: "Manage listings with rich media, 360 virtual tours, and floor plans. Social share ready with one click.", 
+      title: "Asset Node Registry", 
+      desc: "Manage global listings with high-depth media, 360 virtual tours, and floor plans. Social share ready with mission-critical precision.", 
       color: "from-blue-500 to-sky-500" 
     },
     { 
       icon: MessageSquare, 
-      title: "Global WhatsApp CRM", 
-      desc: "Personalized follow-ups at scale. Send property cards, brochures, and site-visit details directly via API.", 
+      title: "WhatsApp Resolve Bridge", 
+      desc: "Architected follow-ups at scale. Deploy property nodes, brochures, and site-visit particulars directly via high-authority API.", 
       color: "from-emerald-500 to-teal-600" 
     },
     { 
       icon: TrendingUp, 
-      title: "Advanced HR & Analytics", 
-      desc: "Track agent performance, set revenue targets, and manage commissions. Real-time data for better decisions.", 
+      title: "Operational Governance", 
+      desc: "Track agent velocity, set revenue targets, and manage commissions. Real-time fiscal intelligence for better technical decisions.", 
       color: "from-violet-600 to-fuchsia-600" 
     },
     { 
       icon: Shield, 
       title: "Enterprise Document Vault", 
-      desc: "Securely store KYC, agreements, and payment records. AES-256 encryption compliant with global standards.", 
+      desc: "Securely store KYC, agreements, and fiscal records. AES-256 encryption compliant with global architectural standards.", 
       color: "from-amber-500 to-orange-600" 
     },
     { 
       icon: LayoutDashboard, 
-      title: "Multi-Branch Control", 
-      desc: "Manage multiple cities or branches from a single Master dashboard. Unified reporting for global operations.", 
+      title: "Multi-Node Command", 
+      desc: "Manage multiple regional clusters from a single Master dashboard. Unified reporting for global PropTech operations.", 
       color: "from-slate-700 to-slate-900" 
     },
   ]
@@ -157,13 +157,13 @@ export default function Landing() {
               <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">The Global Benchmark for Real Estate Automation</span>
             </div>
 
-            <h1 className="text-5xl lg:text-8xl font-black tracking-tighter leading-[0.95] text-slate-900 mb-10 max-w-6xl mx-auto italic select-none">
-              Modern Real Estate<br />
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-500">Accelerated.</span>
+            <h1 className="text-5xl lg:text-9xl font-black tracking-tighter leading-[0.85] text-slate-900 mb-10 max-w-7xl mx-auto italic select-none">
+              Master Real Estate<br />
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-500">Matrix Architecture.</span>
             </h1>
 
-            <p className="text-xl lg:text-2xl text-slate-500 font-medium max-w-2xl mx-auto mb-16 leading-relaxed">
-              PropGOCrm empowers elite agencies to automate lead pipelines, sync global portals, and dominate market share with AI-intelligence. 🌍
+            <p className="text-xl lg:text-3xl text-slate-500 font-black italic max-w-3xl mx-auto mb-16 leading-relaxed">
+              Accelerating elite PropTech operations with AI-Intelligence, Global Portal Sync, and High-Authority Governance. 🌍
             </p>
 
             <div className="flex flex-col sm:flex-row gap-6 justify-center mb-28">
@@ -183,8 +183,8 @@ export default function Landing() {
                 {/* Dashboard Sidebar */}
                 <div className="absolute inset-y-0 left-0 w-24 lg:w-72 bg-[#020617] border-r border-slate-800/40 p-8 hidden md:flex flex-col gap-10">
                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-blue-600/30"><Building2 size={24} /></div>
-                      <span className="text-white font-black text-2xl tracking-tighter hidden lg:block italic underline decoration-blue-600 underline-offset-4">PropGOCrm</span>
+                      <div className="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-slate-900/10"><Building2 size={24} /></div>
+                      <span className="text-white font-black text-2xl tracking-tighter hidden lg:block italic underline decoration-blue-600 underline-offset-8">MasterMatrix</span>
                    </div>
                    <div className="flex flex-col gap-3">
                       {[LayoutDashboard, Users, Building2, MessageSquare, TrendingUp, Calendar].map((Icon, i) => (
@@ -294,7 +294,7 @@ export default function Landing() {
                   One Sync.<br />Every Listing Portal.
                 </h2>
                 <p className="text-xl text-slate-500 mb-10 leading-relaxed max-w-lg mx-auto lg:mx-0">
-                  Capturing leads from Bayut, Property Finder, Pabbly, n8n, and Dubizzle used to be manual. PropGOCrm syncs with them all in real-time, pulling every inquiry directly into your agent's dashboard.
+                  Capturing leads from Bayut, Property Finder, Pabbly, n8n, and Dubizzle used to be manual. The Master Real Estate Matrix syncs with them all in real-time, pulling every inquiry directly into your agent's dashboard.
                 </p>
                 <div className="flex flex-col gap-4 text-left max-w-sm mx-auto lg:mx-0">
                   <div className="flex items-center gap-3">
@@ -467,19 +467,19 @@ export default function Landing() {
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-16 lg:gap-24 items-center justify-center text-center">
                    <div className="space-y-4">
                       <p className="text-5xl lg:text-8xl font-black text-slate-900 tracking-tighter italic">1,200+</p>
-                      <p className="text-[10px] font-black uppercase text-blue-600 tracking-[0.4em] leading-none">Global Agencies</p>
+                      <p className="text-[10px] font-black uppercase text-blue-600 tracking-[0.4em] leading-none">Operational Nodes</p>
                    </div>
                    <div className="space-y-4">
                       <p className="text-5xl lg:text-8xl font-black text-slate-900 tracking-tighter italic">12M+</p>
-                      <p className="text-[10px] font-black uppercase text-blue-600 tracking-[0.4em] leading-none">Qualified Leads</p>
+                      <p className="text-[10px] font-black uppercase text-blue-600 tracking-[0.4em] leading-none">Intelligence Quantums</p>
                    </div>
                    <div className="space-y-4">
                       <p className="text-5xl lg:text-8xl font-black text-slate-900 tracking-tighter italic">4.8/5</p>
-                      <p className="text-[10px] font-black uppercase text-blue-600 tracking-[0.4em] leading-none">Trust Horizon</p>
+                      <p className="text-[10px] font-black uppercase text-blue-600 tracking-[0.4em] leading-none">Authority Horizon</p>
                    </div>
                    <div className="space-y-4">
                       <p className="text-5xl lg:text-8xl font-black text-slate-900 tracking-tighter italic">99%</p>
-                      <p className="text-[10px] font-black uppercase text-blue-600 tracking-[0.4em] leading-none">Sync Precision</p>
+                      <p className="text-[10px] font-black uppercase text-blue-600 tracking-[0.4em] leading-none">Matrix Precision</p>
                    </div>
                 </div>
              </div>
@@ -500,7 +500,7 @@ export default function Landing() {
                  </div>
                  <h2 className="text-5xl lg:text-9xl font-black text-white leading-[0.85] tracking-tighter mb-16 italic">Dominate Your<br /><span className="text-blue-600">Local Market.</span></h2>
                  <p className="text-2xl lg:text-3xl text-slate-400 max-w-3xl mx-auto font-medium mb-24 leading-relaxed">
-                   Join 1,200+ elite real estate powerhouses using PropGOCrm to accelerate sales and dominate their territory.
+                   Join 1,200+ elite real estate powerhouses using the Master Real Estate Matrix to accelerate sales and dominate their territory.
                  </p>
                  <div className="flex flex-col sm:flex-row gap-8 justify-center">
                    <Link href="/signup" className="px-20 py-8 bg-blue-600 text-white rounded-full font-black text-2xl shadow-[0_20px_60px_rgba(37,99,235,0.4)] hover:scale-105 active:scale-95 transition-all">

@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                properties: { title: "PropGOCrm Leads Sync" },
+                properties: { title: "Master Real Estate Matrix Leads Sync" },
             }),
         })
 

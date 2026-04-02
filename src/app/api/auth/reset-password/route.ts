@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
 
     // 5. Notify user of success
     if (user.email) {
-        await sendPasswordResetSuccessEmail(user.email, user.name || "PropGoCRM User");
+        await sendPasswordResetSuccessEmail(user.email, user.name || "Master Real Estate Matrix User");
     }
 
     return NextResponse.json({ message: "Password updated successfully" })

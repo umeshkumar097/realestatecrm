@@ -69,17 +69,17 @@ export async function POST(req: NextRequest) {
             // 4. Send Emails (Outside transaction for speed)
             const verificationHtml = emailWrapper(`
               <p>Hello ${adminName},</p>
-              <p>Thank you for choosing PropGoCRM! Your professional agency space <strong>${agencyName}</strong> is ready.</p>
+              <p>Thank you for choosing Master Real Estate Matrix! Your professional agency space <strong>${agencyName}</strong> is ready.</p>
               <p>To activate your account and access the dashboard, please use this verification code:</p>
               <div style="background: #f1f5f9; padding: 24px; border-radius: 16px; text-align: center; margin: 32px 0;">
                 <span style="font-size: 32px; font-weight: 900; letter-spacing: 0.2em; color: #2563eb;">${result.token}</span>
               </div>
               <p>Welcome aboard!</p>
-            `, "Verify your PropGoCRM Agency")
+            `, "Verify your Master Real Estate Matrix Agency")
 
             await sendEmail({
               to: adminEmail,
-              subject: "Action Required: Verify your PropGoCRM Account",
+              subject: "Action Required: Verify your Master Real Estate Matrix Account",
               html: verificationHtml,
             })
 

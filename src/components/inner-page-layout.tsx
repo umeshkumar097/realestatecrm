@@ -11,56 +11,66 @@ interface InnerPageProps {
 
 export default function InnerPageLayout({ title, subtitle, badge, children }: InnerPageProps) {
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-zinc-50/50 font-sans selection:bg-blue-100 selection:text-blue-900 overflow-x-hidden flex flex-col">
       {/* Navbar */}
-      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-100 py-4 px-6 lg:px-16">
+      <header className="sticky top-0 z-50 bg-white/70 backdrop-blur-3xl border-b border-white py-6 px-6 lg:px-16 shadow-[0_8px_32px_rgba(0,0,0,0.04)]">
         <div className="container mx-auto flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-md group-hover:scale-110 transition-transform">
-              <Building2 className="text-white h-5 w-5" />
+          <Link href="/" className="flex items-center gap-4 group">
+            <div className="w-11 h-11 bg-slate-900 rounded-[14px] flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform">
+              <Building2 className="text-white h-6 w-6 italic" />
             </div>
-            <div>
-              <span className="text-lg font-black tracking-tight text-slate-900 leading-none">PropGOCrm</span>
-              <span className="block text-[8px] font-bold text-blue-500 uppercase tracking-widest leading-none mt-1">The Global Standard</span>
+            <div className="space-y-0.5">
+              <span className="text-xl font-black tracking-tighter text-slate-900 leading-none italic uppercase">Master Real Estate Matrix</span>
+              <span className="block text-[8px] font-black text-blue-600 uppercase tracking-[0.4em] leading-none italic">Architectural Governance</span>
             </div>
           </Link>
-          <Link href="/" className="flex items-center gap-1.5 text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors">
-            <ArrowLeft className="h-4 w-4" /> Back to Home
+          <Link href="/" className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-blue-600 transition-all italic">
+            <ArrowLeft className="h-4 w-4" /> Back to Matrix Home
           </Link>
         </div>
       </header>
 
       {/* Hero */}
-      <div className="bg-gradient-to-b from-slate-50 to-white py-16 px-6 lg:px-16 border-b border-slate-100">
-        <div className="container mx-auto max-w-3xl">
+      <div className="bg-white py-24 px-6 lg:px-16 border-b border-slate-50 relative overflow-hidden">
+        <div className="absolute top-0 right-0 p-40 -mr-16 -mt-16 bg-blue-600/5 rounded-full blur-[80px] -z-10" />
+        <div className="container mx-auto max-w-4xl relative z-10 space-y-6">
           {badge && (
-            <span className="inline-flex items-center px-3 py-1 bg-blue-50 text-blue-600 text-xs font-black uppercase tracking-widest rounded-full border border-blue-100 mb-5">
+            <span className="inline-flex items-center px-8 py-3 bg-slate-900 text-white text-[10px] font-black uppercase tracking-[0.4em] rounded-full italic shadow-2xl">
               {badge}
             </span>
           )}
-          <h1 className="text-3xl lg:text-5xl font-black text-slate-900 mb-4">{title}</h1>
-          {subtitle && <p className="text-lg text-slate-500 leading-relaxed">{subtitle}</p>}
+          <h1 className="text-4xl lg:text-7xl font-black tracking-tighter text-zinc-900 italic balance leading-[0.85]">{title}</h1>
+          {subtitle && (
+             <div className="space-y-4">
+               <p className="text-[11px] font-black uppercase tracking-[0.3em] text-zinc-400 italic">Operational Documentation Node</p>
+               <p className="text-xl md:text-2xl text-slate-500 italic font-black leading-relaxed max-w-3xl border-l-4 border-blue-600/10 pl-8">{subtitle}</p>
+             </div>
+          )}
         </div>
       </div>
 
       {/* Content */}
-      <main className="flex-1 py-16 px-6 lg:px-16">
-        <div className="container mx-auto max-w-3xl">
-          {children}
-        </div>
+      <main className="flex-1 py-20 px-6 lg:px-16 container mx-auto max-w-4xl">
+          <div className="relative">
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[500px] bg-blue-600/5 blur-[120px] rounded-full pointer-events-none -z-10" />
+              {children}
+          </div>
       </main>
 
       {/* Footer */}
-      <footer className="bg-slate-950 py-8 px-6 lg:px-16 border-t border-slate-800">
-        <div className="container mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-slate-500 text-sm">© 2026 <a href="https://aiclex.in" target="_blank" className="text-blue-400 hover:text-white transition-colors font-semibold">PropGOCrm Global</a>. All rights reserved.</p>
-          <div className="flex gap-6">
+      <footer className="bg-slate-900 py-12 px-6 lg:px-16 border-t border-slate-800">
+        <div className="container mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="space-y-1">
+             <p className="text-slate-500 font-black text-[10px] uppercase tracking-[0.2em] italic">© 2026 Master Real Estate Matrix Global HQ. A product by <a href="https://aiclex.in" className="text-slate-400 hover:text-blue-600">Aiclex Labs</a>.</p>
+             <p className="text-slate-700 font-bold text-[8px] uppercase tracking-widest leading-none italic">Enterprise Real-Estate Deployment Node: V2.1.0-STABLE</p>
+          </div>
+          <div className="flex gap-10">
             {[
-              { label: "Privacy", href: "/privacy" },
-              { label: "Terms", href: "/terms" },
-              { label: "Contact", href: "/contact" },
+              { label: "Data Residency", href: "/privacy" },
+              { label: "Governance", href: "/terms" },
+              { label: "Strategic Ingress", href: "/contact" },
             ].map(l => (
-              <Link key={l.label} href={l.href} className="text-slate-500 hover:text-white text-sm transition-colors">{l.label}</Link>
+              <Link key={l.label} href={l.href} className="text-slate-500 hover:text-white text-[10px] uppercase font-black tracking-[0.3em] transition-all italic">{l.label}</Link>
             ))}
           </div>
         </div>

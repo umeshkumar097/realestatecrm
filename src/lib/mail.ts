@@ -22,7 +22,7 @@ interface SendEmailOptions {
 export const sendEmail = async ({ to, subject, html }: SendEmailOptions) => {
   try {
     const info = await transporter.sendMail({
-      from: `"PropGoCRM" <${process.env.SMTP_USER}>`,
+      from: `"Master Real Estate Matrix" <${process.env.SMTP_USER}>`,
       to,
       subject,
       html,
@@ -36,7 +36,7 @@ export const sendEmail = async ({ to, subject, html }: SendEmailOptions) => {
 };
 
 /**
- * Common HTML Wrapper for PropGoCRM Branding
+ * Common HTML Wrapper for Master Real Estate Matrix Branding
  */
 export const emailWrapper = (content: string, title: string) => `
 <!DOCTYPE html>
@@ -58,14 +58,14 @@ export const emailWrapper = (content: string, title: string) => `
 <body>
   <div class="container">
     <div class="header">
-      <div class="logo-text">PropGo<span class="accent">CRM</span></div>
+      <div class="logo-text">Master Matrix Registry</div>
     </div>
     <div class="content">
       <h1 style="font-size: 24px; font-weight: 800; margin-bottom: 24px; color: #0f172a;">${title}</h1>
       ${content}
     </div>
     <div class="footer">
-      <p>© 2026 PropGoCRM Global. Powered by Aiclex Technologies.</p>
+      <p>© 2026 Master Real Estate Matrix Global. Powered by Aiclex Labs.</p>
     </div>
   </div>
 </body>
@@ -93,7 +93,7 @@ export const sendVerificationEmail = async (email: string, name: string, token: 
   const html = getVerificationEmail(name, token);
   return sendEmail({
     to: email,
-    subject: "Action Required: Verify your PropGoCRM Account",
+    subject: "Action Required: Verify your Master Real Estate Matrix Account",
     html,
   });
 };
@@ -104,7 +104,7 @@ export const sendVerificationEmail = async (email: string, name: string, token: 
 export const sendPasswordResetEmail = async (email: string, token: string) => {
   const resetUrl = `${APP_URL}/reset-password?token=${token}`;
   const html = emailWrapper(`
-    <p>A password reset was requested for your PropGoCRM account.</p>
+    <p>A password reset was requested for your Master Real Estate Matrix account.</p>
     <p>Please click the button below to reset your password:</p>
     <div style="text-align: center; margin: 32px 0;">
       <a href="${resetUrl}" class="button">Reset Password</a>
@@ -115,7 +115,7 @@ export const sendPasswordResetEmail = async (email: string, token: string) => {
 
   return sendEmail({
     to: email,
-    subject: "Reset your PropGoCRM Password",
+    subject: "Reset your Master Real Estate Matrix Password",
     html,
   });
 };
@@ -129,7 +129,7 @@ export const sendStaffInvitationEmail = async (email: string, name: string, agen
   
   const content = `
     <p>Hello <span class="highlight">${name}</span>,</p>
-    <p>You have been invited to join <span class="highlight">${agencyName}</span> as an Agent on the PropGoCRM platform.</p>
+    <p>You have been invited to join <span class="highlight">${agencyName}</span> as an Agent on the Master Real Estate Matrix platform.</p>
     
     <div style="background-color: #f8fafc; padding: 24px; border-radius: 16px; margin: 24px 0; border: 1px dashed #cbd5e1;">
       <p style="margin: 0; font-size: 14px; color: #64748b;">Temporary Credentials:</p>
@@ -142,12 +142,12 @@ export const sendStaffInvitationEmail = async (email: string, name: string, agen
       <a href="${verifyUrl}" class="button">Verify Email & Activate</a>
     </div>
 
-    <p style="font-size: 13px; color: #64748b;">If you already have a PropGoCRM account, you can simply <a href="${loginUrl}" class="highlight">Login here</a>. After verification, we recommend changing your password immediately.</p>
+    <p style="font-size: 13px; color: #64748b;">If you already have a Master Real Estate Matrix account, you can simply <a href="${loginUrl}" class="highlight">Login here</a>. After verification, we recommend changing your password immediately.</p>
   `;
 
   return sendEmail({
     to: email,
-    subject: `🚀 Invitation: Join ${agencyName} on PropGoCRM`,
+    subject: `🚀 Invitation: Join ${agencyName} on Master Real Estate Matrix`,
     html: emailWrapper(content, "Staff Invitation"),
   });
 };
@@ -215,7 +215,7 @@ export const sendMemberUpdateNotification = async (adminEmail: string, memberDat
 export const sendPasswordResetSuccessEmail = async (email: string, name: string) => {
   const content = `
     <p>Hello <span class="highlight">${name}</span>,</p>
-    <p>This is a security confirmation that the password for your PropGoCRM account has been **successfully updated**.</p>
+    <p>This is a security confirmation that the password for your Master Real Estate Matrix account has been **successfully updated**.</p>
     
     <div style="background-color: #ecfdf5; padding: 24px; border-radius: 16px; margin: 24px 0; border: 1px solid #10b981;">
         <p style="margin: 0; font-weight: bold; color: #065f46; text-align: center;">Shield Verified: Credentials Updated</p>

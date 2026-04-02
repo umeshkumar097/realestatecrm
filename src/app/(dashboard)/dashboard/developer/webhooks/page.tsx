@@ -123,9 +123,9 @@ export default function WebhookRegistryPage() {
                                                 <label className="text-[9px] font-black uppercase text-zinc-400 tracking-widest flex items-center gap-1.5"><Globe size={10}/> Endpoint URL</label>
                                                 <div className="flex items-center gap-2">
                                                     <code className="flex-1 bg-white dark:bg-zinc-900 px-5 py-3 border border-zinc-200 dark:border-zinc-800 rounded-xl text-xs font-bold text-slate-600 dark:text-zinc-400 truncate tracking-tight font-mono">
-                                                        https://propgocrm.com/api/webhooks/incoming/{wh.agencyId}
+                                                        https://matrix.matrix/api/webhooks/incoming/{wh.agencyId}
                                                     </code>
-                                                    <button onClick={() => { navigator.clipboard.writeText(`https://propgocrm.com/api/webhooks/incoming/${wh.agencyId}`); alert("URL Copied!"); }} className="p-3 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl hover:text-primary transition-all font-black text-[10px] uppercase">Copy</button>
+                                                    <button onClick={() => { navigator.clipboard.writeText(`https://matrix.matrix/api/webhooks/incoming/${wh.agencyId}`); alert("URL Copied!"); }} className="p-3 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl hover:text-primary transition-all font-black text-[10px] uppercase">Copy</button>
                                                 </div>
                                             </div>
                                             

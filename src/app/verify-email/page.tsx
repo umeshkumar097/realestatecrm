@@ -96,7 +96,7 @@ function VerifyEmailContent() {
         </div>
         <h1 className="text-3xl font-black text-slate-900 tracking-tight">Account Verified!</h1>
         <p className="text-lg text-slate-500 font-medium max-w-sm mx-auto">
-          Your PropGoCRM account is now active. Redirecting you to login...
+          Your Master Real Estate Matrix account is now active. Redirecting you to login...
         </p>
         <div className="pt-8">
            <Loader2 className="w-8 h-8 text-blue-600 animate-spin mx-auto" />

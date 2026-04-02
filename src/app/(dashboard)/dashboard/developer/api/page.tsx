@@ -210,7 +210,7 @@ export default function DeveloperApiPage() {
 
                     <p className="text-center px-4 text-[10px] font-black uppercase tracking-widest text-zinc-400 leading-relaxed">
                         Developer suite v1.0.4<br/>
-                        PropGoCRM Global Registry
+                        Master Matrix Global Registry
                     </p>
                 </div>
             </div>

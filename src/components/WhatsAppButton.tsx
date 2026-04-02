@@ -13,7 +13,7 @@ export default function WhatsAppButton() {
         setStatus("submitting")
         
         // Construct WhatsApp message
-        const message = `*PropGoCRM New Inquiry* \n\n*Name:* ${form.name}\n*Agency:* ${form.agency}\n*Interest:* ${form.interest}\n\n_Sent via PropGoCRM Website_`
+        const message = `*Master Real Estate Matrix New Inquiry* \n\n*Name:* ${form.name}\n*Agency:* ${form.agency}\n*Interest:* ${form.interest}\n\n_Sent via Master Matrix Architecture_`
         const waUrl = `https://wa.me/918449488090?text=${encodeURIComponent(message)}`
 
         setTimeout(() => {

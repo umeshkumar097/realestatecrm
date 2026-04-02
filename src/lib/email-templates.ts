@@ -2,7 +2,7 @@ import { emailWrapper } from "./mail";
 
 export const getVerificationEmail = (name: string, token: string) => emailWrapper(`
   <p>Hello ${name},</p>
-  <p>Thank you for choosing PropGoCRM! Your professional real estate workspace is almost ready.</p>
+  <p>Thank you for choosing Master Real Estate Matrix! Your professional real estate workspace is almost ready.</p>
   <p>Please use the following verification code to activate your account and access your dashboard:</p>
   <div style="background: #f8fafc; border: 2px dashed #cbd5e1; padding: 32px; border-radius: 24px; text-align: center; margin: 32px 0;">
     <span style="font-size: 36px; font-weight: 900; letter-spacing: 0.3em; color: #2563eb;">${token}</span>
@@ -12,7 +12,7 @@ export const getVerificationEmail = (name: string, token: string) => emailWrappe
 
 export const getWelcomeEmail = (name: string, agencyName: string) => emailWrapper(`
   <p>Hello ${name},</p>
-  <p>Welcome to the future of real estate management. Your agency, <strong>${agencyName}</strong>, is now active on PropGoCRM.</p>
+  <p>Welcome to the future of real estate management. Your agency, <strong>${agencyName}</strong>, is now active on Master Real Estate Matrix.</p>
   <p>Here are your first steps to success:</p>
   <ul style="padding-left: 20px;">
     <li><strong>Sync Portals</strong>: Connect your Bayut, Property Finder, or Zillow accounts.</li>
@@ -22,10 +22,10 @@ export const getWelcomeEmail = (name: string, agencyName: string) => emailWrappe
   <div style="text-align: center; margin-top: 40px;">
     <a href="https://propgocrm.com/dashboard" style="display: inline-block; padding: 18px 36px; background-color: #2563eb; color: #ffffff; text-decoration: none; border-radius: 16px; font-weight: 900; font-size: 16px; box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.2);">Explore Your Dashboard</a>
   </div>
-`, "Welcome to PropGoCRM! 🚀");
+`, "Welcome to Master Real Estate Matrix! 🚀");
 
 export const getEnterpriseInquiryEmail = (leadName: string, company: string, email: string, phone: string, message: string) => emailWrapper(`
-  <p>A new high-value enterprise inquiry has been received through the PropGoCRM marketing site.</p>
+  <p>A new high-value enterprise inquiry has been received through the Master Real Estate Matrix marketing site.</p>
   <div style="background: #f1f5f9; padding: 30px; border-radius: 20px; margin: 24px 0;">
     <p style="margin: 5px 0;"><strong>Name:</strong> ${leadName}</p>
     <p style="margin: 5px 0;"><strong>Company:</strong> ${company}</p>
@@ -35,7 +35,7 @@ export const getEnterpriseInquiryEmail = (leadName: string, company: string, ema
     <p style="font-style: italic; color: #475569;">"${message}"</p>
   </div>
   <p>Please contact this lead within the next 2 hours for maximum conversion.</p>
-`, "New Enterprise Lead - PropGoCRM");
+`, "New Enterprise Lead - Master Real Estate Matrix");
 
 export const getTicketAcknowledgmentEmail = (name: string, ticketId: string, subject: string) => emailWrapper(`
   <p>Hello ${name},</p>

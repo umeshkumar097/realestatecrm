@@ -60,50 +60,54 @@ export default function LoginForm({ agency }: LoginFormProps) {
   }
 
   return (
-    <div className="w-full max-w-md bg-white dark:bg-zinc-900 rounded-2xl shadow-xl border border-zinc-200 dark:border-zinc-800 p-8">
-      <div className="flex flex-col items-center mb-8">
-        <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center mb-4 shadow-lg shadow-primary/20 overflow-hidden">
+    <div className="w-full max-w-lg bg-white/40 backdrop-blur-2xl rounded-[60px] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.1)] border border-white p-12 relative animate-in zoom-in-95 duration-700">
+      <div className="absolute top-0 right-0 p-32 -mr-16 -mt-16 bg-blue-600/5 rounded-full blur-[80px] -z-10" />
+      
+      <div className="flex flex-col items-center mb-12">
+        <div className="w-24 h-24 bg-slate-900 rounded-[32px] flex items-center justify-center mb-6 shadow-2xl shadow-slate-900/20 overflow-hidden border-4 border-white">
           {agency?.logo ? (
              <img src={agency.logo} alt={agency.name} className="w-full h-full object-cover" />
           ) : (
-            <Building2 className="text-white h-7 w-7" />
+            <Building2 className="text-white h-10 w-10 italic" />
           )}
         </div>
-        <h1 className="text-2xl font-bold">{agency?.name || "Welcome Back"}</h1>
-        <p className="text-zinc-500 text-sm mt-1 text-center">
-            {agency ? `Log in to ${agency.name} portal` : "Enter your credentials to access your agency dashboard."}
-        </p>
+        <div className="text-center space-y-1">
+            <h1 className="text-3xl font-black text-slate-900 tracking-tighter italic">{agency?.name || "Master Matrix Ingress"}</h1>
+            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 italic">
+                {agency ? `Authorizing Node: ${agency.name}` : "Private Intelligence Vault Access"}
+            </p>
+        </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-8">
         {error && (
-          <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 rounded-lg text-red-600 dark:text-red-400 text-sm">
-            {error}
+          <div className="p-4 bg-rose-50 border border-rose-100 rounded-[20px] text-rose-600 text-[10px] font-black uppercase tracking-[0.2em] italic animate-in shake duration-500">
+            Resolve Error: {error}
           </div>
         )}
         
-        <div className="space-y-1">
-          <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Email Address</label>
+        <div className="space-y-2">
+          <label className="text-[10px] font-black uppercase text-slate-400 ml-1 italic tracking-[0.2em]">Operational Node ID (Email)</label>
           <input
             type="email"
             required
-            className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 focus:ring-2 focus:ring-primary outline-none transition-all"
-            placeholder="name@agency.com"
+            className="w-full px-8 py-5 rounded-[32px] border border-slate-50 bg-slate-50/50 text-sm font-black italic outline-none focus:bg-white focus:ring-4 focus:ring-blue-600/5 transition-all"
+            placeholder="node.ingress@matrix.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
         </div>
 
-        <div className="space-y-1">
-          <div className="flex justify-between">
-            <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">Password</label>
-            <Link href="/forgot-password" className="text-sm text-primary hover:underline">Forgot?</Link>
+        <div className="space-y-2">
+          <div className="flex justify-between items-center px-1">
+            <label className="text-[10px] font-black uppercase text-slate-400 italic tracking-[0.2em]">Access Key (Password)</label>
+            <Link href="/forgot-password" hidden className="text-[10px] font-black text-blue-600 uppercase tracking-widest hover:underline italic">Forgot Key?</Link>
           </div>
           <input
             type="password"
             required
-            className="w-full px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 focus:ring-2 focus:ring-primary outline-none transition-all"
-            placeholder="••••••••"
+            className="w-full px-8 py-5 rounded-[32px] border border-slate-50 bg-slate-50/50 text-sm font-black italic outline-none focus:bg-white focus:ring-4 focus:ring-blue-600/5 transition-all"
+            placeholder="••••••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
@@ -112,17 +116,17 @@ export default function LoginForm({ agency }: LoginFormProps) {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-2.5 bg-primary text-white rounded-lg font-bold shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+          className="w-full py-6 bg-slate-900 text-white rounded-[32px] text-[11px] font-black uppercase tracking-[0.4em] italic shadow-2xl shadow-slate-900/20 hover:bg-blue-600 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-4 disabled:opacity-50"
         >
-          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Sign In"}
+          {loading ? <Loader2 className="h-6 w-6 animate-spin" /> : <>Authorize Ingress ⚡</>}
         </button>
       </form>
 
       {!agency && (
-        <div className="mt-8 pt-6 border-t border-zinc-100 dark:border-zinc-800 text-center">
-            <p className="text-zinc-500 text-sm">
-                Don't have an account?{" "}
-                <Link href="/signup" className="text-primary font-bold hover:underline">Create Agency</Link>
+        <div className="mt-12 pt-8 border-t border-slate-50 text-center">
+            <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] italic">
+                Zero Node Presence?{" "}
+                <Link href="/signup" className="text-blue-600 font-black hover:underline ml-2">Initialize Agency Matrix</Link>
             </p>
         </div>
       )}

@@ -72,7 +72,7 @@ export default function IntegrationsPage() {
         <InnerPageLayout 
             badge="Ecosystem"
             title="Integrations"
-            subtitle="Connect PropGOCrm with the tools you already use every day."
+            subtitle="Connect Master Real Estate Matrix with the tools you already use every day."
         >
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* INCOMING WEBHOOKS */}
@@ -176,7 +176,7 @@ export default function IntegrationsPage() {
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Connected Spreadsheet</p>
-                                        <h3 className="text-sm font-black text-zinc-800">PropGOCrm Leads Sync</h3>
+                                        <h3 className="text-sm font-black text-zinc-800">Master Real Estate Matrix Leads Sync</h3>
                                     </div>
                                     <div className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-[10px] font-black uppercase tracking-widest">
                                         Synced

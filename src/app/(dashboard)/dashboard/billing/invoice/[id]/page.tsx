@@ -211,7 +211,7 @@ export default function InvoiceViewer() {
                                 <ul className="text-[9px] text-zinc-400 font-bold space-y-2 leading-relaxed">
                                     <li>1. This is a computer-generated invoice and does not require a physical signature.</li>
                                     <li>2. Payments should be made in favor of Aiclex Technologies to the details provided.</li>
-                                    <li>3. Delayed payments may result in temporary suspension of PropGoCRM agency services.</li>
+                                    <li>3. Delayed payments may result in temporary suspension of Master Matrix agency services.</li>
                                     <li>4. For any billing inquiries, please contact {PLATFORM_CONFIG.company.email}.</li>
                                 </ul>
                             </div>
@@ -219,7 +219,7 @@ export default function InvoiceViewer() {
                     </div>
 
                     <div className="bg-zinc-50 p-8 text-center text-[9px] font-black text-zinc-400 uppercase tracking-[0.2em]">
-                        Certified Saas Document - PropGoCRM Ecosystem
+                        Certified Saas Document - Master Real Estate Matrix Ecosystem
                     </div>
                 </div>
             </div>

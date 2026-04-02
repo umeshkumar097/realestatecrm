@@ -11,7 +11,7 @@ export default function SecurityPage() {
         <section>
           <h2 className="text-xl font-black text-slate-900 mb-3">WhatsApp Session Safety</h2>
           <p className="text-sm leading-relaxed">
-            PropCRM uses the Baileys library, which connects directly to WhatsApp's web servers. We do not store your messages on our central server unless they are part of a lead record you've authorized.
+            The Master Real Estate Matrix uses the Baileys library, which connects directly to WhatsApp's web servers. We do not store your messages on our central server unless they are part of a lead record you've authorized.
           </p>
         </section>
 

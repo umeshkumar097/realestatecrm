@@ -5,7 +5,7 @@ export default function ChangelogPage() {
     <InnerPageLayout 
       badge="Updates"
       title="Product Changelog"
-      subtitle="Stay up to date with the latest features and improvements in PropCRM."
+      subtitle="Stay up to date with the latest features and improvements in Master Real Estate Matrix."
     >
       <div className="space-y-12">
         <div className="relative pl-8 border-l-2 border-slate-100">

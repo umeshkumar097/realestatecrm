@@ -27,9 +27,9 @@ export default function ApiDocsPage() {
 
     const samples = {
         auth: {
-            curl: `curl -X GET "https://propgocrm.com/api/leads" \\
+            curl: `curl -X GET "https://matrix.matrix/api/leads" \\
   -H "x-api-key: YOUR_API_KEY"`,
-            node: `const response = await fetch("https://propgocrm.com/api/leads", {
+            node: `const response = await fetch("https://matrix.matrix/api/leads", {
   headers: {
     "x-api-key": "YOUR_API_KEY"
   }
@@ -37,13 +37,13 @@ export default function ApiDocsPage() {
 const data = await response.json();`,
             python: `import requests
 
-url = "https://propgocrm.com/api/leads"
+url = "https://matrix.matrix/api/leads"
 headers = {"x-api-key": "YOUR_API_KEY"}
 
 response = requests.get(url, headers=headers)
 print(response.json())`,
             php: `<?php
-$ch = curl_init("https://propgocrm.com/api/leads");
+$ch = curl_init("https://matrix.matrix/api/leads");
 curl_setopt($ch, CURLOPT_HTTPHEADER, array("x-api-key: YOUR_API_KEY"));
 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 $response = curl_exec($ch);
@@ -52,7 +52,7 @@ echo $response;
 ?>`
         },
         webhook: {
-            curl: `curl -X POST "https://propgocrm.com/api/webhooks/incoming/AGENCY_ID" \\
+            curl: `curl -X POST "https://matrix.matrix/api/webhooks/incoming/AGENCY_ID" \\
   -H "x-webhook-secret: YOUR_WEBHOOK_SECRET" \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -61,7 +61,7 @@ echo $response;
     "email": "john@example.com",
     "notes": "Interested in 3BHK"
   }'`,
-            node: `await fetch("https://propgocrm.com/api/webhooks/incoming/AGENCY_ID", {
+            node: `await fetch("https://matrix.matrix/api/webhooks/incoming/AGENCY_ID", {
   method: "POST",
   headers: {
     "Content-Type": "application/json",
@@ -75,7 +75,7 @@ echo $response;
 });`,
             python: `import requests
 
-url = "https://propgocrm.com/api/webhooks/incoming/AGENCY_ID"
+url = "https://matrix.matrix/api/webhooks/incoming/AGENCY_ID"
 headers = {
     "x-webhook-secret": "YOUR_WEBHOOK_SECRET",
     "Content-Type": "application/json"
@@ -97,7 +97,7 @@ $options = array(
     )
 );
 $context  = stream_context_create($options);
-$result = file_get_contents("https://propgocrm.com/api/webhooks/incoming/AGENCY_ID", false, $context);
+$result = file_get_contents("https://matrix.matrix/api/webhooks/incoming/AGENCY_ID", false, $context);
 ?>`
         }
     }
@@ -111,7 +111,7 @@ $result = file_get_contents("https://propgocrm.com/api/webhooks/incoming/AGENCY_
                         <BookOpen size={14}/>
                         Developer Reference v1.2
                     </div>
-                    <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">PropGoCRM API Blueprint</h1>
+                    <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">Master Matrix API Blueprint</h1>
                     <p className="text-zinc-500 font-medium tracking-tight">Accelerate your real estate workflows with professional-grade API connectivity.</p>
                 </div>
                 

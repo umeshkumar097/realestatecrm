@@ -76,7 +76,7 @@ export default function PlatformLeadsPage() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-black tracking-tight">Sales Inquiries</h1>
-          <p className="text-zinc-500 text-sm">Leads captured from the PropGOCrm landing page.</p>
+          <p className="text-zinc-500 text-sm">Leads captured from the Master Real Estate Matrix landing ingress.</p>
         </div>
         
         <div className="flex items-center gap-3">

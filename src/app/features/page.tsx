@@ -16,19 +16,19 @@ import Navbar from "@/components/Navbar"
 import Footer from "@/components/Footer"
 
 const SectionHeader = ({ icon: Icon, title, subtitle, badge }: { icon: any, title: string, subtitle: string, badge?: string }) => (
-    <div className="flex flex-col items-center text-center mb-16 space-y-4">
+    <div className="flex flex-col items-center text-center mb-24 space-y-6">
         {badge && (
-            <span className="px-4 py-1.5 bg-primary/10 text-primary text-[10px] font-black uppercase tracking-[0.2em] rounded-full border border-primary/20">
+            <span className="px-8 py-3 bg-primary/5 text-primary text-[10px] font-black uppercase tracking-[0.4em] rounded-full border border-primary/10 italic shadow-sm">
                 {badge}
             </span>
         )}
-        <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center shadow-2xl shadow-primary/30 mb-2">
-            <Icon className="text-white h-8 w-8" />
+        <div className="w-24 h-24 bg-slate-900 rounded-[32px] flex items-center justify-center shadow-2xl shadow-slate-900/10 mb-4 border-4 border-white">
+            <Icon className="text-white h-10 w-10 italic" />
         </div>
-        <h2 className="text-3xl md:text-5xl font-black tracking-tight text-zinc-900 balance">
+        <h2 className="text-4xl md:text-7xl font-black tracking-tighter text-zinc-900 italic balance leading-[1.1]">
             {title}
         </h2>
-        <p className="text-zinc-500 text-lg md:text-xl max-w-2xl font-medium leading-relaxed">
+        <p className="text-zinc-400 text-[11px] font-black uppercase tracking-[0.3em] max-w-2xl italic">
             {subtitle}
         </p>
     </div>
@@ -64,11 +64,11 @@ export default function FeaturesPage() {
                         <div className="inline-flex items-center gap-2 px-6 py-2 bg-emerald-50 text-emerald-600 rounded-full text-xs font-black uppercase tracking-widest border border-emerald-100 animate-bounce">
                             <Zap size={14} /> NEW: PORTAL SYNC 2.0
                         </div>
-                        <h1 className="text-5xl md:text-8xl font-black tracking-tight text-zinc-900 leading-[0.95] balance">
-                            Everything You Need To <span className="text-primary">Scale Profitably</span>.
+                        <h1 className="text-5xl md:text-9xl font-black tracking-tighter text-zinc-900 leading-[0.85] balance italic">
+                            Architectural Core: <span className="text-primary underline decoration-primary/20 underline-offset-[16px]">Operational Dominance</span>.
                         </h1>
-                        <p className="text-xl md:text-2xl text-zinc-500 font-medium max-w-2xl mx-auto leading-relaxed">
-                            Stop juggling multiple tabs. PropGOCrm centralizes your leads, sales, and marketing into one high-performance OS.
+                        <p className="text-xl md:text-3xl text-zinc-500 font-black italic max-w-3xl mx-auto leading-relaxed">
+                            The Master Real Estate Matrix centralizes your fiscal, operational, and asset nodes into one high-performance architectural OS. 🌍
                         </p>
                         <div className="flex flex-wrap items-center justify-center gap-6 pt-8">
                             <Link href="/signup" className="group bg-primary text-white px-10 py-5 rounded-[24px] text-lg font-black tracking-tight flex items-center gap-3 shadow-2xl shadow-primary/40 hover:scale-105 active:scale-95 transition-all">
@@ -86,10 +86,10 @@ export default function FeaturesPage() {
             <section className="py-32 bg-zinc-50/50">
                 <div className="container mx-auto px-6">
                     <SectionHeader 
-                        badge="Capture Engine"
+                        badge="Ingress Engine"
                         icon={Smartphone}
-                        title="Advanced Lead Management System"
-                        subtitle="Capture leads automatically from all major property portals and websites. Never miss an opportunity with our comprehensive lead capture suite."
+                        title="Advanced Operational Node Management"
+                        subtitle="Centralizing Every Inquiry Node into the Master Strategy Matrix"
                     />
                     
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
@@ -160,11 +160,12 @@ export default function FeaturesPage() {
                             <div className="w-16 h-16 bg-emerald-500 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-xl shadow-emerald-200">
                                 <MessageSquare className="text-white h-8 w-8" />
                             </div>
-                            <h2 className="text-4xl md:text-5xl font-black tracking-tight text-zinc-900 leading-tight balance">
-                                WhatsApp & SMS Integration
+                            <h2 className="text-4xl md:text-6xl font-black tracking-tighter text-zinc-900 leading-tight italic">
+                                WhatsApp Bridge Resolve
                             </h2>
-                            <p className="text-zinc-500 text-lg font-medium leading-relaxed">
-                                Connect with clients instantly through WhatsApp and SMS. Send property updates, schedule viewings, and maintain relationships effortlessly.
+                            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-zinc-400 italic mb-4">Master Ingress for Personalized Relationship Governance</p>
+                            <p className="text-zinc-500 text-lg font-black italic leading-relaxed">
+                                Connect with client nodes instantly through high-authority WhatsApp bridges. Send property realizations, automate site-visit schedules, and maintain governance effortlessly.
                             </p>
                             <ul className="space-y-4">
                                 {[

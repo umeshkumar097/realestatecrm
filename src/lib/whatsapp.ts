@@ -81,7 +81,7 @@ export async function sendLeadAlert(agentId: string, agentPhone: string, lead: {
   }
 
   const chatId = `${agentPhone.replace(/\D/g, "")}@c.us`
-  const message = `🏠 *New Lead Alert — PropGOCrm*
+  const message = `🏠 *New Lead Alert — Master Real Estate Matrix*
 
 👤 *Name:* ${lead.name}
 📱 *Phone:* ${lead.phone}
@@ -89,7 +89,7 @@ export async function sendLeadAlert(agentId: string, agentPhone: string, lead: {
 💰 *Budget:* ${lead.budget}
 📌 *Source:* ${lead.source}
 
-_Log in to PropGOCrm to take action: https://app.propgocrm.com_`
+_Log in to Master Real Estate Matrix to take action: https://app.propgocrm.com_`
 
   try {
     await client.sendMessage(chatId, message)

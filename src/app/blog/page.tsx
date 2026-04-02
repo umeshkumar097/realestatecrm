@@ -12,7 +12,7 @@ export default function BlogPage() {
   return (
     <InnerPageLayout 
       badge="Resources"
-      title="PropCRM Blog"
+      title="Master Matrix Registry Blog"
       subtitle="Insights, updates, and tips for the modern real estate agency."
     >
       <div className="space-y-8">

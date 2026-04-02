@@ -13,7 +13,7 @@ export default function RefundPage() {
                 <div className="space-y-10 text-lg font-medium text-zinc-600 leading-relaxed">
                     <section className="space-y-4">
                         <h2 className="text-2xl font-black text-zinc-900 tracking-tight">1. Service Commitment</h2>
-                        <p>PropGoCRM provides high-performance SaaS solutions. We offer a 14-day free trial to ensure the platform meets your agency's needs before billing begins.</p>
+                        <p>The Master Real Estate Matrix provides high-performance SaaS solutions. We offer a 14-day discovery phase to ensure the architecture meets your agency's needs before fiscal commitment begins.</p>
                     </section>
                     <section className="space-y-4">
                         <h2 className="text-2xl font-black text-zinc-900 tracking-tight">2. Subscription Refunds</h2>

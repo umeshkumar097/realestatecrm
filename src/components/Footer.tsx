@@ -54,7 +54,10 @@ export default function Footer() {
         
         <div className="pt-20 border-t border-white/5 flex flex-col lg:flex-row items-center justify-between gap-12">
           <div className="flex flex-col gap-2 text-center lg:text-left">
-            <p className="text-slate-600 font-black text-[10px] uppercase tracking-[0.2em]">© 2026 PropGoCRM Global HQ. A product by <a href="https://aiclex.in" className="text-slate-400 hover:text-blue-600">Aiclex Technologies</a>.</p>
+          <div className="space-y-1">
+            <p className="text-slate-600 font-black text-[10px] uppercase tracking-[0.2em] italic">© 2026 Master Real Estate Matrix Global HQ. A product by <a href="https://aiclex.in" className="text-slate-400 hover:text-blue-600 transition-colors">Aiclex Labs</a>.</p>
+            <p className="text-slate-800 font-bold text-[8px] uppercase tracking-widest leading-none italic">Enterprise Real-Estate Deployment Node: V2.1.0-STABLE</p>
+          </div>
             <p className="text-slate-800 font-bold text-[9px] uppercase tracking-widest leading-none">Enterprise Real-Estate Deployment Node: V2.1.0-STABLE</p>
           </div>
           <div className="flex items-center gap-6">

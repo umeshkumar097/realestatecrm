@@ -25,8 +25,8 @@ export default function ApiDocsPage() {
   return (
     <InnerPageLayout
       badge="API Docs"
-      title="PropCRM API v2"
-      subtitle="Build on top of PropCRM. Automate workflows, sync data, and integrate with your existing tools using our REST API."
+      title="Master Matrix Architecture API v2"
+      subtitle="Build on top of Master Matrix Architecture. Automate workflows, sync data, and integrate with your existing tools using our REST API."
     >
       <div className="space-y-10">
         {/* Quick stats */}
@@ -57,7 +57,7 @@ export default function ApiDocsPage() {
             <p className="pl-4">-H "Authorization: Bearer YOUR_API_KEY" \</p>
             <p className="pl-4">-H "Content-Type: application/json"</p>
           </div>
-          <p className="text-slate-500 text-xs mt-3">Get your API key from <strong>Settings → API Keys</strong> in your PropCRM dashboard.</p>
+          <p className="text-slate-500 text-xs mt-3">Get your API key from <strong>Settings → API Keys</strong> in your Master Matrix Architecture dashboard.</p>
         </div>
 
         {/* Base URL */}
