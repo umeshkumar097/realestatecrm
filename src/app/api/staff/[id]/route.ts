@@ -31,15 +31,38 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
         }
 
         const agencyName = member.agency?.name || "Your Agency";
+        const email = member.email || "";
+        const name = member.name || "Agent";
 
-        // 3. Delete member
-        await prisma.user.delete({
-            where: { id }
-        });
+        // 3. Professional Offboarding: Unassign leads/tickets and clear tasks first
+        await prisma.$transaction([
+            // a. Unassign all Leads (protecting the client data)
+            prisma.lead.updateMany({
+                where: { assignedToId: id, agencyId },
+                data: { assignedToId: null }
+            }),
+            // b. Unassign all Tickets
+            prisma.ticket.updateMany({
+                where: { assignedToId: id, agencyId },
+                data: { assignedToId: null }
+            }),
+            // c. Delete all Tasks assigned to this person
+            prisma.task.deleteMany({
+                where: { assignedToId: id, agencyId }
+            }),
+            // d. Delete all Activity logs for this person
+            prisma.activity.deleteMany({
+                where: { userId: id, agencyId }
+            }),
+            // e. Finally delete the User account itself
+            prisma.user.delete({
+                where: { id }
+            })
+        ]);
 
         // 4. Notify Admin
         if (adminEmail) {
-            await sendMemberUpdateNotification(adminEmail, { name: member.name || "Agent", email: member.email || "" }, "DELETED", agencyName);
+            await sendMemberUpdateNotification(adminEmail, { name, email }, "DELETED", agencyName);
         }
 
         return NextResponse.json({ success: true, message: "Member successfully offboarded" });
