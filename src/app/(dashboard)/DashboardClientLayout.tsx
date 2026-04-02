@@ -93,7 +93,7 @@ export default function DashboardClientLayout({
           </span>
         </div>
 
-        <div className="flex-1 py-6 px-4 space-y-1">
+        <div className="flex-1 py-10 px-6 space-y-1.5 overflow-y-auto">
           {navigation.map((item: any) => {
             const userRole = (session?.user as any)?.role
             
@@ -110,13 +110,13 @@ export default function DashboardClientLayout({
                 key={item.name}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all group",
+                  "flex items-center gap-4 px-4 py-3 rounded-[14px] text-[10px] font-black uppercase tracking-[0.2em] transition-all group",
                   isActive 
-                    ? "bg-primary text-white shadow-md shadow-primary/10" 
-                    : "text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100"
+                    ? "bg-slate-900 text-white shadow-[0_12px_24px_rgba(0,0,0,0.1)] border border-white/10" 
+                    : "text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900"
                 )}
               >
-                <item.icon className={cn("h-5 w-5", isActive ? "text-white" : "text-zinc-400 group-hover:text-zinc-600")} />
+                <item.icon className={cn("h-4 w-4 transition-transform group-hover:scale-110", isActive ? "text-blue-500" : "text-zinc-400 group-hover:text-zinc-600")} />
                 {item.name}
               </Link>
             )
@@ -125,50 +125,38 @@ export default function DashboardClientLayout({
 
         {/* Developer Section */}
         {((session?.user as any)?.role === 'ADMIN' || (session?.user as any)?.role === 'AGENCY_OWNER') && (
-          <div className="px-4 py-2 mt-auto">
-            <p className="px-3 mb-2 text-[10px] font-black uppercase tracking-widest text-zinc-400">Developer Suite</p>
-            <div className="space-y-1">
+          <div className="px-6 py-4 mt-auto border-t border-zinc-100 dark:border-zinc-800">
+            <p className="px-4 mb-4 text-[9px] font-black uppercase tracking-[0.3em] text-zinc-400 italic">Core Architect Suite</p>
+            <div className="space-y-1.5">
               <Link
                 href="/dashboard/developer/api"
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all group",
+                  "flex items-center gap-4 px-4 py-3 rounded-[12px] text-[9px] font-black uppercase tracking-[0.2em] transition-all group",
                   pathname === '/dashboard/developer/api' 
-                    ? "bg-zinc-900 text-white shadow-md shadow-zinc-900/10" 
-                    : "text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100"
+                    ? "bg-zinc-900 text-blue-500 shadow-xl" 
+                    : "text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-zinc-900"
                 )}
               >
-                <Code className={cn("h-4 w-4", pathname === '/dashboard/developer/api' ? "text-white" : "text-zinc-400 group-hover:text-zinc-600")} />
-                API Settings
+                <Code className={cn("h-3.5 w-3.5", pathname === '/dashboard/developer/api' ? "text-blue-500" : "text-zinc-400")} />
+                API Infrastructure
               </Link>
               <Link
                 href="/dashboard/developer/webhooks"
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all group",
+                  "flex items-center gap-4 px-4 py-3 rounded-[12px] text-[9px] font-black uppercase tracking-[0.2em] transition-all group",
                   pathname === '/dashboard/developer/webhooks' 
-                    ? "bg-zinc-900 text-white shadow-md shadow-zinc-900/10" 
-                    : "text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100"
+                    ? "bg-zinc-900 text-blue-500 shadow-xl" 
+                    : "text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-zinc-900"
                 )}
               >
-                <Zap className={cn("h-4 w-4", pathname === '/dashboard/developer/webhooks' ? "text-white" : "text-zinc-400 group-hover:text-zinc-600")} />
-                Webhooks
-              </Link>
-              <Link
-                href="/dashboard/developer/docs"
-                className={cn(
-                  "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-all group",
-                  pathname === '/dashboard/developer/docs' 
-                    ? "bg-zinc-900 text-white shadow-md shadow-zinc-900/10" 
-                    : "text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100"
-                )}
-              >
-                <BookOpen className={cn("h-4 w-4", pathname === '/dashboard/developer/docs' ? "text-white" : "text-zinc-400 group-hover:text-zinc-600")} />
-                API Documentation
+                <Zap className={cn("h-3.5 w-3.5", pathname === '/dashboard/developer/webhooks' ? "text-blue-500" : "text-zinc-400")} />
+                Live Webhooks
               </Link>
             </div>
           </div>
         )}
 
-        <div className="p-4 border-t border-zinc-100 dark:border-zinc-800">
+        <div className="p-6 border-t border-zinc-100 dark:border-zinc-800">
           <button
             onClick={async () => {
               // Force logout fallback if signOut hangs after 2s
@@ -179,10 +167,10 @@ export default function DashboardClientLayout({
               await signOut({ redirect: true, callbackUrl: "/" })
               clearTimeout(timeout)
             }}
-            className="flex w-full items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all"
+            className="flex w-full items-center gap-4 px-4 py-3 rounded-[14px] text-[10px] font-black uppercase tracking-[0.2em] text-red-500 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all border border-transparent hover:border-red-100"
           >
-            <LogOut className="h-5 w-5" />
-            Logout
+            <LogOut className="h-4 w-4" />
+            Logout Engine
           </button>
         </div>
       </div>
@@ -190,33 +178,40 @@ export default function DashboardClientLayout({
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="h-16 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-8 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="text-right hidden lg:block mr-4">
-                <p className="text-xs font-black text-zinc-400 uppercase tracking-widest leading-none">
-                    {time.toLocaleDateString('en-IN', { weekday: 'short', day: '2-digit', month: 'short' })}
+        <header className="h-20 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-10 flex items-center justify-between shadow-sm relative z-10">
+          <div className="flex items-center gap-8">
+            <div className="text-right hidden xl:block border-r border-zinc-100 pr-8">
+                <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.2em] leading-none mb-1.5">
+                    {time.toLocaleDateString('en-IN', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' })}
                 </p>
-                <p className="text-sm font-black text-zinc-800 tabular-nums">
+                <p className="text-sm font-black text-zinc-800 tabular-nums tracking-tight">
                     {time.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}
                 </p>
             </div>
 
-            <button 
-                onClick={handleQuickAdd}
-                className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm font-bold shadow-md shadow-primary/10 hover:opacity-90 active:scale-95 transition-all"
-            >
-                <Plus className="h-4 w-4" />
-                Quick Add
-            </button>
-            <div className="flex items-center gap-3 pl-4 border-l border-zinc-200 dark:border-zinc-800">
-                <div className="text-right hidden sm:block">
-                    <p className="text-sm font-bold">{session?.user?.name || "Member"}</p>
-                    <p className="text-xs text-zinc-500 uppercase font-black tracking-widest">{(session?.user as any)?.role || "Agent"}</p>
+            <div className="flex items-center gap-4">
+                <div className="flex items-center gap-3 px-5 py-2.5 bg-emerald-500/5 border border-emerald-500/10 rounded-full shadow-sm">
+                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)] animate-pulse" />
+                   <span className="text-emerald-600 font-black text-[9px] uppercase tracking-[0.3em] italic">Calyx Sync: Live</span>
                 </div>
-                <div className="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center font-bold text-zinc-600">
-                    {session?.user?.name?.charAt(0) || "U"}
-                </div>
+                <button 
+                    onClick={handleQuickAdd}
+                    className="flex items-center gap-2 px-6 py-2.5 bg-slate-900 text-white rounded-full text-[10px] font-black uppercase tracking-[0.2em] shadow-xl shadow-slate-900/20 hover:bg-blue-600 active:scale-95 transition-all"
+                >
+                    <Plus className="h-3.5 w-3.5" />
+                    Rapid Deployment
+                </button>
             </div>
+          </div>
+
+          <div className="flex items-center gap-5">
+              <div className="text-right hidden sm:block">
+                  <p className="text-xs font-black text-slate-900 uppercase tracking-tight">{session?.user?.name || "Member"}</p>
+                  <p className="text-[9px] text-zinc-400 uppercase font-bold tracking-[0.3em] leading-tight">{(session?.user as any)?.role || "Agent"}</p>
+              </div>
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-slate-700 to-slate-900 border border-white/10 flex items-center justify-center font-black text-white shadow-xl">
+                  {session?.user?.name?.charAt(0) || "U"}
+              </div>
           </div>
         </header>
 
