@@ -15,34 +15,19 @@ export default function WhatsAppWebPage() {
   const [qr, setQr] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [connectingAt, setConnectingAt] = useState<number | null>(null)
 
   const fetchStatus = useCallback(async () => {
     try {
-      const res = await fetch("/api/whatsapp")
+      const res = await fetch("/api/whatsapp", { cache: "no-store" })
       const data = await res.json()
       const normalizedStatus = data.status?.toLowerCase() as Status
       
-      // UI State Locking: If we are within the 30s grace period, 
-      // do NOT let the UI switch back to 'disconnected' status.
-      const gracePeriod = 30000 // Increased from previous to 30s for stability
-      const isWithinGrace = connectingAt && (Date.now() - connectingAt) < gracePeriod
-
-      if ((status === "connecting" || isWithinGrace) && normalizedStatus === "disconnected" && !data.qr) {
-          // Keep showing 'connecting' even if server says 'disconnected'
-          setStatus("connecting")
-          return;
-      }
-      
-      // Usual update logic
-      if (normalizedStatus === "connected") {
-          setError(null)
-          setConnectingAt(null)
-      }
+      // Pure status sync: No buffering, no grace periods
       setStatus(normalizedStatus || "disconnected")
       setQr(data.qr ?? null)
+      if (normalizedStatus === "connected") setError(null)
     } catch (err) { console.error("Poll Error", err) }
-  }, [status, connectingAt])
+  }, [])
 
   useEffect(() => {
     fetchStatus()
@@ -53,7 +38,6 @@ export default function WhatsAppWebPage() {
   const handleConnect = async (force: boolean = false) => {
     setLoading(true)
     setError(null)
-    setConnectingAt(Date.now())
     setStatus("connecting") // Set state IMMEDIATELY
     
     await fetch("/api/whatsapp", {
@@ -71,7 +55,6 @@ export default function WhatsAppWebPage() {
     // Immediate state reset for instant feedback
     setStatus("disconnected")
     setQr(null)
-    setConnectingAt(null)
 
     try {
       const res = await fetch("/api/whatsapp", { 

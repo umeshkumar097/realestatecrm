@@ -14,12 +14,18 @@ export async function GET(req: NextRequest) {
   try {
     const response = await fetch(`${BRIDGE_URL}/status/${userId}`, {
       headers: {
-        "x-bridge-secret": BRIDGE_SECRET
-      }
+        "x-bridge-secret": BRIDGE_SECRET,
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0"
+      },
+      cache: "no-store"
     });
 
     const data = await response.json();
-    return NextResponse.json(data);
+    const res = NextResponse.json(data);
+    res.headers.set("Cache-Control", "no-cache, no-store, must-revalidate");
+    return res;
   } catch (error: any) {
     console.error("WhatsApp status check failed:", error);
     return NextResponse.json({ 
@@ -54,13 +60,17 @@ export async function POST(req: NextRequest) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-bridge-secret": BRIDGE_SECRET
+        "x-bridge-secret": BRIDGE_SECRET,
+        "Cache-Control": "no-cache"
       },
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
+      cache: "no-store"
     });
 
     const data = await response.json();
-    return NextResponse.json(data);
+    const res = NextResponse.json(data);
+    res.headers.set("Cache-Control", "no-cache, no-store, must-revalidate");
+    return res;
   } catch (error: any) {
     console.error(`WhatsApp ${action} failure:`, error);
     return NextResponse.json({ error: error.message }, { status: 500 });
