@@ -15,8 +15,16 @@ export default function WhatsAppWebPage() {
   const [qr, setQr] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [forcedOfflineUntil, setForcedOfflineUntil] = useState<number>(0)
 
   const fetchStatus = useCallback(async () => {
+    // LOCKDOWN logic: If we are in a forced reset, ignore whatever the server says
+    if (Date.now() < forcedOfflineUntil) {
+      setStatus("disconnected")
+      setQr(null)
+      return
+    }
+
     try {
       const res = await fetch("/api/whatsapp", { cache: "no-store" })
       const data = await res.json()
@@ -30,7 +38,7 @@ export default function WhatsAppWebPage() {
       console.error("Poll Error", err)
       setStatus("disconnected") // Fallback to disconnected on network failure
     }
-  }, [])
+  }, [forcedOfflineUntil])
 
   useEffect(() => {
     fetchStatus()
@@ -77,20 +85,25 @@ export default function WhatsAppWebPage() {
   }
 
   const handleReset = async () => {
-    if (!confirm("EMERGENCY RESET: This will physically restart your connection on the server. Continue?")) return
+    if (!confirm("NUCLEAR RESET: This will FORCE your connection to stay OFFLINE for 60 seconds to wipe all zombie sessions from the server. Continue?")) return
+    
     setLoading(true)
-    setStatus("disconnected")
+    setError(null)
     setQr(null)
+    setStatus("disconnected")
+    
+    // Nuclear Lockdown: 60 seconds
+    setForcedOfflineUntil(Date.now() + 60000)
 
     try {
       await fetch("/api/whatsapp", { 
         method: "POST", 
         body: JSON.stringify({ action: "reset" }) 
       })
-      alert("Bridge Reset Complete. Please wait a few seconds and then refresh to scan again.")
+      alert("Nuclear Reset Initiated. Please wait for the 60-second cleanup to finish, then a new QR will appear.")
     } catch (err: any) {
       console.error("Reset error", err)
-      setError("Failed to reset bridge. Please contact support.")
+      setError("Failed to rest bridge. System will still stay locked for 60s for safety.")
     } finally {
       setLoading(false)
     }
