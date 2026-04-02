@@ -49,9 +49,9 @@ export async function POST(req: NextRequest) {
     if (action === "connect") {
       endpoint = "/connect";
       body = { agentId: userId, agencyId, force };
-    } else if (action === "disconnect") {
+    } else if (action === "disconnect" || action === "reset") {
       endpoint = "/disconnect";
-      body = { agentId: userId };
+      body = { agentId: userId, force: action === "reset" };
     } else {
       return NextResponse.json({ error: "Unknown action" }, { status: 400 });
     }

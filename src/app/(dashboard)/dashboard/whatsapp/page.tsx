@@ -26,7 +26,10 @@ export default function WhatsAppWebPage() {
       setStatus(normalizedStatus || "disconnected")
       setQr(data.qr ?? null)
       if (normalizedStatus === "connected") setError(null)
-    } catch (err) { console.error("Poll Error", err) }
+    } catch (err) { 
+      console.error("Poll Error", err)
+      setStatus("disconnected") // Fallback to disconnected on network failure
+    }
   }, [])
 
   useEffect(() => {
@@ -73,6 +76,26 @@ export default function WhatsAppWebPage() {
     }
   }
 
+  const handleReset = async () => {
+    if (!confirm("EMERGENCY RESET: This will physically restart your connection on the server. Continue?")) return
+    setLoading(true)
+    setStatus("disconnected")
+    setQr(null)
+
+    try {
+      await fetch("/api/whatsapp", { 
+        method: "POST", 
+        body: JSON.stringify({ action: "reset" }) 
+      })
+      alert("Bridge Reset Complete. Please wait a few seconds and then refresh to scan again.")
+    } catch (err: any) {
+      console.error("Reset error", err)
+      setError("Failed to reset bridge. Please contact support.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="max-w-4xl mx-auto space-y-10 pb-20 p-6 animate-in fade-in duration-700">
       <div className="flex items-center justify-between">
@@ -98,11 +121,16 @@ export default function WhatsAppWebPage() {
                     </p>
                 </div>
             </div>
-            {status === "connected" && (
-                <button onClick={handleDisconnect} className="p-4 bg-white border border-red-100 text-red-500 rounded-2xl hover:bg-red-50 transition-all flex items-center gap-2 text-xs font-black uppercase tracking-widest">
-                    <XCircle size={16} /> Logout
+            <div className="flex items-center gap-3">
+                {status === "connected" && (
+                    <button onClick={handleDisconnect} className="p-4 bg-white border border-red-100 text-red-500 rounded-2xl hover:bg-red-50 transition-all flex items-center gap-2 text-xs font-black uppercase tracking-widest leading-none">
+                        <XCircle size={16} /> Logout
+                    </button>
+                )}
+                <button onClick={handleReset} className="p-4 bg-zinc-900 text-white rounded-2xl hover:bg-black transition-all flex items-center gap-2 text-[10px] font-black uppercase tracking-widest leading-none shadow-xl shadow-zinc-900/20">
+                    <RefreshCw size={14} className={loading && status === "disconnected" ? "animate-spin" : ""} /> Force Reset Bridge
                 </button>
-            )}
+            </div>
         </div>
 
         <div className="flex-1 flex flex-col items-center justify-center p-12 text-center">
