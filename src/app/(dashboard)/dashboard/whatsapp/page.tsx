@@ -1,191 +1,238 @@
 "use client"
+
 import { useState, useEffect, useCallback } from "react"
 import Link from "next/link"
-import { 
-  MessageSquare, CheckCircle2, XCircle, RefreshCw,
-  Smartphone, WifiOff, Shield, ArrowLeft,
-  Globe, Loader2 
-} from "lucide-react"
-import { useSession } from "next-auth/react"
+import { ArrowLeft, Globe, WifiOff, XCircle, RefreshCw, QrCode, ShieldCheck, Zap } from "lucide-react"
 
-type Status = "disconnected" | "connecting" | "connected"
+/**
+ * WHATSAPP "CLEAN SLATE" DASHBOARD (Phase 18)
+ * 100% Stateless - High Performance - World Class UI
+ */
+
+type ConnectionStatus = "disconnected" | "connecting" | "connected" | "resetting"
 
 export default function WhatsAppWebPage() {
-  const [status, setStatus] = useState<Status>("disconnected")
+  const [status, setStatus] = useState<ConnectionStatus>("disconnected")
   const [qr, setQr] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [forcedOfflineUntil, setForcedOfflineUntil] = useState<number>(0)
+  const [lockdown, setLockdown] = useState<number>(0)
 
-  const fetchStatus = useCallback(async () => {
-    // LOCKDOWN logic: If we are in a forced reset, ignore whatever the server says
-    if (Date.now() < forcedOfflineUntil) {
-      setStatus("disconnected")
+  // 1. PURE SYNC ENGINE: Fetches the absolute truth from the server
+  const syncStatus = useCallback(async () => {
+    // If we are in 'lockdown' (Nuclear Reset), don't even ask the server
+    if (Date.now() < lockdown) {
+      setStatus("resetting")
       setQr(null)
       return
     }
 
     try {
-      const res = await fetch("/api/whatsapp", { cache: "no-store" })
+      const res = await fetch("/api/whatsapp", { cache: "no-store", headers: { 'Pragma': 'no-cache' } })
       const data = await res.json()
-      const normalizedStatus = data.status?.toLowerCase() as Status
-      
-      // Pure status sync: No buffering, no grace periods
-      setStatus(normalizedStatus || "disconnected")
+      const serverStatus = data.status?.toLowerCase() as ConnectionStatus
+
+      // Sync logic: Pure reflection of server data
+      setStatus(serverStatus || "disconnected")
       setQr(data.qr ?? null)
-      if (normalizedStatus === "connected") setError(null)
-    } catch (err) { 
-      console.error("Poll Error", err)
-      setStatus("disconnected") // Fallback to disconnected on network failure
+      if (serverStatus === "connected") setError(null)
+    } catch (err) {
+      console.error("[WA Sync] Failure:", err)
+      setStatus("disconnected")
     }
-  }, [forcedOfflineUntil])
+  }, [lockdown])
 
+  // 2. High-Performance Poller
   useEffect(() => {
-    fetchStatus()
-    const interval = setInterval(fetchStatus, 3000) // Slightly slower poll (3s)
+    syncStatus()
+    const interval = setInterval(syncStatus, status === "connected" ? 10000 : 3000)
     return () => clearInterval(interval)
-  }, [fetchStatus])
+  }, [syncStatus, status])
 
-  const handleConnect = async (force: boolean = false) => {
+  // 3. NUCLEAR RESET ACTION: Physically kills ghost sessions
+  const handleReset = async () => {
+    if (!confirm("NUCLEAR RESET: This will FORCE your connection to stay OFFLINE for 60 seconds to wipe all zombie sessions. Continue?")) return
+    
     setLoading(true)
-    setError(null)
-    setStatus("connecting") // Set state IMMEDIATELY
-    
-    await fetch("/api/whatsapp", {
-      method: "POST",
-      body: JSON.stringify({ action: "connect", force }),
-    })
-    
-    setLoading(false)
-  }
-
-  const handleDisconnect = async () => {
-    if (!confirm("Are you sure you want to log out and stop synchronization?")) return
-    setLoading(true)
-    
-    // Immediate state reset for instant feedback
-    setStatus("disconnected")
+    setLockdown(Date.now() + 60000)
+    setStatus("resetting")
     setQr(null)
 
     try {
       const res = await fetch("/api/whatsapp", { 
         method: "POST", 
-        body: JSON.stringify({ action: "disconnect" }) 
+        body: JSON.stringify({ action: "reset" }) 
       })
-      
-      if (!res.ok) throw new Error("Server failed to disconnect session")
-      
-      console.log("WhatsApp disconnected successfully")
+      const data = await res.json()
+      if (data.error) throw new Error(data.error)
     } catch (err: any) {
-      console.error("Disconnect error", err)
-      setError("Failed to fully disconnect server session. Please try again.")
+      console.error("[WA Reset] Failure:", err.message)
+      setError("Reset initiated, but bridge communication failed. Cooldown remains active for safety.")
     } finally {
       setLoading(false)
     }
   }
 
-  const handleReset = async () => {
-    if (!confirm("NUCLEAR RESET: This will FORCE your connection to stay OFFLINE for 60 seconds to wipe all zombie sessions from the server. Continue?")) return
-    
+  // 4. ACTION: Disconnect (Soft)
+  const handleDisconnect = async () => {
     setLoading(true)
-    setError(null)
-    setQr(null)
     setStatus("disconnected")
-    
-    // Nuclear Lockdown: 60 seconds
-    setForcedOfflineUntil(Date.now() + 60000)
+    setQr(null)
 
     try {
-      await fetch("/api/whatsapp", { 
-        method: "POST", 
-        body: JSON.stringify({ action: "reset" }) 
-      })
-      alert("Nuclear Reset Initiated. Please wait for the 60-second cleanup to finish, then a new QR will appear.")
+      await fetch("/api/whatsapp", { method: "POST", body: JSON.stringify({ action: "disconnect" }) })
+      syncStatus()
     } catch (err: any) {
-      console.error("Reset error", err)
-      setError("Failed to rest bridge. System will still stay locked for 60s for safety.")
+      setError("Disconnect failed. Use Force Reset if necessary.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleConnect = async (force: boolean = false) => {
+    setLoading(true)
+    setError(null)
+    setStatus("connecting")
+    
+    try {
+      const res = await fetch("/api/whatsapp", {
+        method: "POST",
+        body: JSON.stringify({ action: "connect", force })
+      })
+      const data = await res.json()
+      if (data.error) throw new Error(data.error)
+      syncStatus()
+    } catch (err: any) {
+      setError(err.message || "Failed to initialize bridge.")
+      setStatus("disconnected")
     } finally {
       setLoading(false)
     }
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-10 pb-20 p-6 animate-in fade-in duration-700">
+    <div className="max-w-4xl mx-auto space-y-10 pb-20 p-6 animate-in fade-in slide-in-from-bottom-5 duration-1000">
+      {/* Header Section */}
       <div className="flex items-center justify-between">
         <div className="space-y-1">
-            <Link href="/dashboard" className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-primary transition-colors">
-                <ArrowLeft size={12} /> Dashboard
+            <Link href="/dashboard" className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-zinc-400 hover:text-zinc-900 transition-all group">
+                <ArrowLeft size={12} className="group-hover:-translate-x-1 transition-transform" /> Dashboard
             </Link>
-            <h1 className="text-4xl font-black text-slate-900 tracking-tighter">WhatsApp Integration</h1>
-            <p className="text-zinc-500 font-medium">Stateless VPS Bridge (Root Port 80)</p>
+            <h1 className="text-5xl font-black text-slate-900 tracking-tighter">WhatsApp <span className="text-emerald-500">Sync</span></h1>
+            <p className="text-zinc-500 font-medium flex items-center gap-2">
+                <ShieldCheck size={14} className="text-emerald-500" /> Secure VPS Bridge (Stateless Mode)
+            </p>
         </div>
       </div>
 
-      <div className="bg-white border border-slate-200 rounded-[48px] shadow-sm overflow-hidden flex flex-col min-h-[500px]">
-        <div className={`p-8 flex items-center justify-between border-b ${status === "connected" ? "bg-emerald-50/50" : "bg-white"}`}>
-            <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${status === "connected" ? "bg-emerald-500 text-white shadow-xl shadow-emerald-500/20" : status === "connecting" ? "bg-amber-500 text-white animate-pulse" : "bg-zinc-100 text-zinc-400"}`}>
-                    {status === "connected" ? <Globe /> : status === "connecting" ? <RefreshCw className="animate-spin" /> : <WifiOff />}
+      <div className="bg-white border border-slate-100 rounded-[56px] shadow-2xl shadow-slate-200/50 overflow-hidden flex flex-col min-h-[600px] relative overflow-hidden">
+        {/* Status Hub Bar */}
+        <div className={`p-10 flex items-center justify-between border-b transition-colors duration-1000 ${status === "connected" ? "bg-emerald-50/40" : "bg-white"}`}>
+            <div className="flex items-center gap-6">
+                <div className={`w-16 h-16 rounded-[24px] flex items-center justify-center transition-all duration-700 ${status === "connected" ? "bg-emerald-500 text-white shadow-[0_20px_50px_rgba(16,185,129,0.3)]" : status === "connecting" || status === "resetting" ? "bg-amber-500 text-white animate-pulse" : "bg-zinc-100 text-zinc-300"}`}>
+                    {status === "connected" ? <Globe size={28} /> : status === "resetting" ? <Zap size={28} /> : status === "connecting" ? <RefreshCw size={28} className="animate-spin" /> : <WifiOff size={28} />}
                 </div>
-                <div>
-                    <p className="font-black text-slate-800 uppercase tracking-widest text-[10px]">Sync Status</p>
-                    <p className={`text-lg font-black uppercase tracking-tighter ${status === "connected" ? "text-emerald-600" : "text-zinc-400"}`}>
-                        {status === "connected" ? "LIVE & SYNCED" : status === "connecting" ? "WAITING FOR SCAN" : "OFFLINE"}
-                    </p>
+                <div className="space-y-0.5">
+                    <p className="font-bold text-slate-400 uppercase tracking-[0.2em] text-[10px]">Real-Time Signal</p>
+                    <div className="flex items-center gap-2">
+                        <div className={`w-2 h-2 rounded-full animate-ping ${status === "connected" ? "bg-emerald-500" : status === "resetting" ? "bg-amber-500" : "bg-zinc-300"}`} />
+                        <p className={`text-2xl font-black uppercase tracking-tighter ${status === "connected" ? "text-emerald-600" : status === "resetting" ? "text-amber-600" : "text-zinc-400"}`}>
+                            {status === "connected" ? "Live & Synced" : status === "resetting" ? "Nuclear Resetting..." : status === "connecting" ? "Establishing..." : "Offline"}
+                        </p>
+                    </div>
                 </div>
             </div>
-            <div className="flex items-center gap-3">
+
+            <div className="flex items-center gap-4">
                 {status === "connected" && (
-                    <button onClick={handleDisconnect} className="p-4 bg-white border border-red-100 text-red-500 rounded-2xl hover:bg-red-50 transition-all flex items-center gap-2 text-xs font-black uppercase tracking-widest leading-none">
-                        <XCircle size={16} /> Logout
+                    <button onClick={handleDisconnect} disabled={loading} className="px-6 py-4 bg-white border border-red-100 text-red-500 rounded-2xl hover:bg-red-50 transition-all font-bold uppercase tracking-widest text-[10px] flex items-center gap-2 disabled:opacity-50">
+                        <XCircle size={14} /> Disconnect
                     </button>
                 )}
-                <button onClick={handleReset} className="p-4 bg-zinc-900 text-white rounded-2xl hover:bg-black transition-all flex items-center gap-2 text-[10px] font-black uppercase tracking-widest leading-none shadow-xl shadow-zinc-900/20">
-                    <RefreshCw size={14} className={loading && status === "disconnected" ? "animate-spin" : ""} /> Force Reset Bridge
+                <button onClick={handleReset} disabled={loading} className="px-6 py-4 bg-zinc-900 text-white rounded-2xl hover:scale-105 active:scale-95 transition-all font-bold uppercase tracking-widest text-[10px] flex items-center gap-2 shadow-2xl shadow-zinc-900/20 disabled:opacity-50 group">
+                    <RefreshCw size={14} className={loading || status === "resetting" ? "animate-spin" : "group-hover:rotate-180 transition-transform duration-500"} /> Force Reset Hub
                 </button>
             </div>
         </div>
 
-        <div className="flex-1 flex flex-col items-center justify-center p-12 text-center">
+        {/* Content Section */}
+        <div className="flex-1 flex flex-col items-center justify-center p-16 text-center space-y-8">
             {status === "connected" ? (
-                <div className="space-y-6">
-                    <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto ring-8 ring-emerald-50">
-                        <CheckCircle2 size={40} className="text-emerald-500" />
+                <div className="space-y-6 animate-in zoom-in duration-1000">
+                    <div className="w-32 h-32 bg-emerald-500 rounded-full flex items-center justify-center mx-auto shadow-2xl shadow-emerald-500/30">
+                        <ShieldCheck size={64} className="text-white" />
                     </div>
-                    <h2 className="text-2xl font-black text-slate-900 tracking-tight">Active Connectivity! 🚀</h2>
-                </div>
-            ) : status === "connecting" && qr ? (
-                <div className="space-y-8 animate-in zoom-in-95 duration-500">
                     <div className="space-y-2">
-                        <h2 className="text-2xl font-black text-slate-900 tracking-tighter">Scan to Authorize</h2>
-                        <p className="text-xs font-black text-zinc-400 uppercase tracking-widest">Open WhatsApp → Linked Devices → Scan</p>
+                        <h2 className="text-3xl font-black text-slate-900 tracking-tight">System Operational 🚀</h2>
+                        <p className="text-zinc-500 max-w-sm mx-auto font-medium">Your WhatsApp channel is now bridged to the CRM. Messages are being synced in real-time.</p>
                     </div>
-                    <div className="bg-white p-6 rounded-[40px] border-4 border-slate-900 shadow-2xl inline-block">
-                        <img src={qr} alt="QR" className="w-[280px] h-[280px]" />
+                </div>
+            ) : status === "resetting" ? (
+                <div className="space-y-8 max-w-md animate-in fade-in duration-500">
+                    <div className="relative">
+                        <RefreshCw size={80} className="text-amber-500 animate-spin mx-auto opacity-20" />
+                        <Zap size={40} className="text-amber-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
                     </div>
-                    <button onClick={() => handleConnect(true)} className="text-[10px] font-black uppercase underline text-zinc-400 hover:text-primary">Force Refresh QR</button>
+                    <div className="space-y-3">
+                        <h2 className="text-3xl font-black text-slate-900 tracking-tighter uppercase italic">Nuclear Reset In-Progress</h2>
+                        <p className="text-zinc-500 font-medium leading-relaxed">We are physically terminating all zombie sessions on the server. The hub will remain locked for 60 seconds to ensure a total memory wipe. 🧼</p>
+                    </div>
+                    <div className="w-full bg-zinc-100 h-2 rounded-full overflow-hidden">
+                        <div className="bg-amber-500 h-full animate-[progress_60s_linear]" />
+                    </div>
                 </div>
             ) : status === "connecting" ? (
-                <div className="space-y-6 flex flex-col items-center">
-                    <Loader2 size={48} className="animate-spin text-amber-500" />
-                    <div>
-                        <h2 className="text-xl font-black text-slate-800">Booting Bridge Cluster</h2>
-                        <p className="text-xs font-black text-zinc-400 uppercase tracking-widest">Standardizing Handshake...</p>
+                <div className="space-y-6">
+                    <QrCode size={80} className="text-amber-500 animate-pulse mx-auto" />
+                    <h2 className="text-2xl font-bold text-slate-900 tracking-tight italic">Negotiating with QR Engine...</h2>
+                </div>
+            ) : qr ? (
+                <div className="space-y-8 animate-in zoom-in-95 duration-700">
+                    <div className="bg-white p-10 rounded-[40px] shadow-2xl border-4 border-emerald-500 inline-block relative group">
+                        <img src={qr} alt="Scan QR" className="w-[300px] h-[300px]" />
+                        <div className="absolute inset-0 bg-white/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center p-8 backdrop-blur-sm">
+                            <p className="text-xs font-black uppercase tracking-[0.2em] text-slate-900">Scan to Link</p>
+                        </div>
                     </div>
-                    {error && <p className="p-3 bg-red-50 text-red-500 text-[10px] font-black uppercase rounded-xl">{error}</p>}
+                    <div className="space-y-3">
+                        <h2 className="text-2xl font-black text-slate-900 tracking-tight">Scan with WhatsApp</h2>
+                        <p className="text-zinc-500 font-medium text-sm">Open WhatsApp &gt; Settings &gt; Linked Devices &gt; Link a Device</p>
+                    </div>
                 </div>
             ) : (
                 <div className="space-y-8">
-                    <div className="w-20 h-20 bg-zinc-100 rounded-[32px] flex items-center justify-center mx-auto"><Smartphone size={32} className="text-zinc-300" /></div>
-                    <button 
-                        onClick={() => handleConnect(false)} 
-                        disabled={loading}
-                        className="px-12 py-5 bg-emerald-500 text-white rounded-3xl text-sm font-black uppercase tracking-widest shadow-xl shadow-emerald-500/20 hover:scale-[1.02] active:scale-95 transition-all"
-                    >
-                        {loading ? <Loader2 className="animate-spin" /> : "Connect Core Handset"}
-                    </button>
+                    <div className="w-32 h-32 bg-zinc-100 rounded-[32px] flex items-center justify-center mx-auto text-zinc-300">
+                        <QrCode size={64} />
+                    </div>
+                    <div className="space-y-6">
+                        <div className="space-y-2">
+                            <h2 className="text-3xl font-black text-slate-900 tracking-tighter">Ready to Bridged</h2>
+                            <p className="text-zinc-500 font-medium text-sm">Initialize your server node to start the WhatsApp bridge.</p>
+                        </div>
+                        <button onClick={() => handleConnect()} disabled={loading} className="px-12 py-5 bg-emerald-500 text-white rounded-[24px] font-black uppercase tracking-widest text-xs hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-emerald-500/20 disabled:opacity-50">
+                            Initialize Sync Hub
+                        </button>
+                    </div>
                 </div>
             )}
+
+            {error && (
+                <div className="mt-8 p-4 bg-red-50 text-red-600 rounded-2xl text-xs font-bold border border-red-100 animate-in shake duration-500">
+                    ⚠️ {error}
+                </div>
+            )}
+        </div>
+
+        {/* Footer info */}
+        <div className="p-8 bg-zinc-50/50 border-t flex items-center justify-center gap-8">
+            <div className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">End-to-End Encrypted</span>
+            </div>
+            <div className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest">24/7 VPS Uptime</span>
+            </div>
         </div>
       </div>
     </div>
