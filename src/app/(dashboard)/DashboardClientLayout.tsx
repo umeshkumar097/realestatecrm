@@ -170,7 +170,15 @@ export default function DashboardClientLayout({
 
         <div className="p-4 border-t border-zinc-100 dark:border-zinc-800">
           <button
-            onClick={() => signOut({ callbackUrl: '/' })}
+            onClick={async () => {
+              // Force logout fallback if signOut hangs after 2s
+              const timeout = setTimeout(() => {
+                window.location.href = "/login"
+              }, 2000)
+              
+              await signOut({ redirect: true, callbackUrl: "/" })
+              clearTimeout(timeout)
+            }}
             className="flex w-full items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10 transition-all"
           >
             <LogOut className="h-5 w-5" />

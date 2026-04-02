@@ -65,21 +65,26 @@ export default function WhatsAppWebPage() {
   }
 
   const handleDisconnect = async () => {
-    if (!confirm("Stop synchronization?")) return
+    if (!confirm("Are you sure you want to log out and stop synchronization?")) return
     setLoading(true)
     
-    // Immediate state reset to provide instant feedback
+    // Immediate state reset for instant feedback
     setStatus("disconnected")
     setQr(null)
     setConnectingAt(null)
 
     try {
-      await fetch("/api/whatsapp", { 
+      const res = await fetch("/api/whatsapp", { 
         method: "POST", 
         body: JSON.stringify({ action: "disconnect" }) 
       })
-    } catch (err) {
+      
+      if (!res.ok) throw new Error("Server failed to disconnect session")
+      
+      console.log("WhatsApp disconnected successfully")
+    } catch (err: any) {
       console.error("Disconnect error", err)
+      setError("Failed to fully disconnect server session. Please try again.")
     } finally {
       setLoading(false)
     }
