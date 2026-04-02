@@ -58,9 +58,37 @@ export async function DELETE(
       where.assignedToId = userId
     }
 
-    await prisma.lead.delete({ where })
+    // Deep Delete: Remove all dependent records first to avoid constraint errors
+    await prisma.$transaction([
+      // 1. Delete all installments related to the lead's EMIs
+      prisma.installment.deleteMany({
+        where: { emi: { leadId } }
+      }),
+      // 2. Delete all EMIs
+      prisma.eMI.deleteMany({
+        where: { leadId }
+      }),
+      // 3. Delete all WhatsApp Messages
+      prisma.message.deleteMany({
+        where: { leadId }
+      }),
+      // 4. Delete all Support Tickets
+      prisma.ticket.deleteMany({
+        where: { leadId }
+      }),
+      // 5. Delete all Activity logs
+      prisma.activity.deleteMany({
+        where: { leadId }
+      }),
+      // 6. Finally delete the lead itself
+      prisma.lead.delete({
+        where
+      })
+    ])
+
     return NextResponse.json({ success: true })
   } catch (error: any) {
+    console.error("[DELETE Lead Error]:", error)
     return NextResponse.json({ error: "Failed to delete lead or access denied" }, { status: 500 })
   }
 }

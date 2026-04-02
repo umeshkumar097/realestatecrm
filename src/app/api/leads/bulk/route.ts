@@ -64,14 +64,38 @@ export async function DELETE(req: NextRequest) {
   }
 
   try {
-    const result = await prisma.lead.deleteMany({
-      where: {
-        id: { in: ids },
-        agencyId
-      }
-    })
+    // Deep Bulk Delete: Remove all dependent records for all given IDs first
+    await prisma.$transaction([
+      // 1. Delete all installments related to the specific leads' EMIs
+      prisma.installment.deleteMany({
+        where: { emi: { leadId: { in: ids }, agencyId } }
+      }),
+      // 2. Delete all EMIs
+      prisma.eMI.deleteMany({
+        where: { leadId: { in: ids }, agencyId }
+      }),
+      // 3. Delete all WhatsApp Messages
+      prisma.message.deleteMany({
+        where: { leadId: { in: ids }, agencyId }
+      }),
+      // 4. Delete all Support Tickets
+      prisma.ticket.deleteMany({
+        where: { leadId: { in: ids }, agencyId }
+      }),
+      // 5. Delete all Activity logs
+      prisma.activity.deleteMany({
+        where: { leadId: { in: ids }, agencyId }
+      }),
+      // 6. Finally delete the leads themselves
+      prisma.lead.deleteMany({
+        where: {
+          id: { in: ids },
+          agencyId
+        }
+      })
+    ])
 
-    return NextResponse.json({ deleted: result.count })
+    return NextResponse.json({ deleted: ids.length })
   } catch (err: any) {
     console.error("[Bulk Delete Error]:", err)
     return NextResponse.json({ error: "Failed to delete clients" }, { status: 500 })
