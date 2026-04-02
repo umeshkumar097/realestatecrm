@@ -27,28 +27,28 @@ export default function Navbar() {
 
   return (
     <>
-      <header className={`fixed top-0 w-full z-50 transition-all duration-500 ${isScrolled ? "bg-white/80 backdrop-blur-xl shadow-sm border-b border-slate-100 py-3" : "bg-transparent py-6"}`}>
+      <header className={`fixed top-0 w-full z-50 transition-all duration-700 ${isScrolled ? "bg-white/70 backdrop-blur-3xl shadow-[0_8px_32px_rgba(0,0,0,0.04)] border-b border-white/20 py-4" : "bg-transparent py-8"}`}>
         <div className="container mx-auto px-6 lg:px-12 flex items-center justify-between">
-          <Link href="/">
+          <Link href="/" className="hover:scale-105 transition-transform active:scale-95">
             <Logo />
           </Link>
 
-          <nav className="hidden md:flex items-center gap-10">
+          <nav className="hidden md:flex items-center gap-12">
             {navLinks.map((link) => (
-              <Link key={link.name} href={link.href} className="text-sm font-bold tracking-tight text-slate-600 hover:text-blue-600 transition-colors relative group">
+              <Link key={link.name} href={link.href} className="text-[10px] font-black uppercase tracking-[0.25em] text-slate-500 hover:text-blue-600 transition-all relative group">
                 {link.name}
-                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-blue-600 transition-all group-hover:w-full" />
+                <span className="absolute -bottom-1.5 left-0 w-0 h-0.5 bg-blue-600 transition-all group-hover:w-full" />
               </Link>
             ))}
           </nav>
 
-          <div className="hidden md:flex items-center gap-6">
-            <Link href="/login" className="text-sm font-bold text-slate-600 hover:text-blue-600 transition-colors">Login</Link>
+          <div className="hidden md:flex items-center gap-8">
+            <Link href="/login" className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 hover:text-blue-600 transition-all">Login</Link>
             <button 
               onClick={() => setIsLeadModalOpen(true)}
-              className="group px-7 py-3 bg-slate-900 text-white rounded-2xl text-sm font-black tracking-tight shadow-xl shadow-slate-900/10 hover:bg-blue-600 hover:-translate-y-0.5 transition-all active:scale-95 flex items-center gap-2"
+              className="group px-8 py-3.5 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] shadow-2xl shadow-slate-900/20 hover:bg-blue-600 hover:scale-105 transition-all active:scale-95 flex items-center gap-3"
             >
-              Book Demo <ArrowRight className="h-4 w-4 group-hover:translate-x-0.5 transition-transform" />
+              Consult Demo <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
             </button>
           </div>
 

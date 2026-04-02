@@ -10,23 +10,34 @@ const interFont = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "RealEstateCRM AI | Best Property Management Software 2026",
-  description: "Scale your agency with the world's leading AI-powered Real Estate CRM. Automate leads, manage EMIs, and close deals faster with our secure, multi-tenant property management platform.",
-  keywords: ["Real Estate CRM", "AI Property Management", "Best CRM for Real Estate Agents", "Real Estate Automation", "Property Lead Management", "SaaS CRM India"],
+  title: "RealEstateCRM AI | #1 Global Property Management & Sales Hub 2026",
+  description: "Accelerate your agency with the world's most advanced AI-powered Real Estate CRM. Dominate markets in Dubai, London, NYC, and Mumbai with automated lead pipelines, global portal sync, and integrated WhatsApp CRM.",
+  keywords: [
+    "Real Estate CRM", 
+    "AI Property Management", 
+    "Best CRM for Real Estate Agents", 
+    "Dubai Real Estate CRM", 
+    "London Property Software", 
+    "Prop-Tech AI", 
+    "Real Estate Sales Automation", 
+    "Property Lead Management", 
+    "Global Real Estate Dashboard", 
+    "Enterprise Property CRM"
+  ],
   authors: [{ name: "Aiclex Technologies" }],
-  creator: "Umesh Kumar / Aiclex",
+  creator: "Aiclex - Global PropTech Elite",
   openGraph: {
-    title: "RealEstateCRM AI - Scaling Modern Real Estate Agencies",
-    description: "The all-in-one AI platform for property management, leads, and automated financial tracking.",
+    title: "RealEstateCRM AI - Global Hub for Modern Real Estate Dominance",
+    description: "The all-in-one AI platform for elite property management, lead acceleration, and global market sync.",
     url: "https://propgocrm.com",
-    siteName: "RealEstateCRM",
+    siteName: "PropGOCrm AI",
     locale: "en_IN",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "RealEstateCRM AI | Scale Your Agency",
-    description: "Automate your real estate business with the most advanced AI-powered CRM.",
+    title: "PropGOCrm AI | Dominate Your Local Market Globally",
+    description: "Automate your real estate powerhouse with the most advanced AI-powered CRM on the market.",
   },
   alternates: {
     canonical: "https://propgocrm.com",

@@ -25,38 +25,47 @@ export default function Footer() {
             </div>
           </div>
           
-          <div className="lg:col-span-7 grid grid-cols-2 lg:grid-cols-3 gap-12">
+            <div className="lg:col-span-7 grid grid-cols-2 lg:grid-cols-3 gap-16">
             <div>
-              <h4 className="text-white font-black text-xs uppercase tracking-[0.3em] mb-10">Product</h4>
+              <h4 className="text-white font-black text-[10px] uppercase tracking-[0.3em] mb-12 italic opacity-60">Architect</h4>
               <ul className="flex flex-col gap-6">
-                <li><Link href="/features" className="text-slate-500 hover:text-white font-bold transition-all">Features</Link></li>
-                <li><Link href="/#pricing" className="text-slate-500 hover:text-white font-bold transition-all">Pricing</Link></li>
+                <li><Link href="/features" className="text-slate-500 hover:text-blue-500 font-bold text-sm tracking-tight transition-all">Feature Dashboard</Link></li>
+                <li><Link href="/#pricing" className="text-slate-500 hover:text-blue-500 font-bold text-sm tracking-tight transition-all">Global Pricing</Link></li>
+                <li><Link href="/about" className="text-slate-500 hover:text-blue-500 font-bold text-sm tracking-tight transition-all">Our Vision</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="text-white font-black text-xs uppercase tracking-[0.3em] mb-10">Company</h4>
+              <h4 className="text-white font-black text-[10px] uppercase tracking-[0.3em] mb-12 italic opacity-60">Governance</h4>
               <ul className="flex flex-col gap-6">
-                <li><Link href="/about" className="text-slate-500 hover:text-white font-bold transition-all">About Us</Link></li>
-                <li><Link href="/contact" className="text-slate-500 hover:text-white font-bold transition-all">Contact Us</Link></li>
+                <li><Link href="/privacy" className="text-slate-500 hover:text-white font-bold text-sm tracking-tight transition-all">Data Residency</Link></li>
+                <li><Link href="/terms" className="text-slate-500 hover:text-white font-bold text-sm tracking-tight transition-all">Service Level Agreement</Link></li>
+                <li><Link href="/security" className="text-slate-500 hover:text-white font-bold text-sm tracking-tight transition-all">GDPR & ISO Compliance</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="text-white font-black text-xs uppercase tracking-[0.3em] mb-10">Legal</h4>
+              <h4 className="text-white font-black text-[10px] uppercase tracking-[0.3em] mb-12 italic opacity-60">Control</h4>
               <ul className="flex flex-col gap-6">
-                <li><Link href="/privacy" className="text-slate-500 hover:text-white font-bold transition-all">Privacy Policy</Link></li>
-                <li><Link href="/terms" className="text-slate-500 hover:text-white font-bold transition-all">Terms of Service</Link></li>
-                <li><Link href="/refund" className="text-slate-500 hover:text-white font-bold transition-all">Refund Policy</Link></li>
-                <li><Link href="/disclaimer" className="text-slate-500 hover:text-white font-bold transition-all">Disclaimer</Link></li>
+                <li><Link href="/contact" className="text-slate-500 hover:text-white font-bold text-sm tracking-tight transition-all">Enterprise Support</Link></li>
+                <li><Link href="/login" className="text-slate-500 hover:text-white font-bold text-sm tracking-tight transition-all">Global Node Login</Link></li>
               </ul>
             </div>
           </div>
         </div>
         
-        <div className="pt-16 border-t border-slate-900 flex flex-col md:flex-row items-center justify-between gap-10">
-          <p className="text-slate-600 font-bold text-sm">© 2026 PropGoCRM Global. Product by <a href="https://aiclex.in" className="text-slate-400 hover:text-blue-500">Aiclex Technologies</a>.</p>
-          <div className="flex items-center gap-2 px-6 py-3 bg-slate-900/50 rounded-full border border-slate-800">
-             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-             <span className="text-emerald-500 font-black text-[10px] uppercase tracking-widest">Global Ingress: Operational</span>
+        <div className="pt-20 border-t border-white/5 flex flex-col lg:flex-row items-center justify-between gap-12">
+          <div className="flex flex-col gap-2 text-center lg:text-left">
+            <p className="text-slate-600 font-black text-[10px] uppercase tracking-[0.2em]">© 2026 PropGoCRM Global HQ. A product by <a href="https://aiclex.in" className="text-slate-400 hover:text-blue-600">Aiclex Technologies</a>.</p>
+            <p className="text-slate-800 font-bold text-[9px] uppercase tracking-widest leading-none">Enterprise Real-Estate Deployment Node: V2.1.0-STABLE</p>
+          </div>
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-3 px-6 py-3 bg-white/5 rounded-full border border-white/10 shadow-2xl">
+               <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.8)] animate-pulse" />
+               <span className="text-emerald-500 font-black text-[10px] uppercase tracking-[0.3em]">Calyx Sync: Online</span>
+            </div>
+            <div className="flex items-center gap-3 px-6 py-3 bg-white/5 rounded-full border border-white/10 opacity-40">
+               <Shield size={12} className="text-slate-400" />
+               <span className="text-slate-400 font-black text-[10px] uppercase tracking-[0.3em]">AES-256 SSL Protocol</span>
+            </div>
           </div>
         </div>
       </div>
